@@ -13,7 +13,7 @@ import { launchEvent, on, run } from 'tns-core-modules/application';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { registerElements } from './src/dom/setup-registry';
-import GlimmerResolverDelegate from './src/glimmer/context';
+import GlimmerResolverDelegate, { Compilable } from './src/glimmer/context';
 import setupGlimmer from './src/glimmer/setup';
 // import { setPropertyDidChange } from '@glimmer/component';
 //Exports
@@ -88,13 +88,14 @@ export default class Application {
     // }
     static renderComponent(name, containerElement, nextSibling = null) {
         // const state = State(data);
-        const component = GlimmerResolverDelegate.lookupComponent(name).compilable.compile(Application.context);
+        let main = Compilable(`<${name} />`).compile(Application.context);
+        // const component = GlimmerResolverDelegate.lookupComponent(name).compilable.compile(Application.context);
         console.log('Main Created');
         const artifact = artifacts(Application.context);
         console.log('Artifacts Created');
         Application.aotRuntime = AotRuntime(Application.document, artifact, Application.resolver);
         const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
-        let iterator = renderAot(Application.aotRuntime, component, cursor);
+        let iterator = renderAot(Application.aotRuntime, main, cursor);
         console.log('Iterator Created');
         try {
             const result = renderSync(Application.aotRuntime.env, iterator);
