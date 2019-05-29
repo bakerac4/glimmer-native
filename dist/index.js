@@ -92,12 +92,12 @@ export default class Application {
         console.log('Main Created');
         const artifact = artifacts(Application.context);
         console.log('Artifacts Created');
-        const aotRuntime = AotRuntime(Application.document, artifact, Application.resolver);
+        Application.aotRuntime = AotRuntime(Application.document, artifact, Application.resolver);
         const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
-        let iterator = renderAot(aotRuntime, component, cursor);
+        let iterator = renderAot(Application.aotRuntime, component, cursor);
         console.log('Iterator Created');
         try {
-            const result = renderSync(aotRuntime.env, iterator);
+            const result = renderSync(Application.aotRuntime.env, iterator);
             console.log('Render Sync');
             Application.result = result;
             Application._rendered = true;
@@ -156,11 +156,10 @@ export default class Application {
     }
     _rerender() {
         return __awaiter(this, void 0, void 0, function* () {
-            let { aotRuntime } = this;
             try {
-                aotRuntime.env.begin();
+                Application.aotRuntime.env.begin();
                 yield Application.result.rerender();
-                aotRuntime.env.commit();
+                Application.aotRuntime.env.commit();
                 Application._rendered = true;
             }
             catch (error) {

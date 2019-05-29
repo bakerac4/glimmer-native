@@ -22,6 +22,7 @@ export default class Application {
     static resolver: any;
     static result: any;
     static _rendered: boolean;
+    static aotRuntime: any;
     constructor(rootName: string, resolverDelegate: any, resolver: any);
     static renderComponent(name: any, containerElement: any, nextSibling?: any): void;
     boot(): Promise<{}>;
