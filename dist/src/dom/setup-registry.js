@@ -2,8 +2,7 @@
 import { registerElement } from './element-registry';
 export function registerElements() {
     registerElement('head', () => null, {
-        insertChild(parentNode, childNode, atIndex) {
-        },
+        insertChild(parentNode, childNode, atIndex) { }
     });
     registerElement('Frame', () => require('tns-core-modules/ui/frame').Frame, {
         insertChild(parentNode, childNode, atIndex) {

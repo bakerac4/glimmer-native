@@ -2,6 +2,8 @@
 // import { createElement, logger as log } from "./basicdom";
 // import PageElement from "./native/PageElement";
 // import NativeElementNode from "./native/NativeElementNode";
+import Application, { ElementNode } from '../..';
+
 // export type FrameSpec = Frame | FrameElement | string
 // export type PageSpec = typeof GlimmerComponent;
 // export interface NavigationOptions {
@@ -43,10 +45,24 @@ export function navigate(name: string): any {
     // // let targetFrame = resolveFrame();
 
     // // const document = new DocumentNode();
-    // const newFrame = new ElementNode('frame');
+    const document = Application.document;
+    const newFrame = new ElementNode('frame');
     // // //setup a frame so we always have somewhere to hang our css
-    // newFrame.setAttribute("id", name);
-    // GlimmerNative.document.appendChild(newFrame);
+    newFrame.setAttribute('id', name);
+    document.appendChild(newFrame);
+
+    try {
+        console.log('About to render new result');
+        Application.renderComponent(name, newFrame);
+        Application.rootFrame.nativeView.navigate({
+            create: () => {
+                return newFrame.firstElement().nativeView;
+            }
+        });
+        console.log('New page rendered');
+    } catch (error) {
+        console.log(`Error in initial render: ${error}`);
+    }
     // // const context = Context(GlimmerResolverDelegate);
     // // const programArtifacts = artifacts(context);
     // // const aotRuntime = AotRuntime(document as any, programArtifacts, GlimmerNative.resolver);
@@ -54,7 +70,6 @@ export function navigate(name: string): any {
     // //     throw new Error("navigate requires frame option to be a native Frame, a FrameElement, a frame Id, or null")
     // // }
 
-    // const component = GlimmerResolverDelegate.lookupComponent(name).compilable.compile(GlimmerNative.context);
     // let cursor: Cursor = { element: newFrame as any, nextSibling: null };
     // const iterator = renderAot(GlimmerNative.aotRuntime, component, cursor);
     // try {

@@ -11,7 +11,7 @@ function* elementIterator(el) {
 export default class DocumentNode extends ViewNode {
     constructor() {
         super();
-        this.tagName = "docNode";
+        this.tagName = 'docNode';
         this.nodeType = 9;
         //this.documentElement = new ElementNode('document')
         this.head = new ElementNode('head');
@@ -37,7 +37,7 @@ export default class DocumentNode extends ViewNode {
     }
     getElementById(id) {
         for (let el of elementIterator(this)) {
-            if (el.nodeType === 1 && (el).id === id)
+            if (el.nodeType === 1 && el.id === id)
                 return el;
         }
     }

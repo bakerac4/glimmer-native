@@ -62,7 +62,6 @@ export class ResolverDelegate {
 ResolverDelegate.components = {};
 ResolverDelegate.helpers = {};
 ResolverDelegate.modifiers = {};
-;
 export default {
     lookupComponent: ResolverDelegate.lookupComponent,
     lookupHelper: ResolverDelegate.lookupHelper,

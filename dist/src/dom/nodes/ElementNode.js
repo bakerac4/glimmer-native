@@ -3,9 +3,7 @@ import ViewNode from './ViewNode';
 function camelize(kebab) {
     return kebab.replace(/[\-]+(\w)/g, (m, l) => l.toUpperCase());
 }
-const EVENT_ATTRIBUTES = Object.freeze([
-    'tap'
-]);
+const EVENT_ATTRIBUTES = Object.freeze(['tap']);
 export default class ElementNode extends ViewNode {
     constructor(tagName) {
         super();
@@ -17,7 +15,7 @@ export default class ElementNode extends ViewNode {
             this._nativeView = new viewClass();
             this._nativeView.__GlimmerNativeElement__ = this;
             console.log(`${this} has view class`);
-            EVENT_ATTRIBUTES.forEach(event => {
+            EVENT_ATTRIBUTES.forEach((event) => {
                 console.log(`Checking for atttribute ${event}`);
                 let attribute = this.getAttribute(event);
                 console.log(`Attribute ${event}: ${attribute}`);
@@ -42,11 +40,11 @@ export default class ElementNode extends ViewNode {
                 this.setStyle(camelize(propertyName), null);
             },
             get cssText() {
-                console.log("got css text");
+                console.log('got css text');
                 return getStyle();
             },
             set cssText(value) {
-                console.log("set css text");
+                console.log('set css text');
                 setStyle(value);
             }
         };
@@ -64,19 +62,19 @@ export default class ElementNode extends ViewNode {
     appendChild(childNode) {
         super.appendChild(childNode);
         if (childNode.nodeType === 3) {
-            this.setText((childNode).text);
+            this.setText(childNode.text);
         }
         if (childNode.nodeType === 7) {
-            (childNode).setOnNode(this);
+            childNode.setOnNode(this);
         }
     }
     insertBefore(childNode, referenceNode) {
         super.insertBefore(childNode, referenceNode);
         if (childNode.nodeType === 3) {
-            this.setText((childNode).text);
+            this.setText(childNode.text);
         }
         if (childNode.nodeType === 7) {
-            (childNode).setOnNode(this);
+            childNode.setOnNode(this);
         }
     }
     removeChild(childNode) {
@@ -85,7 +83,7 @@ export default class ElementNode extends ViewNode {
             this.setText('');
         }
         if (childNode.nodeType === 7) {
-            (childNode).clearOnNode(this);
+            childNode.clearOnNode(this);
         }
     }
 }

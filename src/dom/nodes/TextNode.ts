@@ -10,12 +10,12 @@ export default class TextNode extends ViewNode {
 
         this._meta = {
             skipAddToDom: true
-        }
-        console.log(`created ${this}`)
+        };
+        console.log(`created ${this}`);
     }
 
     setText(text) {
-        this.text = text
-        this.parentNode.setText(text)
+        this.text = text;
+        this.parentNode.setText(text);
     }
 }

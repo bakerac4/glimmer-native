@@ -2,13 +2,7 @@ import { isAndroid, isIOS } from 'tns-core-modules/platform';
 import { isBoolean } from 'tns-core-modules/utils/types';
 import { getViewMeta, normalizeElementName } from '../element-registry';
 import { insertChild, removeChild } from '../utils';
-const XML_ATTRIBUTES = Object.freeze([
-    'tap',
-    'style',
-    'rows',
-    'columns',
-    'fontAttributes'
-]);
+const XML_ATTRIBUTES = Object.freeze(['tap', 'style', 'rows', 'columns', 'fontAttributes']);
 export default class ViewNode {
     constructor() {
         this.nodeType = null;
@@ -70,7 +64,7 @@ export default class ViewNode {
         return (this._ownerDocument = el);
     }
     getAttribute(key) {
-        return (this.nativeView)[key];
+        return this.nativeView[key];
     }
     /* istanbul ignore next */
     setAttribute(key, value) {
@@ -123,7 +117,7 @@ export default class ViewNode {
             // NativeScript uses Alignment instead of Align, this ensures that text-align works
             property += 'ment';
         }
-        (this.nativeView.style)[property] = value;
+        this.nativeView.style[property] = value;
     }
     /* istanbul ignore next */
     setText(text) {
@@ -231,7 +225,7 @@ export default class ViewNode {
         // insert the node again to the parent. See #220
         childNode.prevSibling = null;
         childNode.nextSibling = null;
-        this.childNodes = this.childNodes.filter(node => node !== childNode);
+        this.childNodes = this.childNodes.filter((node) => node !== childNode);
         removeChild(this, childNode);
     }
     firstElement() {

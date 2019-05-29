@@ -41,68 +41,100 @@ export default class Application {
     constructor(rootName, resolverDelegate, resolver) {
         registerElements();
         setupGlimmer(resolverDelegate, resolver);
-        this.document = new DocumentNode();
-        this.rootFrame = new ElementNode('frame');
-        this.rootFrame.setAttribute('id', 'app-root-frame');
-        this.document.appendChild(this.rootFrame);
-        this.context = Context(GlimmerResolverDelegate);
-        this.artifacts = artifacts(this.context);
-        this.aotRuntime = AotRuntime(this.document, this.artifacts, resolver);
+        Application.document = new DocumentNode();
+        Application.rootFrame = new ElementNode('frame');
+        Application.rootFrame.setAttribute('id', 'app-root-frame');
+        Application.document.appendChild(Application.rootFrame);
+        Application.context = Context(GlimmerResolverDelegate);
+        Application.resolver = resolver;
         this.rootName = rootName;
-        this.resolver = resolver;
         this.resolverDelegate = resolverDelegate;
+        // if we add this back in, we get that error
+        Application.renderComponent(rootName, Application.rootFrame, null);
+        // console.log('Context Created');
+        // this.main = GlimmerResolverDelegate.lookupComponent(rootName).compilable.compile(this.context);
+        // console.log('Main Created');
+        // this.artifacts = artifacts(this.context);
+        // console.log('Artifacts Created');
+        // this.aotRuntime = AotRuntime(this.document as any, this.artifacts, resolver);
+        // console.log('aotRuntime Created');
     }
-    setup(folder) {
-        this.addTemplates(folder);
-        this.addComponents(folder);
-    }
-    addTemplates(appFolder) {
-        let templatesFile = appFolder.getFile('templates.json');
-        let templates = templatesFile.readTextSync();
-        // console.log(`Templates: ${templates}`);
-        JSON.parse(templates).forEach((template) => {
-            this.resolverDelegate.registerComponent(template.name, template.handle, template.source, template.capabilities);
-        });
-    }
-    addComponents(appFolder) {
-        let componentsFile = appFolder.getFile('components.json');
-        let components = componentsFile.readTextSync();
-        console.log(`About to resolve require`);
-        JSON.parse(components).forEach((component) => {
-            console.log(`About to resolve require`);
-            const classFile = require(`../src/ui/components/${component.name}/component.ts`);
-            this.resolver.registerComponent(component.name, classFile.default);
-        });
-    }
-    renderComponent(name, containerElement) {
-        const cursor = { element: containerElement, nextSibling: null };
-        const main = GlimmerResolverDelegate.lookupComponent(name).compilable.compile(this.context);
-        let iterator = renderAot(this.aotRuntime, main, cursor);
+    // setup(folder) {
+    //     this.addTemplates(folder);
+    //     this.addComponents(folder);
+    // }
+    // addTemplates(appFolder) {
+    //     let templatesFile = appFolder.getFile('templates.json');
+    //     let templates = templatesFile.readTextSync();
+    //     // console.log(`Templates: ${templates}`);
+    //     JSON.parse(templates).forEach((template) => {
+    //         this.resolverDelegate.registerComponent(
+    //             template.name,
+    //             template.handle,
+    //             template.source,
+    //             template.capabilities
+    //         );
+    //     });
+    // }
+    // addComponents(appFolder) {
+    //     let componentsFile = appFolder.getFile('components.json');
+    //     let components = componentsFile.readTextSync();
+    //     console.log(`About to resolve require`);
+    //     JSON.parse(components).forEach((component) => {
+    //         console.log(`About to resolve require`);
+    //         const classFile = require(`../src/ui/components/${component.name}/component.ts`);
+    //         this.resolver.registerComponent(component.name, classFile.default);
+    //     });
+    // }
+    static renderComponent(name, containerElement, nextSibling = null) {
+        // const state = State(data);
+        const component = GlimmerResolverDelegate.lookupComponent(name).compilable.compile(Application.context);
+        console.log('Main Created');
+        const artifact = artifacts(Application.context);
+        console.log('Artifacts Created');
+        const aotRuntime = AotRuntime(Application.document, artifact, Application.resolver);
+        const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
+        let iterator = renderAot(aotRuntime, component, cursor);
+        console.log('Iterator Created');
         try {
-            const result = renderSync(this.aotRuntime.env, iterator);
-            this.result = result;
-            this._rendered = true;
+            const result = renderSync(aotRuntime.env, iterator);
+            console.log('Render Sync');
+            Application.result = result;
+            Application._rendered = true;
         }
         catch (error) {
             console.log(`Error rendering component ${name}: ${error}`);
         }
     }
     boot() {
+        const rootFrame = Application.rootFrame;
         return new Promise((resolve, reject) => {
             //wait for launch
             on(launchEvent, () => {
+                // const cursor = { element: this.rootFrame, nextSibling: null } as Cursor;
+                // let iterator = renderAot(this.aotRuntime, this.main, cursor);
+                // console.log('Iterator Created');
+                // try {
+                //     const result = renderSync(this.aotRuntime.env, iterator);
+                //     console.log('Render Sync');
+                //     this.result = result;
+                //     this._rendered = true;
+                // } catch (error) {
+                //     console.log(`Error rendering component ${name}: ${error}`);
+                // }
+                // this.renderComponent('HelloGlimmer', rootFrame);
                 // this.renderComponent(this.rootName, this.rootFrame);
                 // This is super hacky and likely needs to be abstracted away.
-                this.rootFrame.nativeView.navigate({
+                rootFrame.nativeView.navigate({
                     create: () => {
-                        return this.rootFrame.firstElement().nativeView;
+                        return rootFrame.firstElement().nativeView;
                     }
                 });
             });
             try {
                 run({
                     create() {
-                        return this.rootFrame.nativeView;
+                        return rootFrame.nativeView;
                     }
                 });
             }
@@ -112,7 +144,7 @@ export default class Application {
         });
     }
     scheduleRerender() {
-        if (this._scheduled || !this._rendered)
+        if (this._scheduled || !Application._rendered)
             return;
         this._rendering = true;
         this._scheduled = true;
@@ -124,12 +156,12 @@ export default class Application {
     }
     _rerender() {
         return __awaiter(this, void 0, void 0, function* () {
-            let { aotRuntime, result } = this;
+            let { aotRuntime } = this;
             try {
                 aotRuntime.env.begin();
-                yield result.rerender();
+                yield Application.result.rerender();
                 aotRuntime.env.commit();
-                this._rendered = true;
+                Application._rendered = true;
             }
             catch (error) {
                 console.log(`Error in re-render: ${error}`);

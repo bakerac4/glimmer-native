@@ -11,7 +11,7 @@ export function Compilable(source: any) {
     console.log('In Compilable: ' + source);
     const precompiled = precompile(source);
     console.log('Precompiled');
-    const component = Component(precompiled)
+    const component = Component(precompiled);
     console.log(`Compiled Component: ${component}`);
     return component;
 }
@@ -27,7 +27,7 @@ export class ResolverDelegate {
             source: strip`${source}`,
             handle,
             capabilities
-        }
+        };
         console.log(`ResolverDelegate Components ${ResolverDelegate.components}`);
     }
 
@@ -43,7 +43,7 @@ export class ResolverDelegate {
     static lookupComponent(name: any) {
         console.log(`lookupComponent: ${name}`);
         let component = ResolverDelegate.components[name];
-        if (component === null)  {
+        if (component === null) {
             return null;
         }
         console.log(`component found: ${component}`);
@@ -69,10 +69,10 @@ export class ResolverDelegate {
             return ResolverDelegate.helpers[name];
         }
     }
-};
+}
 
 export default {
     lookupComponent: ResolverDelegate.lookupComponent,
     lookupHelper: ResolverDelegate.lookupHelper,
     lookupModifier: ResolverDelegate.lookupModifier
-}
+};

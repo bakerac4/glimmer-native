@@ -5,13 +5,7 @@ import { isBoolean } from 'tns-core-modules/utils/types';
 import { getViewMeta, normalizeElementName } from '../element-registry';
 import { insertChild, removeChild } from '../utils';
 
-const XML_ATTRIBUTES = Object.freeze([
-    'tap',
-    'style',
-    'rows',
-    'columns',
-    'fontAttributes'
-]);
+const XML_ATTRIBUTES = Object.freeze(['tap', 'style', 'rows', 'columns', 'fontAttributes']);
 
 export default class ViewNode {
     nodeValue: any;
@@ -36,20 +30,20 @@ export default class ViewNode {
     _meta: any;
 
     constructor() {
-        this.nodeType = null
-        this._tagName = null
-        this.parentNode = null
-        this.childNodes = []
-        this.prevSibling = null
-        this.nextSibling = null
+        this.nodeType = null;
+        this._tagName = null;
+        this.parentNode = null;
+        this.childNodes = [];
+        this.prevSibling = null;
+        this.nextSibling = null;
 
-        this._ownerDocument = null
-        this._nativeView = null
-        this._meta = null
+        this._ownerDocument = null;
+        this._nativeView = null;
+        this._meta = null;
     }
 
     hasAttribute() {
-        return false
+        return false;
     }
 
     removeAttribute() {
@@ -58,66 +52,66 @@ export default class ViewNode {
 
     /* istanbul ignore next */
     toString() {
-        return `${this.constructor.name}(${this.tagName})`
+        return `${this.constructor.name}(${this.tagName})`;
     }
 
     set tagName(name) {
-        this._tagName = normalizeElementName(name)
+        this._tagName = normalizeElementName(name);
     }
 
     get tagName() {
-        return this._tagName
+        return this._tagName;
     }
 
     get firstChild() {
-        return this.childNodes.length ? this.childNodes[0] : null
+        return this.childNodes.length ? this.childNodes[0] : null;
     }
 
     get lastChild() {
-        return this.childNodes.length ? this.childNodes[this.childNodes.length - 1]: null
+        return this.childNodes.length ? this.childNodes[this.childNodes.length - 1] : null;
     }
 
     get nativeView() {
-        return this._nativeView
+        return this._nativeView;
     }
 
     set nativeView(view) {
         if (this._nativeView) {
-            throw new Error(`Can't override native view.`)
+            throw new Error(`Can't override native view.`);
         }
 
-        this._nativeView = view
+        this._nativeView = view;
     }
 
     get meta() {
         if (this._meta) {
-            return this._meta
+            return this._meta;
         }
 
-        return (this._meta = getViewMeta(this.tagName))
+        return (this._meta = getViewMeta(this.tagName));
     }
 
-  /* istanbul ignore next */
+    /* istanbul ignore next */
     get ownerDocument() {
         if (this._ownerDocument) {
-            return this._ownerDocument
+            return this._ownerDocument;
         }
 
-        let el = this
+        let el = this;
         while (el != null && el.nodeType !== 9) {
-            el = el.parentNode
+            el = el.parentNode;
         }
 
-        return (this._ownerDocument = el)
+        return (this._ownerDocument = el);
     }
 
     getAttribute(key) {
-        return (this.nativeView)[key]
+        return this.nativeView[key];
     }
 
-  /* istanbul ignore next */
+    /* istanbul ignore next */
     setAttribute(key, value) {
-        const nv = this.nativeView
+        const nv = this.nativeView;
 
         if (!nv) return;
 
@@ -137,94 +131,89 @@ export default class ViewNode {
                 break;
             }
         }
-        console.log(`setAttr ${this} ${key} ${value}`)
+        console.log(`setAttr ${this} ${key} ${value}`);
         try {
             if (XML_ATTRIBUTES.indexOf(key) !== -1) {
-                nv[key] = value
+                nv[key] = value;
             } else {
                 // detect expandable attrs for boolean values
                 // See https://vuejs.org/v2/guide/components-props.html#Passing-a-Boolean
                 if (isBoolean(nv[key]) && value === '') {
-                    value = true
-                }
-                else {
-                    nv[key] = value
+                    value = true;
+                } else {
+                    nv[key] = value;
                 }
             }
         } catch (e) {
             // ignore but log
-            console.warn(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`)
+            console.warn(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
         }
     }
 
     /* istanbul ignore next */
     setStyle(property, value) {
-        console.log(`setStyle ${this} ${property} ${value}`)
+        console.log(`setStyle ${this} ${property} ${value}`);
         if (!(value = value.trim()).length) {
-            return
+            return;
         }
 
         if (property.endsWith('Align')) {
             // NativeScript uses Alignment instead of Align, this ensures that text-align works
-            property += 'ment'
+            property += 'ment';
         }
-        (this.nativeView.style)[property] = value
+        this.nativeView.style[property] = value;
     }
 
     /* istanbul ignore next */
     setText(text) {
-        console.log(`setText ${this} ${text}`)
+        console.log(`setText ${this} ${text}`);
         if (this.nodeType === 3) {
-            this.parentNode.setText(text)
+            this.parentNode.setText(text);
         } else {
-            this.setAttribute('text', text)
+            this.setAttribute('text', text);
         }
     }
 
     /* istanbul ignore next */
     addEventListener(event, handler) {
-        console.log(`add event listener ${this} ${event}`)
-        this.nativeView.on(event, handler)
+        console.log(`add event listener ${this} ${event}`);
+        this.nativeView.on(event, handler);
     }
 
     /* istanbul ignore next */
     removeEventListener(event, handler) {
-        console.log(`remove event listener ${this} ${event}`)
-        this.nativeView.off(event, handler)
+        console.log(`remove event listener ${this} ${event}`);
+        this.nativeView.off(event, handler);
     }
 
     dispatchEvent(event: EventData) {
-       if (this.nativeView) {
-           //nativescript uses the EventName while dom uses Type
-           console.log(`In dispatch event: ${event}`);
-           event.eventName = (event as any).type;
-           console.log(`event name: ${event.eventName}`);
-           this.nativeView.notify(event);
-       }
+        if (this.nativeView) {
+            //nativescript uses the EventName while dom uses Type
+            console.log(`In dispatch event: ${event}`);
+            event.eventName = (event as any).type;
+            console.log(`event name: ${event.eventName}`);
+            this.nativeView.notify(event);
+        }
     }
 
     insertBefore(childNode, referenceNode) {
-        console.log(`insert before ${this} ${childNode} ${referenceNode}`)
+        console.log(`insert before ${this} ${childNode} ${referenceNode}`);
         if (!childNode) {
-            throw new Error(`Can't insert child.`)
+            throw new Error(`Can't insert child.`);
         }
 
         // in some rare cases insertBefore is called with a null referenceNode
         // this makes sure that it get's appended as the last child
         if (!referenceNode) {
-            return this.appendChild(childNode)
+            return this.appendChild(childNode);
         }
 
         if (referenceNode.parentNode !== this) {
-            throw new Error(
-                `Can't insert child, because the reference node has a different parent.`
-            )
+            throw new Error(`Can't insert child, because the reference node has a different parent.`);
         }
 
         if (childNode.parentNode && childNode.parentNode !== this) {
-            throw new Error(
-                `Can't insert child, because it already has a different parent.`
-            )
+            throw new Error(`Can't insert child, because it already has a different parent.`);
         }
 
         if (childNode.parentNode === this) {
@@ -235,28 +224,26 @@ export default class ViewNode {
             // throw new Error(`Can't insert child, because it is already a child.`)
         }
 
-        let index = this.childNodes.indexOf(referenceNode)
+        let index = this.childNodes.indexOf(referenceNode);
 
-        childNode.parentNode = this
-        childNode.nextSibling = referenceNode
-        childNode.prevSibling = this.childNodes[index - 1]
+        childNode.parentNode = this;
+        childNode.nextSibling = referenceNode;
+        childNode.prevSibling = this.childNodes[index - 1];
 
-        referenceNode.prevSibling = childNode
-        this.childNodes.splice(index, 0, childNode)
+        referenceNode.prevSibling = childNode;
+        this.childNodes.splice(index, 0, childNode);
 
-        insertChild(this, childNode, index)
+        insertChild(this, childNode, index);
     }
 
     appendChild(childNode) {
-        console.log(`append child ${this} ${childNode}`)
+        console.log(`append child ${this} ${childNode}`);
         if (!childNode) {
-            throw new Error(`Can't append child.`)
+            throw new Error(`Can't append child.`);
         }
 
         if (childNode.parentNode && childNode.parentNode !== this) {
-            throw new Error(
-                `Can't append child, because it already has a different parent.`
-            )
+            throw new Error(`Can't append child, because it already has a different parent.`);
         }
 
         if (childNode.parentNode === this) {
@@ -267,55 +254,55 @@ export default class ViewNode {
             // throw new Error(`Can't append child, because it is already a child.`)
         }
 
-        childNode.parentNode = this
+        childNode.parentNode = this;
 
         if (this.lastChild) {
-            childNode.prevSibling = this.lastChild
-            this.lastChild.nextSibling = childNode
+            childNode.prevSibling = this.lastChild;
+            this.lastChild.nextSibling = childNode;
         }
 
-        this.childNodes.push(childNode)
+        this.childNodes.push(childNode);
 
-        insertChild(this, childNode, this.childNodes.length - 1)
+        insertChild(this, childNode, this.childNodes.length - 1);
     }
 
     removeChild(childNode) {
-        console.log(`remove child ${this} ${childNode}`)
+        console.log(`remove child ${this} ${childNode}`);
         if (!childNode) {
-            throw new Error(`Can't remove child.`)
+            throw new Error(`Can't remove child.`);
         }
 
         if (!childNode.parentNode) {
-            throw new Error(`Can't remove child, because it has no parent.`)
+            throw new Error(`Can't remove child, because it has no parent.`);
         }
 
         if (childNode.parentNode !== this) {
-            throw new Error(`Can't remove child, because it has a different parent.`)
+            throw new Error(`Can't remove child, because it has a different parent.`);
         }
 
-        childNode.parentNode = null
+        childNode.parentNode = null;
 
         if (childNode.prevSibling) {
-            childNode.prevSibling.nextSibling = childNode.nextSibling
+            childNode.prevSibling.nextSibling = childNode.nextSibling;
         }
 
         if (childNode.nextSibling) {
-            childNode.nextSibling.prevSibling = childNode.prevSibling
+            childNode.nextSibling.prevSibling = childNode.prevSibling;
         }
 
         // reset the prevSibling and nextSibling. If not, a keep-alived component will
         // still have a filled nextSibling attribute so vue will not
         // insert the node again to the parent. See #220
-        childNode.prevSibling = null
-        childNode.nextSibling = null
+        childNode.prevSibling = null;
+        childNode.nextSibling = null;
 
-        this.childNodes = this.childNodes.filter(node => node !== childNode)
+        this.childNodes = this.childNodes.filter((node) => node !== childNode);
 
-        removeChild(this, childNode)
+        removeChild(this, childNode);
     }
 
     firstElement() {
-        for(var child of this.childNodes) {
+        for (var child of this.childNodes) {
             if (child.nodeType == 1) {
                 return child;
             }
