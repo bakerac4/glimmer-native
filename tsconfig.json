@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": { "*": ["types/*"] },
+        "declaration": true,
+        "declarationDir": "./dist",
+        "module": "es2015",
+        "noImplicitAny": false,
+        "outDir": "./dist",
+        "target": "es6",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": false,
+        "experimentalDecorators": true,
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true
+    },
+    "files": [
+        "index.ts"
+    ],
+    "include": [
+        "lib/glimmer/**/*",
+        "lib/dom/**/*"
+    ],
+    "exclude": ["node_modules", "dist"]
+}

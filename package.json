@@ -1,0 +1,56 @@
+{
+    "name": "glimmer-native",
+    "version": "0.0.0",
+    "description": "Glimmer Nativescript Integration",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bakerac4/glimmer-native.git"
+    },
+    "keywords": [
+        "nativescript",
+        "glimmer",
+        "ember"
+    ],
+    "scripts": {
+        "build": "tsc --skipLibCheck"
+    },
+    "main": "dist/index.js",
+    "author": "Adam Baker",
+    "peerDependencies": {
+        "tns-core-modules": "5.4.0"
+    },
+    "dependencies": {
+        "@glimmer/application": "^0.13.0",
+        "@glimmer/application-pipeline": "^0.15.0",
+        "@glimmer/blueprint": "~0.13.0",
+        "@glimmer/bundle-compiler": "^0.41.0",
+        "@glimmer/compiler": "^0.41.0",
+        "@glimmer/component": "^0.14.0-alpha.7",
+        "@glimmer/encoder": "^0.41.0",
+        "@glimmer/inline-precompile": "^1.0.0",
+        "@glimmer/interfaces": "^0.41.0",
+        "@glimmer/object-reference": "^0.41.0",
+        "@glimmer/opcode-compiler": "^0.41.0",
+        "@glimmer/program": "^0.41.0",
+        "@glimmer/reference": "^0.41.0",
+        "@glimmer/resolver": "^0.4.1",
+        "@glimmer/runtime": "^0.41.0",
+        "@glimmer/syntax": "^0.41.0",
+        "@glimmer/test-helpers": "^0.31.1",
+        "@glimmer/tracking": "^0.14.0-alpha.7",
+        "@glimmer/util": "^0.41.0",
+        "@glimmer/vm": "^0.41.0",
+        "@glimmer/wire-format": "^0.41.0",
+        "@simple-dom/document": "^1.4.0",
+        "@simple-dom/interface": "^1.4.0",
+        "@simple-dom/serializer": "^1.4.0",
+        "@simple-dom/void-map": "^1.4.0"
+    },
+    "devDependencies": {
+        "nativescript-dev-webpack": "~0.22.0",
+        "nativescript-theme-core": "~1.0.6",
+        "tns-core-modules": "~5.4.0",
+        "typescript": "^3.4.5"
+    }
+}
