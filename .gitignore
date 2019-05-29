@@ -23,8 +23,6 @@ yarn-error.log*
 tmp/
 typings/
 node_modules/
-dist/
-/dist/
 
 # Visual Studio Code
 .vscode/*

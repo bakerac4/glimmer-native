@@ -1,0 +1,31 @@
+import DocumentNode from './src/dom/nodes/DocumentNode';
+import ElementNode from './src/dom/nodes/ElementNode';
+export { ResolverDelegate } from './src/glimmer/context';
+export { registerElements } from './src/dom/setup-registry';
+export { default as DocumentNode } from './src/dom/nodes/DocumentNode';
+export { default as ElementNode } from './src/dom/nodes/ElementNode';
+export { default as Resolver } from './src/glimmer/resolver';
+export { default as NativeCapabilities } from './src/glimmer/native-capabilities';
+export { NativeModifierConstructor, NativeModifier, NativeModifierDefinitionState, NativeModifierInstance } from './src/glimmer/native-modifier-manager';
+export default class Application {
+    document: DocumentNode;
+    rootFrame: ElementNode;
+    context: any;
+    artifacts: any;
+    aotRuntime: any;
+    rootName: string;
+    result: any;
+    _rendered: boolean;
+    _scheduled: boolean;
+    _rendering: boolean;
+    resolver: any;
+    resolverDelegate: any;
+    constructor(rootName: string, resolverDelegate: any, resolver: any);
+    setup(folder: any): void;
+    addTemplates(appFolder: any): void;
+    addComponents(appFolder: any): void;
+    renderComponent(name: any, containerElement: any): void;
+    boot(): Promise<{}>;
+    scheduleRerender(): void;
+    protected _rerender(): Promise<void>;
+}
