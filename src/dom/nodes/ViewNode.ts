@@ -19,6 +19,7 @@ export default class ViewNode {
     previousSibling: any;
     cloneNode: any;
     args: any;
+    template: any;
 
     nodeType: any;
     _tagName: any;

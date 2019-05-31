@@ -2,6 +2,9 @@ import { ContentView } from 'tns-core-modules/ui/content-view';
 import { View } from 'tns-core-modules/ui/core/view';
 import { LayoutBase } from 'tns-core-modules/ui/layouts/layout-base';
 
+import NativeElementNode from './native/ElementNode';
+import ViewNode from './nodes/ViewNode';
+
 export function isView(view) {
     return view instanceof View;
 }
@@ -14,7 +17,7 @@ export function isContentView(view) {
     return view instanceof ContentView;
 }
 
-export function insertChild(parentNode, childNode, atIndex = -1) {
+export function insertChild(parentNode: ViewNode, childNode: ViewNode, atIndex = -1) {
     if (!parentNode) {
         return;
     }
@@ -30,30 +33,34 @@ export function insertChild(parentNode, childNode, atIndex = -1) {
     const parentView = parentNode.nativeView;
     const childView = childNode.nativeView;
 
-    /*if (parentView instanceof LayoutBase) {
-    if (childView.parent === parentView) {
-      let index = parentView.getChildIndex(childView)
-      if (index !== -1) {
-        parentView.removeChild(childView)
-      }
+    //use the builder logic if we aren't being dynamic, to catch config items like <actionbar> that are not likely to be toggled
+    if (atIndex < 0 && (parentView as any)._addChildFromBuilder) {
+        (parentView as any)._addChildFromBuilder(childNode._nativeView.constructor.name, childView);
+        return;
     }
-    if (atIndex !== -1) {
-      parentView.insertChild(childView, atIndex)
-    } else {
-      parentView.addChild(childView)
+
+    if (parentView instanceof LayoutBase) {
+        if (atIndex >= 0) {
+            //our dom includes "textNode" and "commentNode" which does not appear in the nativeview's children.
+            //we recalculate the index required for the insert operation buy only including native element nodes in the count
+            let nativeIndex = parentNode.childNodes.filter((e) => e instanceof NativeElementNode).indexOf(childNode);
+            parentView.insertChild(childView, nativeIndex);
+        } else {
+            parentView.addChild(childView);
+        }
+        return;
     }
-  } else if (parentView instanceof ContentView) {
-    if (childNode.nodeType === 8) {
-      parentView._addView(childView, atIndex)
-    } else {
-      parentView.content = childView
+
+    if (parentView && (parentView as any)._addChildFromBuilder) {
+        return (parentView as any)._addChildFromBuilder(childNode._nativeView.constructor.name, childView);
     }
-  } else */
-    if (parentView && parentView._addChildFromBuilder) {
-        parentView._addChildFromBuilder(childNode._nativeView.constructor.name, childView);
-    } else {
-        throw new Error("Parent can't contain children: " + parentNode + ', ' + childNode);
+
+    if (parentView instanceof ContentView) {
+        parentView.content = childView;
+        return;
     }
+
+    throw new Error("Parent can't contain children: " + parentNode + ', ' + childNode);
 }
 
 export function removeChild(parentNode, childNode) {

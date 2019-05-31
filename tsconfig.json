@@ -14,12 +14,7 @@
         "skipLibCheck": true,
         "skipDefaultLibCheck": true
     },
-    "files": [
-        "index.ts"
-    ],
-    "include": [
-        "lib/glimmer/**/*",
-        "lib/dom/**/*"
-    ],
+    "files": ["index.ts"],
+    "include": ["src/glimmer/**/*", "src/dom/**/*"],
     "exclude": ["node_modules", "dist"]
 }

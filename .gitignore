@@ -1,7 +1,6 @@
 # NativeScript
 hooks/
 platforms/
-native/
 
 # NativeScript Template
 *.js.map

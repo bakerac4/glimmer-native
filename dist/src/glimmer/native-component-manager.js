@@ -6,6 +6,7 @@ const DESTROYING = Symbol('destroying');
 const DESTROYED = Symbol('destroyed');
 export class Bounds {
     constructor(__bounds) {
+        this._bounds = __bounds;
     }
     get firstNode() {
         return this._bounds.firstNode();
@@ -47,7 +48,7 @@ export default class NativeComponentManager {
         if (handle && symbolTable) {
             return {
                 handle,
-                symbolTable,
+                symbolTable
             };
         }
         throw new Error('unimplemented getAotStaticLayout');
@@ -101,7 +102,7 @@ export default class NativeComponentManager {
                 bucket.component[DESTROYING] = true;
                 bucket.component.willDestroy();
                 bucket.component[DESTROYED] = true;
-            },
+            }
         };
     }
 }

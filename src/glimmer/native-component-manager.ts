@@ -3,15 +3,15 @@ import { DefinitionState } from '@glimmer/component/dist/types/src/component-def
 import { AotRuntimeResolver, ComponentManager as VMComponentManager, Invocation } from '@glimmer/interfaces';
 import { CONSTANT_TAG, PathReference, Tag } from '@glimmer/reference';
 
-
 const EMPTY_SELF = new RootReference(null);
 const NOOP_DESTROYABLE = { destroy() {} };
 const DESTROYING = Symbol('destroying');
 const DESTROYED = Symbol('destroyed');
 
 export class Bounds {
-    private _bounds: any
+    private _bounds: any;
     constructor(__bounds: any) {
+        this._bounds = __bounds;
     }
 
     get firstNode(): Node {
@@ -28,10 +28,7 @@ export class ComponentStateBucket {
     public component: any;
     private args: any;
 
-    constructor(
-        definition: any,
-        args: any,
-    ) {
+    constructor(definition: any, args: any) {
         let { ComponentClass, name } = definition;
         this.args = args;
 
@@ -57,31 +54,23 @@ export class ComponentStateBucket {
     }
 }
 
-export default class NativeComponentManager implements
-    VMComponentManager<
-      ComponentStateBucket,
-      ComponentDefinition
-    > {
+export default class NativeComponentManager implements VMComponentManager<ComponentStateBucket, ComponentDefinition> {
     getCapabilities(state: any) {
         return state.capabilities;
     }
     prepareArgs(): any {
         return null;
     }
-    getAotStaticLayout(
-    { name, handle, symbolTable }: DefinitionState,
-    resolver: AotRuntimeResolver
-    ): Invocation {
+    getAotStaticLayout({ name, handle, symbolTable }: DefinitionState, resolver: AotRuntimeResolver): Invocation {
         if (handle && symbolTable) {
             return {
                 handle,
-                symbolTable,
+                symbolTable
             };
         }
 
         throw new Error('unimplemented getAotStaticLayout');
     }
-
 
     create(environment: any, definition: any, args: any, _dynamicScope: any, _caller: any, _hasDefaultBlock: any) {
         if (definition.ComponentClass) {
@@ -94,7 +83,7 @@ export default class NativeComponentManager implements
         }
         return EMPTY_SELF as any;
     }
-    didCreateElement() { }
+    didCreateElement() {}
     didRenderLayout(bucket: any, bounds: any) {
         if (!bucket) {
             return;
@@ -133,7 +122,7 @@ export default class NativeComponentManager implements
                 bucket.component[DESTROYING] = true;
                 bucket.component.willDestroy();
                 bucket.component[DESTROYED] = true;
-            },
+            }
         };
     }
 }

@@ -1,12 +1,30 @@
-import { precompile } from '@glimmer/compiler';
-
-import LinkTo from './components/link-to/component';
-import ListView from './components/list-view/component';
+import LinkTo from './components/LinkTo/component';
+import LinkToTemplate from './components/LinkTo/template';
 import { ResolverDelegate } from './context';
 import buildAction from './helpers/action';
 import onModifier from './modifiers/on';
 import setModifier from './modifiers/set';
 import NativeCapabilities from './native-capabilities';
+import ActionBar from './native-components/ActionBar/component';
+import ActionBarTemplate from './native-components/ActionBar/template';
+import GridLayout from './native-components/GridLayout/component';
+import GridLayoutTemplate from './native-components/GridLayout/template';
+import Label from './native-components/Label/component';
+import LabelTemplate from './native-components/Label/template';
+import ListView from './native-components/ListView/component';
+import ListViewTemplate from './native-components/ListView/template';
+import Page from './native-components/Page/component';
+import PageTemplate from './native-components/Page/template';
+import ScrollView from './native-components/ScrollView/component';
+import ScrollViewTemplate from './native-components/ScrollView/template';
+import Span from './native-components/Span/component';
+import SpanTemplate from './native-components/Span/template';
+import StackLayout from './native-components/StackLayout/component';
+import StackLayoutTemplate from './native-components/StackLayout/template';
+import TabView from './native-components/TabView/component';
+import TabViewTemplate from './native-components/TabView/template';
+import TabViewItem from './native-components/TabViewItem/component';
+import TabViewItemTemplate from './native-components/TabViewItem/template';
 import Resolver from './resolver';
 
 // const precompile = require('@glimmer/compiler').precompile;
@@ -16,21 +34,25 @@ export default function setupGlimmer(resolverDelegate: ResolverDelegate, resolve
     const onModifierHandle = resolver.registerModifier(onModifier);
     const setModifierHandle = resolver.registerModifier(setModifier);
     const linkToHandle = resolver.registerComponent('LinkTo', LinkTo);
-    const listViewHandle = resolver.registerComponent('ListView', ListView);
     resolverDelegate.registerHelper('action', actionHandle);
     resolverDelegate.registerModifier('on', onModifierHandle);
     resolverDelegate.registerModifier('set', setModifierHandle);
-    // const LinkToTemplate = readFileSync('./components/link-to/template.hbs');
-    resolverDelegate.registerComponent(
-        'LinkTo',
-        linkToHandle,
-        precompile(`<button text={{@text}} class="btn link-to" {{on "tap" (action this.onClick)}}></button>`),
-        NativeCapabilities
-    );
-    resolverDelegate.registerComponent(
-        'ListView',
-        listViewHandle,
-        precompile(`<listview ...attributes {{set 'items' @items}}></listview>`),
-        NativeCapabilities
-    );
+    resolverDelegate.registerComponent('LinkTo', linkToHandle, LinkToTemplate, NativeCapabilities);
+
+    registerNativeComponent(resolver, resolverDelegate, 'ActionBar', ActionBar, ActionBarTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'GridLayout', GridLayout, GridLayoutTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'Label', Label, LabelTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'ListView', ListView, ListViewTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'Page', Page, PageTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'Span', Span, SpanTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'StackLayout', StackLayout, StackLayoutTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'ScrollView', ScrollView, ScrollViewTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'StackLayout', StackLayout, StackLayoutTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'TabView', TabView, TabViewTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'TabViewItem', TabViewItem, TabViewItemTemplate);
+}
+
+function registerNativeComponent(resolver, delegate, name, component, template) {
+    const handle = resolver.registerComponent(name, component);
+    delegate.registerComponent(name, handle, template, NativeCapabilities);
 }
