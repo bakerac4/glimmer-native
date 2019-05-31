@@ -1,7 +1,10 @@
 // Largely taken from the Vue implimentation
 import { registerElement } from './element-registry';
+import ListView from './native/list-view';
 
 export function registerElements() {
+    registerElement('ListView', () => ListView);
+
     registerElement('head', () => null, {
         insertChild(parentNode, childNode, atIndex) {}
     });
@@ -25,7 +28,6 @@ export function registerElements() {
     registerElement('ActionItem', () => require('tns-core-modules/ui/action-bar').ActionItem);
     registerElement('GridLayout', () => require('tns-core-modules/ui/layouts/grid-layout').GridLayout);
     registerElement('ScrollView', () => require('tns-core-modules/ui/scroll-view').ScrollView);
-    registerElement('ListView', () => require('tns-core-modules/ui/list-view').ListView);
     registerElement('NavigationButton', () => require('tns-core-modules/ui/action-bar').NavigationButton);
     registerElement('TabView', () => require('tns-core-modules/ui/tab-view').TabView);
     registerElement('TabViewItem', () => require('tns-core-modules/ui/tab-view').TabViewItem);

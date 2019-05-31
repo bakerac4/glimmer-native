@@ -1,3 +1,4 @@
+import ListView from '../native/list-view';
 import CommentNode from './CommentNode';
 import ElementNode from './ElementNode';
 import TextNode from './TextNode';
@@ -27,7 +28,12 @@ export default class DocumentNode extends ViewNode {
         return new CommentNode(text);
     }
     createElement(tagName) {
-        return new ElementNode(tagName);
+        if (tagName === 'listview') {
+            return new ListView();
+        }
+        else {
+            return new ElementNode(tagName);
+        }
     }
     createElementNS(namespace, tagName) {
         return this.createElement(tagName);
