@@ -6132,6 +6132,18 @@ nativescript-theme-core@~1.0.6:
   resolved "https://registry.yarnpkg.com/nativescript-theme-core/-/nativescript-theme-core-1.0.6.tgz#cea174696bc5b3bd2025412c9c2eb4a5ed2b7f2d"
   integrity sha512-p9v8w0xC/WJDJat/HwxJ/u7Xf50i3JiZR0zx0M7445Gi4HaBClFcjfVc+TLOZEARU4RKauBTopYlLN4xke6tYw==
 
+nativescript-ui-core@~2.0.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/nativescript-ui-core/-/nativescript-ui-core-2.0.1.tgz#c59fee4d714d5138460b7aa98df217f1e02b643e"
+  integrity sha512-6XeRrbp3cP7MFqny6TXpF8VVwhA5bfE2iC1RIB+YjEclK+gC1b+4iov4Yl8c4oP6CMQ40AfwU11R9cEsuRr81g==
+
+nativescript-ui-sidedrawer@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/nativescript-ui-sidedrawer/-/nativescript-ui-sidedrawer-6.0.0.tgz#56a541e0151d502077d1ca787f5bc6111295c3fb"
+  integrity sha512-pfrFTtwKNlq7ksoRkM98oQWrOI6qQmRcdRVYQjbvV1mA/uczG73Zdit2mp8/zdNoO/Lceos6Eru132oZjtGLow==
+  dependencies:
+    nativescript-ui-core "~2.0.0"
+
 nativescript-worker-loader@~0.9.0:
   version "0.9.5"
   resolved "https://registry.yarnpkg.com/nativescript-worker-loader/-/nativescript-worker-loader-0.9.5.tgz#4e1bcf623242036198c52d9f2e3e15abf1a0fc57"

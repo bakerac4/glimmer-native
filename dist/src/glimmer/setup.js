@@ -1,11 +1,16 @@
 import LinkTo from './components/LinkTo/component';
 import LinkToTemplate from './components/LinkTo/template';
 import buildAction from './helpers/action';
+import hash from './helpers/hash';
 import onModifier from './modifiers/on';
 import setModifier from './modifiers/set';
 import NativeCapabilities from './native-capabilities';
 import ActionBar from './native-components/ActionBar/component';
 import ActionBarTemplate from './native-components/ActionBar/template';
+import DrawerMain from './native-components/DrawerMain/component';
+import DrawerMainTemplate from './native-components/DrawerMain/template';
+import DrawerSide from './native-components/DrawerSide/component';
+import DrawerSideTemplate from './native-components/DrawerSide/template';
 import GridLayout from './native-components/GridLayout/component';
 import GridLayoutTemplate from './native-components/GridLayout/template';
 import Label from './native-components/Label/component';
@@ -14,6 +19,8 @@ import ListView from './native-components/ListView/component';
 import ListViewTemplate from './native-components/ListView/template';
 import Page from './native-components/Page/component';
 import PageTemplate from './native-components/Page/template';
+import RadSideDrawer from './native-components/RadSideDrawer/component';
+import RadSideDrawerTemplate from './native-components/RadSideDrawer/template';
 import ScrollView from './native-components/ScrollView/component';
 import ScrollViewTemplate from './native-components/ScrollView/template';
 import Span from './native-components/Span/component';
@@ -27,10 +34,12 @@ import TabViewItemTemplate from './native-components/TabViewItem/template';
 // const precompile = require('@glimmer/compiler').precompile;
 export default function setupGlimmer(resolverDelegate, resolver) {
     const actionHandle = resolver.registerHelper(buildAction);
+    const hashHandle = resolver.registerHelper(hash);
     const onModifierHandle = resolver.registerModifier(onModifier);
     const setModifierHandle = resolver.registerModifier(setModifier);
     const linkToHandle = resolver.registerComponent('LinkTo', LinkTo);
     resolverDelegate.registerHelper('action', actionHandle);
+    resolverDelegate.registerHelper('hash', hashHandle);
     resolverDelegate.registerModifier('on', onModifierHandle);
     resolverDelegate.registerModifier('set', setModifierHandle);
     resolverDelegate.registerComponent('LinkTo', linkToHandle, LinkToTemplate, NativeCapabilities);
@@ -45,6 +54,9 @@ export default function setupGlimmer(resolverDelegate, resolver) {
     registerNativeComponent(resolver, resolverDelegate, 'StackLayout', StackLayout, StackLayoutTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'TabView', TabView, TabViewTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'TabViewItem', TabViewItem, TabViewItemTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'RadSideDrawer', RadSideDrawer, RadSideDrawerTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'DrawerSide', DrawerSide, DrawerSideTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'DrawerMain', DrawerMain, DrawerMainTemplate);
 }
 function registerNativeComponent(resolver, delegate, name, component, template) {
     const handle = resolver.registerComponent(name, component);

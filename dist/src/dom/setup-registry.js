@@ -39,6 +39,7 @@ export function registerElements() {
     registerElement('TextView', () => require('tns-core-modules/ui/text-view').TextView);
     registerElement('p', () => require('tns-core-modules/ui/text-view').TextView);
     registerElement('Comment', () => require('tns-core-modules/ui/placeholder').Placeholder);
+    registerElement('RadSideDrawer', () => require('nativescript-ui-sidedrawer').RadSideDrawer);
     // registerElement('Frame', () => new FrameElement())
     // registerElement('Page', () => new PageElement())
 }
