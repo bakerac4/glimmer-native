@@ -22,6 +22,8 @@ import Comment from './native-components/Comment/component';
 import CommentTemplate from './native-components/Comment/template';
 import DatePicker from './native-components/DatePicker/component';
 import DatePickerTemplate from './native-components/DatePicker/template';
+import DockLayout from './native-components/DockLayout/component';
+import DockLayoutTemplate from './native-components/DockLayout/template';
 import DrawerMain from './native-components/DrawerMain/component';
 import DrawerMainTemplate from './native-components/DrawerMain/template';
 import DrawerSide from './native-components/DrawerSide/component';
@@ -88,6 +90,7 @@ export default function setupGlimmer(resolverDelegate: ResolverDelegate, resolve
     registerNativeComponent(resolver, resolverDelegate, 'Button', Button, ButtonTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'Comment', Comment, CommentTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'DatePicker', DatePicker, DatePickerTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'DockLayout', DockLayout, DockLayoutTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'DrawerSide', DrawerSide, DrawerSideTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'DrawerMain', DrawerMain, DrawerMainTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'FlexboxLayout', FlexboxLayout, FlexboxLayoutTemplate);

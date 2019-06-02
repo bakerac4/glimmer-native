@@ -25,6 +25,7 @@ export function registerElements() {
     registerElement('Comment', () => require('tns-core-modules/ui/placeholder').Placeholder);
     registerElement('Button', () => require('tns-core-modules/ui/button').Button);
     registerElement('DatePicker', () => require('tns-core-modules/ui/date-picker').DatePicker);
+    registerElement('DockLayout', () => require('tns-core-modules/ui/layouts/dock-layout').DockLayout);
     registerElement('FlexboxLayout', () => require('tns-core-modules/ui/layouts/flexbox-layout').FlexboxLayout);
     registerElement('FormattedString', () => require('tns-core-modules/text/formatted-string').FormattedString);
     registerElement('GridLayout', () => require('tns-core-modules/ui/layouts/grid-layout').GridLayout);
