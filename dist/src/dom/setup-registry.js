@@ -29,6 +29,7 @@ export function registerElements() {
     registerElement('FlexboxLayout', () => require('tns-core-modules/ui/layouts/flexbox-layout').FlexboxLayout);
     registerElement('FormattedString', () => require('tns-core-modules/text/formatted-string').FormattedString);
     registerElement('GridLayout', () => require('tns-core-modules/ui/layouts/grid-layout').GridLayout);
+    registerElement('Image', () => require('tns-core-modules/ui/image').Image);
     registerElement('Label', () => require('tns-core-modules/ui/label').Label);
     registerElement('NavigationButton', () => require('tns-core-modules/ui/action-bar').NavigationButton);
     registerElement('Page', () => require('tns-core-modules/ui/page').Page);
