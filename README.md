@@ -5,7 +5,7 @@ Have you ever wanted to use Ember/Glimmer to create a native mobile app? Well no
 Places this borrows code/concepts from:
 [Svelte](https://github.com/halfnelson/svelte-native),
 [Vue](https://github.com/nativescript-vue/nativescript-vue),
-[Glimmer Embedding Turorial](https://github.com/glimmerjs/glimmer-embedding-tutorial),
+[Glimmer Embedding Tutorial](https://github.com/glimmerjs/glimmer-embedding-tutorial),
 [Nativescript Demo](https://github.com/chadhietala/glimmer-native-demo)
 
 ## How to create your first Glimmer-Native project
