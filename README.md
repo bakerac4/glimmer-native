@@ -1,6 +1,7 @@
 # Glimmer-Native
 
-Have you ever wanted to use Ember/Glimmer to create a native mobile app? Well now you can! 
+Have you ever wanted to use Ember/Glimmer to create a native mobile app? Well now you can!
+Keep in mind Glimmer Native is currently in an **ALPHA** state. **Use in production at your own risk**
 
 Places this borrows code/concepts from:
 [Svelte](https://github.com/halfnelson/svelte-native),
