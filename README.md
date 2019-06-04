@@ -47,7 +47,7 @@ There is a default set of Glimmer Components available to you that render native
 There is a built in `action` helper, along with a built in `on` modifier to allow for event handling
 
 ### Routing/Navigation
-There is a `LinkTo` component provided that allows for navigation. You pass a `target` to it which tells GlimmerNative what component to render and navigate to. `<LinkTo @target="Dashboard" text="Dashboard" />` would create a component that listens for a click. Once clicked, Glimmer Native would look up the `Dashboard` Glimmer component, render it, and then navigate to it.
+There is a `LinkTo` component provided that allows for navigation. You pass a `target` to it which tells GlimmerNative what component to render and navigate to. `<LinkTo @target="Dashboard" @text="Dashboard" />` would create a component that listens for a click. Once clicked, Glimmer Native would look up the `Dashboard` Glimmer component, render it, and then navigate to it.
 
 You MUST have the top level element be a `Page` component in order to navigate to it (so in the `Dashboard` component, the first element must be `Page`)
 
