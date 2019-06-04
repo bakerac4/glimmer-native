@@ -12,6 +12,7 @@ Places this borrows code/concepts from:
 
 1. Follow the [NativeScript Setup Guides](https://docs.nativescript.org/angular/start/quick-setup)
 2. Run `ember new hello-glimmer-native -b glimmer-native-blueprint` in the command line
+    - Occasionally the blueprint hangs on the first run. A bug has been created [here](https://github.com/bakerac4/glimmer-native-blueprint/issues/1). If this happens to you, just kill the process and run it again. It will work the 2nd time.
 3. Run `tns run ios --bundle` (or to debug `tns debug ios --bundle --debug-brk`)
 
 
