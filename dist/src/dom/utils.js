@@ -1,7 +1,6 @@
 import { ContentView } from 'tns-core-modules/ui/content-view';
 import { View } from 'tns-core-modules/ui/core/view';
 import { LayoutBase } from 'tns-core-modules/ui/layouts/layout-base';
-import NativeElementNode from './native/ElementNode';
 export function isView(view) {
     return view instanceof View;
 }
@@ -32,8 +31,13 @@ export function insertChild(parentNode, childNode, atIndex = -1) {
         if (atIndex >= 0) {
             //our dom includes "textNode" and "commentNode" which does not appear in the nativeview's children.
             //we recalculate the index required for the insert operation buy only including native element nodes in the count
-            let nativeIndex = parentNode.childNodes.filter((e) => e instanceof NativeElementNode).indexOf(childNode);
-            parentView.insertChild(childView, nativeIndex);
+            // let nativeIndex = parentNode.childNodes
+            //     .filter((e) => {
+            //         const instance = e instanceOf ElementNode';
+            //         return instance;
+            //     })
+            //     .indexOf(childNode);
+            parentView.insertChild(childView, atIndex);
         }
         else {
             parentView.addChild(childView);
