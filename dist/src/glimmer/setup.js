@@ -67,8 +67,7 @@ import buildUserHelper from './references/helper-reference';
 export default function setupGlimmer(resolverDelegate, resolver) {
     const actionHandle = resolver.registerHelper(buildAction);
     const hashHandle = resolver.registerHelper(hash);
-    let glimmerIfHelper = buildUserHelper(ifHelper);
-    // return this.register('helper', name, glimmerHelper);
+    const glimmerIfHelper = buildUserHelper(ifHelper);
     const ifHandle = resolver.registerHelper(glimmerIfHelper);
     const onModifierHandle = resolver.registerModifier(onModifier);
     const setModifierHandle = resolver.registerModifier(setModifier);

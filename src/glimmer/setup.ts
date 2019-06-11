@@ -71,8 +71,7 @@ import Resolver from './resolver';
 export default function setupGlimmer(resolverDelegate: ResolverDelegate, resolver: Resolver) {
     const actionHandle = resolver.registerHelper(buildAction);
     const hashHandle = resolver.registerHelper(hash);
-    let glimmerIfHelper = buildUserHelper(ifHelper);
-    // return this.register('helper', name, glimmerHelper);
+    const glimmerIfHelper = buildUserHelper(ifHelper);
     const ifHandle = resolver.registerHelper(glimmerIfHelper);
     const onModifierHandle = resolver.registerModifier(onModifier);
     const setModifierHandle = resolver.registerModifier(setModifier);
