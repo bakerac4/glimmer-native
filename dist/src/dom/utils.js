@@ -60,7 +60,7 @@ export function removeChild(parentNode, childNode) {
     if (parentNode.meta && typeof parentNode.meta.removeChild === 'function') {
         return parentNode.meta.removeChild(parentNode, childNode);
     }
-    if (!childNode.nativeView || !childNode.nativeView) {
+    if (!childNode.nativeView || !parentNode.nativeView) {
         return;
     }
     const parentView = parentNode.nativeView;

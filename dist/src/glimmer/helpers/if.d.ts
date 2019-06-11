@@ -1,1 +1,1 @@
-export default function (_vm: any, args: any): any;
+export default function ifHelper(params: any[]): any;
