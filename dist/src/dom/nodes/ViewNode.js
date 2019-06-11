@@ -175,6 +175,7 @@ export default class ViewNode {
         childNode.parentNode = this;
         childNode.nextSibling = referenceNode;
         childNode.prevSibling = this.childNodes[index - 1];
+        this.childNodes[index - 1].nextSibling = childNode;
         referenceNode.prevSibling = childNode;
         this.childNodes.splice(index, 0, childNode);
         insertChild(this, childNode, index);
@@ -223,8 +224,8 @@ export default class ViewNode {
         // reset the prevSibling and nextSibling. If not, a keep-alived component will
         // still have a filled nextSibling attribute so vue will not
         // insert the node again to the parent. See #220
-        childNode.prevSibling = null;
-        childNode.nextSibling = null;
+        // childNode.prevSibling = null;
+        // childNode.nextSibling = null;
         this.childNodes = this.childNodes.filter((node) => node !== childNode);
         removeChild(this, childNode);
     }

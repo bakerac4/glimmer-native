@@ -76,7 +76,7 @@ export function removeChild(parentNode, childNode) {
         return parentNode.meta.removeChild(parentNode, childNode);
     }
 
-    if (!childNode.nativeView || !childNode.nativeView) {
+    if (!childNode.nativeView || !parentNode.nativeView) {
         return;
     }
 
