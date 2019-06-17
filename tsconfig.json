@@ -4,7 +4,7 @@
         "paths": { "*": ["types/*"] },
         "declaration": true,
         "declarationDir": "./dist",
-        "module": "es5",
+        "module": "es6",
         "noImplicitAny": false,
         "outDir": "./dist",
         "target": "es6",
