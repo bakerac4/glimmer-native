@@ -8,7 +8,7 @@ const defaultViewMeta = {
     component: null
 };
 export function normalizeElementName(elementName) {
-    console.log(`Normalize Element name ${elementName}`);
+    // console.log(`Normalize Element name ${elementName}`);
     return `${elementName.replace(dashRegExp, '').toLowerCase()}`;
 }
 // export function registerNativeElement(elementName: string, resolver: () => typeof View, meta: ComponentMeta = null) {

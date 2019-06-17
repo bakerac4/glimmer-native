@@ -72,11 +72,11 @@ export default class NativeComponentManager {
         bucket.component.bounds = new Bounds(bounds);
     }
     didCreate(bucket) {
-        console.log('in did created component manager');
+        // console.log('in did created component manager');
         if (!bucket) {
             return;
         }
-        console.log('in did created component manager - about to call didInsertElement');
+        // console.log('in did created component manager - about to call didInsertElement');
         bucket.component.didInsertElement();
     }
     getTag(bucket) {

@@ -7,37 +7,37 @@ import { strip } from '@glimmer/util';
 //  * for demo purposes.
 //  */
 export function Compilable(source) {
-    console.log('In Compilable: ' + source);
+    // console.log('In Compilable: ' + source);
     const precompiled = precompile(source);
-    console.log('Precompiled');
+    // console.log('Precompiled');
     const component = Component(precompiled);
-    console.log(`Compiled Component: ${component}`);
+    // console.log(`Compiled Component: ${component}`);
     return component;
 }
 export class ResolverDelegate {
     registerComponent(name, handle, source, capabilities) {
-        console.log(`addComponent: ${name}`);
+        // console.log(`addComponent: ${name}`);
         ResolverDelegate.components[name] = {
             source: strip `${source}`,
             handle,
             capabilities
         };
-        console.log(`ResolverDelegate Components ${ResolverDelegate.components}`);
+        // console.log(`ResolverDelegate Components ${ResolverDelegate.components}`);
     }
     registerHelper(name, handle) {
         ResolverDelegate.helpers[name] = handle;
-        console.log(ResolverDelegate.helpers);
+        // console.log(ResolverDelegate.helpers);
     }
     registerModifier(name, handle) {
         ResolverDelegate.modifiers[name] = handle;
     }
     static lookupComponent(name) {
-        console.log(`lookupComponent: ${name}`);
+        // console.log(`lookupComponent: ${name}`);
         let component = ResolverDelegate.components[name];
         if (component === null) {
             return null;
         }
-        console.log(`component found: ${component}`);
+        // console.log(`component found: ${component}`);
         //source should now be compiled
         let { handle, source, capabilities } = component;
         return {
@@ -53,7 +53,7 @@ export class ResolverDelegate {
         }
     }
     static lookupHelper(name) {
-        console.log('in lookup helper');
+        // console.log('in lookup helper');
         if (name in ResolverDelegate.helpers) {
             return ResolverDelegate.helpers[name];
         }

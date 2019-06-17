@@ -1,15 +1,13 @@
 import { precompile } from '@glimmer/compiler';
 
-export default precompile(`<radSideDrawer ...attributes>
-<radSideDrawer.drawerContent>
-    <GridLayout>
-        <Label text="Side Menu"></Label>
-    </GridLayout>
-</radSideDrawer.drawerContent>
-<radSideDrawer.mainContent>
+export default precompile(`<radSideDrawer ...attributes />
+<DrawerSide @rendered={{action this.sideInserted}}>
+    {{yield to="side"}}
+</DrawerSide>
+<DrawerMain @rendered={{action this.mainInserted}}>>
     {{yield}}
-</radSideDrawer.mainContent>
-</radSideDrawer>`);
+</DrawerMain>
+`);
 
 // <nsDrawer:RadSideDrawer xmlns:nsDrawer="nativescript-ui-sidedrawer">
 //     <nsDrawer:RadSideDrawer.drawerContent>

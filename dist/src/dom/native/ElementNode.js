@@ -17,8 +17,6 @@ export default class NativeElementNode extends ViewNode {
         this._meta = Object.assign({}, defaultViewMeta, meta || {});
         this._nativeView = new viewClass();
         this._nativeView.__GlimmerNativeElement__ = this;
-        console.log(`created ${this} ${this._nativeView}`);
-        //TODO these style shims mess up the code, extract to external modules
         let setStyleAttribute = (value) => {
             this.setAttribute('style', value);
         };
@@ -34,7 +32,6 @@ export default class NativeElementNode extends ViewNode {
         let animations = new Map();
         let oldAnimations = [];
         const addAnimation = (animation) => {
-            console.log(`Adding animation ${animation}`);
             if (!this.nativeView) {
                 throw Error('Attempt to apply animation to tag without a native view' + this.tagName);
             }
@@ -73,7 +70,6 @@ export default class NativeElementNode extends ViewNode {
             animationInstance.play(this.nativeView);
         };
         const removeAnimation = (animation) => {
-            console.log(`Removing animation ${animation}`);
             if (animations.has(animation)) {
                 let animationInstance = animations.get(animation);
                 animations.delete(animation);
@@ -96,7 +92,6 @@ export default class NativeElementNode extends ViewNode {
                 return [...animations.keys()].join(', ');
             },
             set animation(value) {
-                console.log(`setting animation ${value}`);
                 let new_animations = value.trim() == '' ? [] : value.split(',').map((a) => a.trim());
                 //add new ones
                 for (let anim of new_animations) {
@@ -112,18 +107,15 @@ export default class NativeElementNode extends ViewNode {
                 }
             },
             get cssText() {
-                console.log('got css text');
                 return getStyleAttribute();
             },
             set cssText(value) {
-                console.log('set css text');
                 setStyleAttribute(value);
             }
         };
     }
     /* istanbul ignore next */
     setStyle(property, value) {
-        console.log(`setStyle ${this} ${property} ${value}`);
         if (!(value = value.toString().trim()).length) {
             return;
         }
@@ -147,12 +139,10 @@ export default class NativeElementNode extends ViewNode {
     }
     /* istanbul ignore next */
     addEventListener(event, handler) {
-        console.log(`add event listener ${this} ${event}`);
         this.nativeView.on(event, handler);
     }
     /* istanbul ignore next */
     removeEventListener(event, handler) {
-        console.log(`remove event listener ${this} ${event}`);
         this.nativeView.off(event, handler);
     }
     getAttribute(fullkey) {
@@ -222,7 +212,6 @@ export default class NativeElementNode extends ViewNode {
             }
             else {
                 try {
-                    console.log(`setAttr ${this} ${resolvedKeys.join('.')} ${value}`);
                     setTarget[key] = value;
                 }
                 catch (e) {

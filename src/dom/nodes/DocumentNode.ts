@@ -17,16 +17,8 @@ export default class DocumentNode extends ViewNode {
         super();
         this.tagName = 'docNode';
         this.nodeType = 9;
-        //this.documentElement = new ElementNode('document')
-
         this.head = new ElementNode('head');
         this.appendChild(this.head);
-        /*// make static methods accessible via this
-        this.createComment = DocumentNode.createComment
-        this.createElement = DocumentNode.createElement
-        this.createElementNS = DocumentNode.createElementNS
-        this.createTextNode = DocumentNode.createTextNode*/
-        console.log(`created ${this}`);
     }
 
     createComment(text) {

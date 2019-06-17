@@ -1,3 +1,3 @@
 import { precompile } from '@glimmer/compiler';
 
-export default precompile(`{{yield}}`);
+export default precompile(`<GridLayout>{{yield}}</GridLayout>`);

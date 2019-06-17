@@ -6,8 +6,12 @@ import { launchEvent, on, run } from 'tns-core-modules/application';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { registerElements } from './src/dom/setup-registry';
-import GlimmerResolverDelegate, { Compilable } from './src/glimmer/context';
+import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/glimmer/context';
+import { goBack } from './src/glimmer/navigation';
+import Resolver from './src/glimmer/resolver';
 import setupGlimmer from './src/glimmer/setup';
+
+const { join, relative, resolve, sep } = require('path');
 
 //Exports
 export { ResolverDelegate } from './src/glimmer/context';
@@ -22,6 +26,7 @@ export {
     NativeModifierDefinitionState,
     NativeModifierInstance
 } from './src/glimmer/native-modifier-manager';
+export { goBack } from './src/glimmer/navigation';
 
 export default class Application {
     public static document: DocumentNode;
@@ -29,39 +34,53 @@ export default class Application {
     public static context: any;
     public artifacts: any;
     public aotRuntime: any;
-    public rootName: string;
     public _scheduled: boolean;
     public _rendering: boolean;
     public resolver: any;
     public resolverDelegate: any;
     public main: any;
     static resolver: any;
+    static resolverDelegate: any;
     static result: any;
     static _rendered: boolean;
     static aotRuntime: any;
+    static outsideComponents: any = [];
 
-    constructor(rootName: string, resolverDelegate: any, resolver: any) {
+    constructor(appFolder, components) {
         registerElements();
+        const resolverDelegate = new ResolverDelegate();
+        const resolver = new Resolver();
+        Application.resolver = resolver;
+        Application.resolverDelegate = resolverDelegate;
+        this.parseTemplates(appFolder);
+        this.registerState(components);
         setupGlimmer(resolverDelegate, resolver);
         Application.document = new DocumentNode();
         Application.rootFrame = new ElementNode('frame');
         Application.rootFrame.setAttribute('id', 'app-root-frame');
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
-        Application.resolver = resolver;
-        this.rootName = rootName;
-        this.resolverDelegate = resolverDelegate;
-        Application.renderComponent(rootName, Application.rootFrame, null);
+    }
+
+    renderMain(name, containerElement?, nextSibling = null) {
+        if (!containerElement) {
+            containerElement = Application.rootFrame;
+        }
+        let main = Compilable(`<${name} />`).compile(Application.context);
+        Application._renderComponent(name, containerElement, nextSibling, main);
     }
 
     static renderComponent(name, containerElement, nextSibling = null) {
-        //This seems less than ideal. Need other solutions
-        let main = Compilable(`<${name} />`).compile(Application.context);
+        let component = Compilable(`<${name} />`).compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name).compilable.compile(Application.context);
+        Application._renderComponent(name, containerElement, nextSibling, component);
+    }
+
+    static _renderComponent(name, containerElement, nextSibling, compilable) {
         const artifact = artifacts(Application.context);
         Application.aotRuntime = AotRuntime(Application.document as any, artifact, Application.resolver);
         const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
-        let iterator = renderAot(Application.aotRuntime, main, cursor);
+        let iterator = renderAot(Application.aotRuntime, compilable, cursor);
         try {
             const result = renderSync(Application.aotRuntime.env, iterator);
             console.log('Application Rendered');
@@ -70,6 +89,29 @@ export default class Application {
         } catch (error) {
             console.log(`Error rendering component ${name}: ${error}`);
         }
+    }
+
+    parseTemplates(folder) {
+        let templatesFile = folder.getFile('templates.json');
+        let templates = templatesFile.readTextSync();
+        JSON.parse(templates).forEach((template) => {
+            Application.resolverDelegate.registerComponent(
+                template.name,
+                template.handle,
+                template.source,
+                template.capabilities
+            );
+        });
+    }
+
+    async registerState(components) {
+        components.forEach((component) => {
+            Application.resolver.registerComponent(component.name, component.class);
+        });
+    }
+
+    static registerComponent(name, value) {
+        Application.outsideComponents.push({ name, value });
     }
 
     boot() {

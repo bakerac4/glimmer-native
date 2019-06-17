@@ -1,5 +1,5 @@
+import { AotRuntimeResolver, ComponentDefinition, Dict, Invocation, ModuleLocator } from '@glimmer/interfaces';
 import NativeComponentManager from './native-component-manager';
-import { Dict, ComponentDefinition, ModuleLocator, Invocation, AotRuntimeResolver } from '@glimmer/interfaces';
 export interface TemplateMeta {
     specifier: string;
 }

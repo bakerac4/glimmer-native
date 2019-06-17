@@ -44,10 +44,6 @@ export default class NativeElementNode extends ViewNode {
         this._nativeView = new (viewClass as any)();
         (this._nativeView as any).__GlimmerNativeElement__ = this;
 
-        console.log(`created ${this} ${this._nativeView}`);
-
-        //TODO these style shims mess up the code, extract to external modules
-
         let setStyleAttribute = (value: string): void => {
             this.setAttribute('style', value);
         };
@@ -67,7 +63,6 @@ export default class NativeElementNode extends ViewNode {
         let oldAnimations: KeyframeAnimation[] = [];
 
         const addAnimation = (animation: string) => {
-            console.log(`Adding animation ${animation}`);
             if (!this.nativeView) {
                 throw Error('Attempt to apply animation to tag without a native view' + this.tagName);
             }
@@ -113,7 +108,6 @@ export default class NativeElementNode extends ViewNode {
         };
 
         const removeAnimation = (animation: string) => {
-            console.log(`Removing animation ${animation}`);
             if (animations.has(animation)) {
                 let animationInstance = animations.get(animation);
                 animations.delete(animation);
@@ -141,7 +135,6 @@ export default class NativeElementNode extends ViewNode {
             },
 
             set animation(value: string) {
-                console.log(`setting animation ${value}`);
                 let new_animations = value.trim() == '' ? [] : value.split(',').map((a) => a.trim());
                 //add new ones
                 for (let anim of new_animations) {
@@ -158,12 +151,10 @@ export default class NativeElementNode extends ViewNode {
             },
 
             get cssText(): string {
-                console.log('got css text');
                 return getStyleAttribute();
             },
 
             set cssText(value: string) {
-                console.log('set css text');
                 setStyleAttribute(value);
             }
         };
@@ -171,8 +162,6 @@ export default class NativeElementNode extends ViewNode {
 
     /* istanbul ignore next */
     setStyle(property: string, value: string | number) {
-        console.log(`setStyle ${this} ${property} ${value}`);
-
         if (!(value = value.toString().trim()).length) {
             return;
         }
@@ -202,13 +191,11 @@ export default class NativeElementNode extends ViewNode {
 
     /* istanbul ignore next */
     addEventListener(event: string, handler: EventListener) {
-        console.log(`add event listener ${this} ${event}`);
         this.nativeView.on(event, handler);
     }
 
     /* istanbul ignore next */
     removeEventListener(event: string, handler?: EventListener) {
-        console.log(`remove event listener ${this} ${event}`);
         this.nativeView.off(event, handler);
     }
 
@@ -289,7 +276,6 @@ export default class NativeElementNode extends ViewNode {
                 setTarget = setTarget[key];
             } else {
                 try {
-                    console.log(`setAttr ${this} ${resolvedKeys.join('.')} ${value}`);
                     setTarget[key] = value;
                 } catch (e) {
                     // ignore but log

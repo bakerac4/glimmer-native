@@ -1,19 +1,14 @@
+import { AotRuntimeResolver, ComponentDefinition, Dict, Invocation, ModuleLocator } from '@glimmer/interfaces';
 import { TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
-import { NativeModifierManager, NativeModifierDefinitionState } from './native-modifier-manager';
-import NativeComponentManager from './native-component-manager';
-import CAPABILITIES from './native-capabilities';
 import { unreachable } from '@glimmer/util';
-import {
-  Dict,
-  ComponentDefinition,
-  ModuleLocator,
-  Invocation,
-  AotRuntimeResolver} from '@glimmer/interfaces';
+
+import CAPABILITIES from './native-capabilities';
+import NativeComponentManager from './native-component-manager';
+import { NativeModifierDefinitionState, NativeModifierManager } from './native-modifier-manager';
 
 export interface TemplateMeta {
     specifier: string;
 }
-
 
 class NativeComponentDefinition implements ComponentDefinition {
     name: string;
@@ -44,9 +39,9 @@ export default class Resolver implements AotRuntimeResolver {
     protected managers: Dict<NativeComponentManager> = {};
 
     resolve<U>(handle: number): U {
-        console.log('in resolver resolve');
+        // console.log('in resolver resolve');
         let value = this.table[handle];
-        return (value) as U;
+        return value as U;
     }
 
     managerFor(managerId = 'main'): NativeComponentManager {
@@ -56,7 +51,7 @@ export default class Resolver implements AotRuntimeResolver {
             return manager;
         }
         manager = new NativeComponentManager();
-        this.managers[managerId] = manager
+        this.managers[managerId] = manager;
         return manager;
     }
 
@@ -70,12 +65,12 @@ export default class Resolver implements AotRuntimeResolver {
             if (component.name === name) {
                 definition = component;
             }
-        })
+        });
         return definition;
     }
 
     lookupPartial(name: string, referrer: TemplateMeta): number {
-      throw unreachable();
+        throw unreachable();
     }
 
     registerComponent(name: string, ComponentClass?: any): number {

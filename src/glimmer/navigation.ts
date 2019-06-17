@@ -1,10 +1,11 @@
-// import FrameElement from "../dom//nodes/FrameElement";
+import { BackstackEntry, Frame, getFrameById, topmost } from 'tns-core-modules/ui/frame';
+
+import Application, { ElementNode } from '../..';
+
 // import { createElement, logger as log } from "./basicdom";
 // import PageElement from "./native/PageElement";
 // import NativeElementNode from "./native/NativeElementNode";
-import Application, { ElementNode } from '../..';
-
-// export type FrameSpec = Frame | FrameElement | string
+export type FrameSpec = Frame | string;
 // export type PageSpec = typeof GlimmerComponent;
 // export interface NavigationOptions {
 //     page: PageSpec;
@@ -19,17 +20,16 @@ import Application, { ElementNode } from '../..';
 //     transitioniOS?: NavigationTransition;
 // }
 
-// function resolveFrame(frameSpec?: FrameSpec): Frame {
-//     let targetFrame: Frame;
-//     if (!frameSpec) targetFrame = topmost();
-//     if (frameSpec instanceof FrameElement) targetFrame = frameSpec.nativeView as Frame;
-//     if (frameSpec instanceof Frame) targetFrame = frameSpec;
-//     if (typeof frameSpec == "string") {
-//         targetFrame = getFrameById(frameSpec)
-//         if (!targetFrame) console.log(`Navigate could not find frame with id ${frameSpec}`)
-//     }
-//     return targetFrame;
-// }
+function resolveFrame(frameSpec?: FrameSpec): Frame {
+    let targetFrame: Frame;
+    if (!frameSpec) targetFrame = topmost();
+    if (frameSpec instanceof Frame) targetFrame = frameSpec;
+    if (typeof frameSpec == 'string') {
+        targetFrame = getFrameById(frameSpec);
+        if (!targetFrame) console.log(`Navigate could not find frame with id ${frameSpec}`);
+    }
+    return targetFrame;
+}
 
 // interface ComponentInstanceInfo { element: ElementNode, pageInstance: GlimmerComponent }
 
@@ -107,25 +107,25 @@ export function navigate(name: string): any {
     return null;
 }
 
-// export interface BackNavigationOptions {
-//     frame?: FrameSpec;
-//     to?: PageElement;
-// }
+export interface BackNavigationOptions {
+    frame?: any;
+    to?: any;
+}
 
-// export function goBack(options: BackNavigationOptions = {}) {
-//     let targetFrame = resolveFrame(options.frame);
-//     if (!targetFrame) {
-//         throw new Error("goback requires frame option to be a native Frame, a FrameElement, a frame Id, or null")
-//     }
-//     let backStackEntry: BackstackEntry = null;
-//     if (options.to) {
-//         backStackEntry = targetFrame.backStack.find(e => e.resolvedPage === options.to.nativeView);
-//         if (!backStackEntry) {
-//             throw new Error("Couldn't find the destination page in the frames backstack")
-//         }
-//     }
-//     return targetFrame.goBack(backStackEntry);
-// }
+export function goBack(options: BackNavigationOptions = {}) {
+    let targetFrame = resolveFrame(options.frame);
+    if (!targetFrame) {
+        throw new Error('goback requires frame option to be a native Frame, a FrameElement, a frame Id, or null');
+    }
+    let backStackEntry: BackstackEntry = null;
+    if (options.to) {
+        backStackEntry = targetFrame.backStack.find((e) => e.resolvedPage === options.to.nativeView);
+        if (!backStackEntry) {
+            throw new Error("Couldn't find the destination page in the frames backstack");
+        }
+    }
+    return targetFrame.goBack(backStackEntry);
+}
 
 // export interface ShowModalOptions {
 //     page: PageSpec

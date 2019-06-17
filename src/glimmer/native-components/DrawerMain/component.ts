@@ -1,8 +1,9 @@
 import Component from '@glimmer/component';
 
 export default class DrawerMain extends Component {
+    __owner__: any;
     didInsertElement() {
-        const parentNativeView = (this.element.parentElement as any)._nativeView;
-        parentNativeView.mainContent = (this.element as any)._nativeView;
+        const args: any = this.__owner__.args;
+        args.rendered(this.bounds.firstNode);
     }
 }

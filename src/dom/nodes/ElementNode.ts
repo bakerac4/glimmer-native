@@ -20,11 +20,11 @@ export default class ElementNode extends ViewNode {
         if (viewClass) {
             this._nativeView = new viewClass();
             this._nativeView.__GlimmerNativeElement__ = this;
-            console.log(`${this} has view class`);
+            // console.log(`${this} has view class`);
             EVENT_ATTRIBUTES.forEach((event) => {
-                console.log(`Checking for atttribute ${event}`);
+                // console.log(`Checking for atttribute ${event}`);
                 let attribute = this.getAttribute(event);
-                console.log(`Attribute ${event}: ${attribute}`);
+                // console.log(`Attribute ${event}: ${attribute}`);
                 // console.log(`Native view attribute ${event}: ${this._nativeView.getAttribute(event)}`);
                 if (attribute) {
                     this.addEventListener(event, attribute);
@@ -32,7 +32,7 @@ export default class ElementNode extends ViewNode {
             });
         }
 
-        console.log(`created ${this} ${this._nativeView}`);
+        // console.log(`created ${this} ${this._nativeView}`);
 
         let setStyle = (value) => {
             this.setAttribute('style', value);
@@ -52,19 +52,19 @@ export default class ElementNode extends ViewNode {
             },
 
             get cssText() {
-                console.log('got css text');
+                // console.log('got css text');
                 return getStyle();
             },
 
             set cssText(value) {
-                console.log('set css text');
+                // console.log('set css text');
                 setStyle(value);
             }
         };
     }
 
     setAttribute(key, value) {
-        console.log(`setAttribute: ${key} - ${value}`);
+        // console.log(`setAttribute: ${key} - ${value}`);
         if (key.startsWith('on:')) {
             key = key.substr(3);
             this.addEventListener(key, value);

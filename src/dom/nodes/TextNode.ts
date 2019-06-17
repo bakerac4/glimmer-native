@@ -11,7 +11,6 @@ export default class TextNode extends ViewNode {
         this._meta = {
             skipAddToDom: true
         };
-        console.log(`created ${this}`);
     }
 
     setText(text) {

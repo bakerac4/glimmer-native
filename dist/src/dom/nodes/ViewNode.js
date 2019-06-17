@@ -86,7 +86,6 @@ export default class ViewNode {
                 break;
             }
         }
-        console.log(`setAttr ${this} ${key} ${value}`);
         try {
             if (XML_ATTRIBUTES.indexOf(key) !== -1) {
                 nv[key] = value;
@@ -109,7 +108,6 @@ export default class ViewNode {
     }
     /* istanbul ignore next */
     setStyle(property, value) {
-        console.log(`setStyle ${this} ${property} ${value}`);
         if (!(value = value.trim()).length) {
             return;
         }
@@ -121,7 +119,6 @@ export default class ViewNode {
     }
     /* istanbul ignore next */
     setText(text) {
-        console.log(`setText ${this} ${text}`);
         if (this.nodeType === 3) {
             this.parentNode.setText(text);
         }
@@ -131,25 +128,20 @@ export default class ViewNode {
     }
     /* istanbul ignore next */
     addEventListener(event, handler) {
-        console.log(`add event listener ${this} ${event}`);
         this.nativeView.on(event, handler);
     }
     /* istanbul ignore next */
     removeEventListener(event, handler) {
-        console.log(`remove event listener ${this} ${event}`);
         this.nativeView.off(event, handler);
     }
     dispatchEvent(event) {
         if (this.nativeView) {
             //nativescript uses the EventName while dom uses Type
-            console.log(`In dispatch event: ${event}`);
             event.eventName = event.type;
-            console.log(`event name: ${event.eventName}`);
             this.nativeView.notify(event);
         }
     }
     insertBefore(childNode, referenceNode) {
-        console.log(`insert before ${this} ${childNode} ${referenceNode}`);
         if (!childNode) {
             throw new Error(`Can't insert child.`);
         }
@@ -181,7 +173,6 @@ export default class ViewNode {
         insertChild(this, childNode, index);
     }
     appendChild(childNode) {
-        console.log(`append child ${this} ${childNode}`);
         if (!childNode) {
             throw new Error(`Can't append child.`);
         }
@@ -204,7 +195,6 @@ export default class ViewNode {
         insertChild(this, childNode, this.childNodes.length - 1);
     }
     removeChild(childNode) {
-        console.log(`remove child ${this} ${childNode}`);
         if (!childNode) {
             throw new Error(`Can't remove child.`);
         }
