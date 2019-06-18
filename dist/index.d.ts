@@ -31,7 +31,7 @@ export default class Application {
     static _renderComponent(name: any, containerElement: any, nextSibling: any, compilable: any): void;
     parseTemplates(folder: any): void;
     registerState(components: any): Promise<void>;
-    static registerComponent(name: any, value: any): void;
+    registerComponent(name: any, value: any): void;
     boot(): Promise<{}>;
     scheduleRerender(): void;
     protected _rerender(): Promise<void>;

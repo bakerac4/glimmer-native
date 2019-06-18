@@ -6,17 +6,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { precompile } from '@glimmer/compiler';
 import { Context } from '@glimmer/opcode-compiler';
 import { artifacts } from '@glimmer/program';
-import { AotRuntime, renderAot, renderSync } from '@glimmer/runtime';
+import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
+import { registerElement } from './src/dom/element-registry';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { registerElements } from './src/dom/setup-registry';
 import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/glimmer/context';
 import Resolver from './src/glimmer/resolver';
 import setupGlimmer from './src/glimmer/setup';
-const { join, relative, resolve, sep } = require('path');
 //Exports
 export { ResolverDelegate } from './src/glimmer/context';
 export { registerElements } from './src/dom/setup-registry';
@@ -38,7 +39,7 @@ export default class Application {
         setupGlimmer(resolverDelegate, resolver);
         Application.document = new DocumentNode();
         Application.rootFrame = new ElementNode('frame');
-        Application.rootFrame.setAttribute('id', 'app-root-frame');
+        Application.rootFrame.setAttribute('id', 'root');
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
     }
@@ -83,8 +84,10 @@ export default class Application {
             });
         });
     }
-    static registerComponent(name, value) {
-        Application.outsideComponents.push({ name, value });
+    registerComponent(name, value) {
+        registerElement(name, value);
+        const handle = Application.resolver.registerTemplateOnlyComponent();
+        Application.resolverDelegate.registerComponent(name, handle, precompile(`<${name.toLowerCase()} ...attributes> {{yield}} </${name.toLowerCase()}>`), TEMPLATE_ONLY_COMPONENT);
     }
     boot() {
         const rootFrame = Application.rootFrame;
