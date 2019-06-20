@@ -27,8 +27,8 @@ export default class Application {
     static outsideComponents: any;
     constructor(appFolder: any, components: any);
     renderMain(name: any, containerElement?: any, nextSibling?: any): void;
-    static renderComponent(name: any, containerElement: any, nextSibling?: any): void;
-    static _renderComponent(name: any, containerElement: any, nextSibling: any, compilable: any): void;
+    static renderComponent(name: any, containerElement: any, nextSibling: any, state: any): ElementNode;
+    static _renderComponent(name: any, containerElement: any, nextSibling: any, compilable: any, data?: {}): ElementNode;
     parseTemplates(folder: any): void;
     registerState(components: any): Promise<void>;
     registerComponent(name: any, value: any): void;

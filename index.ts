@@ -1,6 +1,7 @@
 import { precompile } from '@glimmer/compiler';
 import { Context } from '@glimmer/opcode-compiler';
 import { artifacts } from '@glimmer/program';
+import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
 
@@ -9,7 +10,6 @@ import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { registerElements } from './src/dom/setup-registry';
 import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/glimmer/context';
-import NativeCapabilities from './src/glimmer/native-capabilities';
 import Resolver from './src/glimmer/resolver';
 import setupGlimmer from './src/glimmer/setup';
 
@@ -70,22 +70,27 @@ export default class Application {
         Application._renderComponent(name, containerElement, nextSibling, main);
     }
 
-    static renderComponent(name, containerElement, nextSibling = null) {
-        let component = Compilable(`<${name} />`).compile(Application.context);
-        // const component = GlimmerResolverDelegate.lookupComponent(name).compilable.compile(Application.context);
-        Application._renderComponent(name, containerElement, nextSibling, component);
+    static renderComponent(name, containerElement, nextSibling = null, state) {
+        //Shouldn't need to do this here - TODO: Look into why
+        let component = Compilable(`<${name} @model={{this.model}} />`);
+        const compiled = component.compile(Application.context);
+        // const component = GlimmerResolverDelegate.lookupComponent(name);
+        // const compiled = component.compilable.compile(Application.context);
+        return Application._renderComponent(name, containerElement, nextSibling, compiled, state);
     }
 
-    static _renderComponent(name, containerElement, nextSibling, compilable) {
+    static _renderComponent(name, containerElement, nextSibling, compilable, data = {}): ElementNode {
+        let state = State(data);
         const artifact = artifacts(Application.context);
         Application.aotRuntime = AotRuntime(Application.document as any, artifact, Application.resolver);
         const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
-        let iterator = renderAot(Application.aotRuntime, compilable, cursor);
+        let iterator = renderAot(Application.aotRuntime, compilable, cursor, state);
         try {
             const result = renderSync(Application.aotRuntime.env, iterator);
             console.log('Application Rendered');
             Application.result = result;
             Application._rendered = true;
+            return result.firstNode() as any;
         } catch (error) {
             console.log(`Error rendering component ${name}: ${error}`);
         }

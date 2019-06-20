@@ -1,37 +1,34 @@
-import { BackstackEntry, Frame, topmost } from 'tns-core-modules/ui/frame';
+import { BackstackEntry, Frame, NavigationTransition, topmost } from 'tns-core-modules/ui/frame';
+import { Page } from 'tns-core-modules/ui/page';
 
 import Application from '../..';
 import ElementNode from '../dom/nodes/ElementNode';
 
+export type FrameType = Frame | string;
 // import { createElement, logger as log } from "./basicdom";
 // import PageElement from "./native/PageElement";
 // import NativeElementNode from "./native/NativeElementNode";
-export type FrameSpec = Frame | string;
-// export type PageSpec = typeof GlimmerComponent;
-// export interface NavigationOptions {
-//     page: PageSpec;
-//     props?: any;
-//     frame?: FrameSpec;
+export interface NavigationOptions {
+    frame: FrameType;
+    context?: any;
+    animated?: boolean;
+    backstackVisible?: boolean;
+    clearHistory?: boolean;
+    transition?: NavigationTransition;
+    transitionAndroid?: NavigationTransition;
+    transitioniOS?: NavigationTransition;
+}
 
-//     animated?: boolean;
-//     backstackVisible?: boolean;
-//     clearHistory?: boolean;
-//     transition?: NavigationTransition;
-//     transitionAndroid?: NavigationTransition;
-//     transitioniOS?: NavigationTransition;
-// }
-
-function resolveFrame(frameSpec?: FrameSpec): Frame {
+function resolveFrame(frame?: FrameType): Frame {
     let targetFrame: Frame;
-    const document = Application.document;
-    if (!frameSpec) targetFrame = topmost();
-    if (frameSpec instanceof Frame) targetFrame = frameSpec;
-    if (typeof frameSpec == 'string') {
-        const node = resolveFrameNode(frameSpec);
+    if (!frame) targetFrame = topmost();
+    if (frame instanceof Frame) targetFrame = frame;
+    if (typeof frame == 'string') {
+        const node = resolveFrameNode(frame);
         if (node) {
             targetFrame = node.nativeView;
         }
-        if (!targetFrame) console.log(`Navigate could not find frame with id ${frameSpec}`);
+        if (!targetFrame) console.log(`Navigate could not find frame with id ${frame}`);
     }
     return targetFrame;
 }
@@ -47,12 +44,23 @@ function resolveFrameNode(name: string): ElementNode {
     return targetFrame;
 }
 
-export function navigate(name: string): any {
-    const frame = resolveFrameNode(name);
-    if (frame) {
-        topmost().navigate({
+export function navigate(componentName: string, options: NavigationOptions): any {
+    let { frame } = options;
+    const target = resolveFrame(frame);
+    const targetNode = target.get('__GlimmerNativeElement__');
+    if (!componentName) {
+        throw new Error('Must have a valid component name (@target) to perform navigation');
+    }
+
+    if (targetNode) {
+        const element = Application.renderComponent(componentName, targetNode, null, options.context);
+        if (!(element.nativeView instanceof Page)) {
+            throw new Error('Navigate requires a Glimmer Component with a page element at the root');
+        }
+        target.navigate({
+            ...options,
             create: () => {
-                return frame.firstElement().nativeView;
+                return element.nativeView;
             }
         });
     } else {
@@ -63,10 +71,11 @@ export function navigate(name: string): any {
 
         try {
             console.log('About to render new result');
-            Application.renderComponent(name, newFrame);
+            const element = Application.renderComponent(componentName, newFrame, null, options.context);
             topmost().navigate({
+                ...options,
                 create: () => {
-                    return newFrame.firstElement().nativeView;
+                    return element.nativeView;
                 }
             });
             console.log('New page rendered');
@@ -90,10 +99,53 @@ export function goBack(options: BackNavigationOptions = {}) {
     }
     let backStackEntry: BackstackEntry = null;
     if (options.to) {
-        backStackEntry = targetFrame.backStack[0];
+        backStackEntry = targetFrame.backStack.find((e) => e.resolvedPage === options.to.nativeView);
         if (!backStackEntry) {
             throw new Error("Couldn't find the destination page in the frames backstack");
         }
     }
     return targetFrame.goBack(backStackEntry);
+}
+
+export interface ShowModalOptions {
+    context?: any;
+    android?: { cancelable: boolean };
+    ios?: { presentationStyle: any };
+    animated?: boolean;
+    fullscreen?: boolean;
+    stretched: boolean;
+}
+
+const modalStack: any[] = [];
+
+export function showModal<T>(componentName: string, options: ShowModalOptions): Promise<T> {
+    //Get this before any potential new frames are created by component below
+    let modalLauncher = topmost().currentPage;
+
+    const element = Application.renderComponent(
+        componentName,
+        modalLauncher.get('__GlimmerNativeElement__'),
+        null,
+        options.context
+    );
+
+    return new Promise((resolve, reject) => {
+        let resolved = false;
+        const closeCallback = (result: T) => {
+            if (resolved) return;
+            resolved = true;
+            try {
+                console.log('test');
+            } finally {
+                resolve(result);
+            }
+        };
+        modalStack.push(element);
+        modalLauncher.showModal(element.nativeView, { ...options, context: options.context, closeCallback });
+    });
+}
+
+export function closeModal(result: any): void {
+    let modalPageInstanceInfo = modalStack.pop();
+    modalPageInstanceInfo.element.nativeView.closeModal(result);
 }

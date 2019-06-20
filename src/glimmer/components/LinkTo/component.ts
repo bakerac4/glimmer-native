@@ -1,12 +1,54 @@
 import Component from '@glimmer/component';
+import { NavigationTransition } from 'tns-core-modules/ui/frame/frame';
 
-import { navigate } from '../../navigation';
+import { navigate, NavigationOptions, showModal, ShowModalOptions } from '../../navigation';
 
 export default class LinkTo extends Component {
-    target: string;
+    frame?: any;
+    context?: any;
+    animated?: boolean;
+    backstackVisible?: boolean;
+    clearHistory?: boolean;
+    transition?: NavigationTransition;
+    transitionAndroid?: NavigationTransition;
+    transitioniOS?: NavigationTransition;
+    component: string;
+    model: any;
     __owner__: any;
     onClick() {
-        const target = this.__owner__.args.target;
-        navigate(target);
+        const args = this.__owner__.args;
+        const target = args.component;
+
+        if (args.modal) {
+            const options: ShowModalOptions = {
+                android: args.android,
+                ios: args.ios,
+                animated: args.animated,
+                fullscreen: args.fullscreen,
+                stretched: args.stretched
+            };
+            if (args.model) {
+                options.context = {
+                    model: args.model
+                };
+            }
+            showModal(target, options);
+        } else {
+            const options: NavigationOptions = {
+                frame: args.frame,
+                animated: args.animated,
+                backstackVisible: args.backstackVisible,
+                clearHistory: args.clearHistory,
+                transition: args.transition,
+                transitionAndroid: args.transitionAndroid,
+                transitioniOS: args.transitioniOS
+            };
+            if (args.model) {
+                options.context = {
+                    model: args.model
+                };
+            }
+            navigate(target, options);
+        }
     }
 }
