@@ -23,10 +23,8 @@ export class ComponentStateBucket {
             if (ComponentClass.class !== undefined) {
                 ComponentClass = ComponentClass.class;
             }
-            this.component = new ComponentClass({
-                args: this.namedArgsSnapshot(),
-                debugName: name
-            });
+            this.component = new ComponentClass({}, this.namedArgsSnapshot());
+            this.component.debugName = name;
         }
     }
     get tag() {

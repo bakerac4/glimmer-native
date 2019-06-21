@@ -37,10 +37,8 @@ export class ComponentStateBucket {
                 ComponentClass = ComponentClass.class;
             }
 
-            this.component = new ComponentClass({
-                args: this.namedArgsSnapshot(),
-                debugName: name
-            });
+            this.component = new ComponentClass({}, this.namedArgsSnapshot());
+            this.component.debugName = name;
         }
     }
 

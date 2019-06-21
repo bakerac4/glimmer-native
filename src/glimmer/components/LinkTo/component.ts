@@ -14,9 +14,8 @@ export default class LinkTo extends Component {
     transitioniOS?: NavigationTransition;
     component: string;
     model: any;
-    __owner__: any;
     onClick() {
-        const args = this.__owner__.args;
+        const args = this.args as any;
         const target = args.component;
 
         if (args.modal) {

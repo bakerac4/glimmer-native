@@ -11,6 +11,5 @@ export default class LinkTo extends Component {
     transitioniOS?: NavigationTransition;
     component: string;
     model: any;
-    __owner__: any;
     onClick(): void;
 }

@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { navigate, showModal } from '../../navigation';
 export default class LinkTo extends Component {
     onClick() {
-        const args = this.__owner__.args;
+        const args = this.args;
         const target = args.component;
         if (args.modal) {
             const options = {
