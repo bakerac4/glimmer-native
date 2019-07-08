@@ -17,6 +17,7 @@ import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { registerElements } from './src/dom/setup-registry';
 import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/glimmer/context';
+import buildUserHelper from './src/glimmer/references/helper-reference';
 import Resolver from './src/glimmer/resolver';
 import setupGlimmer from './src/glimmer/setup';
 //Exports
@@ -94,6 +95,11 @@ export default class Application {
         registerElement(name, value);
         const handle = Application.resolver.registerTemplateOnlyComponent();
         Application.resolverDelegate.registerComponent(name, handle, precompile(`<${name.toLowerCase()} ...attributes> {{yield}} </${name.toLowerCase()}>`), TEMPLATE_ONLY_COMPONENT);
+    }
+    registerHelper(name, func) {
+        const helper = buildUserHelper(func);
+        const handle = Application.resolver.registerHelper(helper);
+        Application.resolverDelegate.registerHelper(name, handle);
     }
     boot() {
         const rootFrame = Application.rootFrame;

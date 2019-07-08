@@ -1,4 +1,5 @@
-import { BackstackEntry, Frame, NavigationTransition, topmost } from 'tns-core-modules/ui/frame';
+import { EPOCH } from '@glimmer/reference';
+import { BackstackEntry, Frame, NavigatedData, NavigationTransition, topmost } from 'tns-core-modules/ui/frame';
 import { Page } from 'tns-core-modules/ui/page';
 
 import Application from '../..';
@@ -57,6 +58,26 @@ export function navigate(componentName: string, options: NavigationOptions): any
         if (!(element.nativeView instanceof Page)) {
             throw new Error('Navigate requires a Glimmer Component with a page element at the root');
         }
+
+        const handler = async (args: NavigatedData) => {
+            if (args.isBackNavigation) {
+                element.nativeView.off('navigatedFrom', handler);
+                EPOCH.inner.validate(0);
+                // try {
+                //     // Application.result.destroy();
+                //     // Application.aotRuntime.env.begin();
+
+                //     // Application.aotRuntime.env.commit();
+                //     await Application.result.rerender();
+                //     Application._rendered = true;
+                //     console.log('Result Re-rendered');
+                // } catch (error) {
+                //     console.log(`Error in re-render: ${error}`);
+                // }
+            }
+        };
+        element.nativeView.on('navigatedFrom', handler);
+
         target.navigate({
             ...options,
             create: () => {
@@ -72,6 +93,14 @@ export function navigate(componentName: string, options: NavigationOptions): any
         try {
             console.log('About to render new result');
             const element = Application.renderComponent(componentName, newFrame, null, options.context);
+            const handler = (args: NavigatedData) => {
+                if (args.isBackNavigation) {
+                    element.nativeView.off('navigatedFrom', handler);
+                    const destructor = Application.resolver.managerFor().getDestructor();
+                    destructor.destroy();
+                }
+            };
+            element.nativeView.on('navigatedFrom', handler);
             topmost().navigate({
                 ...options,
                 create: () => {

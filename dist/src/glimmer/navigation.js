@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { EPOCH } from '@glimmer/reference';
 import { Frame, topmost } from 'tns-core-modules/ui/frame';
 import { Page } from 'tns-core-modules/ui/page';
 import Application from '../..';
@@ -40,6 +49,23 @@ export function navigate(componentName, options) {
         if (!(element.nativeView instanceof Page)) {
             throw new Error('Navigate requires a Glimmer Component with a page element at the root');
         }
+        const handler = (args) => __awaiter(this, void 0, void 0, function* () {
+            if (args.isBackNavigation) {
+                element.nativeView.off('navigatedFrom', handler);
+                EPOCH.inner.validate(0);
+                // try {
+                //     // Application.result.destroy();
+                //     // Application.aotRuntime.env.begin();
+                //     // Application.aotRuntime.env.commit();
+                //     await Application.result.rerender();
+                //     Application._rendered = true;
+                //     console.log('Result Re-rendered');
+                // } catch (error) {
+                //     console.log(`Error in re-render: ${error}`);
+                // }
+            }
+        });
+        element.nativeView.on('navigatedFrom', handler);
         target.navigate(Object.assign({}, options, { create: () => {
                 return element.nativeView;
             } }));
@@ -52,6 +78,14 @@ export function navigate(componentName, options) {
         try {
             console.log('About to render new result');
             const element = Application.renderComponent(componentName, newFrame, null, options.context);
+            const handler = (args) => {
+                if (args.isBackNavigation) {
+                    element.nativeView.off('navigatedFrom', handler);
+                    const destructor = Application.resolver.managerFor().getDestructor();
+                    destructor.destroy();
+                }
+            };
+            element.nativeView.on('navigatedFrom', handler);
             topmost().navigate(Object.assign({}, options, { create: () => {
                     return element.nativeView;
                 } }));

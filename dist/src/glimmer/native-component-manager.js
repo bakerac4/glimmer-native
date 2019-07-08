@@ -2,8 +2,8 @@ import { RootReference } from '@glimmer/component';
 import { CONSTANT_TAG } from '@glimmer/reference';
 const EMPTY_SELF = new RootReference(null);
 const NOOP_DESTROYABLE = { destroy() { } };
-const DESTROYING = Symbol('destroying');
-const DESTROYED = Symbol('destroyed');
+export const DESTROYING = Symbol('destroying');
+export const DESTROYED = Symbol('destroyed');
 export class Bounds {
     constructor(__bounds) {
         this._bounds = __bounds;

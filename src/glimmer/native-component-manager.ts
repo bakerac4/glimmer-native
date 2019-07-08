@@ -5,8 +5,8 @@ import { CONSTANT_TAG, PathReference, Tag } from '@glimmer/reference';
 
 const EMPTY_SELF = new RootReference(null);
 const NOOP_DESTROYABLE = { destroy() {} };
-const DESTROYING = Symbol('destroying');
-const DESTROYED = Symbol('destroyed');
+export const DESTROYING = Symbol('destroying');
+export const DESTROYED = Symbol('destroyed');
 
 export class Bounds {
     private _bounds: any;

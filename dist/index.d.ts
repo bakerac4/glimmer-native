@@ -32,6 +32,7 @@ export default class Application {
     parseTemplates(folder: any): void;
     registerState(components: any): Promise<void>;
     registerComponent(name: any, value: any): void;
+    registerHelper(name: any, func: any): void;
     boot(): Promise<{}>;
     scheduleRerender(): void;
     protected _rerender(): Promise<void>;

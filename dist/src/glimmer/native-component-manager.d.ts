@@ -2,6 +2,8 @@ import { ComponentDefinition } from '@glimmer/component';
 import { DefinitionState } from '@glimmer/component/dist/types/src/component-definition';
 import { AotRuntimeResolver, ComponentManager as VMComponentManager, Invocation } from '@glimmer/interfaces';
 import { PathReference, Tag } from '@glimmer/reference';
+export declare const DESTROYING: unique symbol;
+export declare const DESTROYED: unique symbol;
 export declare class Bounds {
     private _bounds;
     constructor(__bounds: any);
