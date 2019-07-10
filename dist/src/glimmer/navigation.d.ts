@@ -10,7 +10,7 @@ export interface NavigationOptions {
     transitionAndroid?: NavigationTransition;
     transitioniOS?: NavigationTransition;
 }
-export declare function navigate(componentName: string, options: NavigationOptions): any;
+export declare function navigate(componentName: string, model: any, options: NavigationOptions): any;
 export interface BackNavigationOptions {
     frame?: any;
     to?: any;
@@ -28,5 +28,5 @@ export interface ShowModalOptions {
     fullscreen?: boolean;
     stretched: boolean;
 }
-export declare function showModal<T>(componentName: string, options: ShowModalOptions): Promise<T>;
-export declare function closeModal(result: any): void;
+export declare function showModal<T>(componentName: string, model: any, options?: ShowModalOptions): Promise<T>;
+export declare function closeModal(): void;

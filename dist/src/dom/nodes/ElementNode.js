@@ -1,3 +1,5 @@
+import { KeyframeAnimation } from 'tns-core-modules/ui/animation/keyframe-animation';
+import { CssAnimationParser } from 'tns-core-modules/ui/styling/css-animation-parser';
 import { getViewClass } from '../element-registry';
 import ViewNode from './ViewNode';
 function camelize(kebab) {
@@ -7,6 +9,8 @@ const EVENT_ATTRIBUTES = Object.freeze(['tap']);
 export default class ElementNode extends ViewNode {
     constructor(tagName) {
         super();
+        this.animations = new Map();
+        this.oldAnimations = [];
         this.nodeType = 1;
         this.tagName = tagName;
         //there are some special elements that don't exist natively
@@ -48,6 +52,85 @@ export default class ElementNode extends ViewNode {
                 setStyle(value);
             }
         };
+    }
+    animate(options) {
+        if (this.nativeView) {
+            this.nativeView.animate(options);
+        }
+    }
+    getParentPage() {
+        if (this.nativeView && this.nativeView.page) {
+            return this.nativeView.page.__GlimmerNativeElement__;
+        }
+        return null;
+    }
+    addAnimation(animation) {
+        if (!this.nativeView) {
+            throw Error('Attempt to apply animation to tag without a native view' + this.tagName);
+        }
+        let page = this.getParentPage();
+        if (page === null) {
+            this.animations.set(animation, null);
+            return;
+        }
+        //quickly cancel any old ones
+        while (this.oldAnimations.length) {
+            let oldAnimation = this.oldAnimations.shift();
+            if (oldAnimation.isPlaying) {
+                oldAnimation.cancel();
+            }
+        }
+        //Parse our "animation" style property into an animation info instance (this won't include the keyframes from the css)
+        let animationInfos = CssAnimationParser.keyframeAnimationsFromCSSDeclarations([
+            { property: 'animation', value: animation }
+        ]);
+        if (!animationInfos) {
+            this.animations.set(animation, null);
+            return;
+        }
+        let animationInfo = animationInfos[0];
+        //Fetch an animationInfo instance that includes the keyframes from the css (this won't include the animation properties parsed above)
+        let animationWithKeyframes = page.nativeView.getKeyframeAnimationWithName(animationInfo.name);
+        if (!animationWithKeyframes) {
+            this.animations.set(animation, null);
+            return;
+        }
+        animationInfo.keyframes = animationWithKeyframes.keyframes;
+        //combine the keyframes from the css with the animation from the parsed attribute to get a complete animationInfo object
+        let animationInstance = KeyframeAnimation.keyframeAnimationFromInfo(animationInfo);
+        // save and launch the animation
+        this.animations.set(animation, animationInstance);
+        animationInstance.play(this.nativeView);
+    }
+    removeAnimation(animation) {
+        if (this.animations.has(animation)) {
+            let animationInstance = this.animations.get(animation);
+            this.animations.delete(animation);
+            if (animationInstance) {
+                if (animationInstance.isPlaying) {
+                    //we don't want to stop right away since svelte removes the animation before it is finished due to our lag time starting the animation.
+                    this.oldAnimations.push(animationInstance);
+                }
+            }
+        }
+    }
+    get animation() {
+        return [...this.animations.keys()].join(', ');
+    }
+    set animation(value) {
+        let new_animations = value.trim() == '' ? [] : value.split(',').map((a) => a.trim());
+        //add new ones
+        for (let anim of new_animations) {
+            if (!this.animations.has(anim)) {
+                this.addAnimation(anim);
+            }
+        }
+        //remove old ones
+        for (let anim of this.animations.keys()) {
+            if (new_animations.indexOf(anim) < 0) {
+                this.removeAnimation(anim);
+            }
+        }
     }
     setAttribute(key, value) {
         // console.log(`setAttribute: ${key} - ${value}`);

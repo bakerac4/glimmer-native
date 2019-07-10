@@ -71,7 +71,11 @@ export default class Application {
             console.log('Application Rendered');
             Application.result = result;
             Application._rendered = true;
-            return result.firstNode();
+            let node = result.firstNode();
+            while (!node._nativeView) {
+                node = node.nextSibling;
+            }
+            return node;
         }
         catch (error) {
             console.log(`Error rendering component ${name}: ${error}`);

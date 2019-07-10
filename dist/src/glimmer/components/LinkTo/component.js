@@ -12,12 +12,7 @@ export default class LinkTo extends Component {
                 fullscreen: args.fullscreen,
                 stretched: args.stretched
             };
-            if (args.model) {
-                options.context = {
-                    model: args.model
-                };
-            }
-            showModal(target, options);
+            showModal(target, args.model, options);
         }
         else {
             const options = {
@@ -29,12 +24,7 @@ export default class LinkTo extends Component {
                 transitionAndroid: args.transitionAndroid,
                 transitioniOS: args.transitioniOS
             };
-            if (args.model) {
-                options.context = {
-                    model: args.model
-                };
-            }
-            navigate(target, options);
+            navigate(target, args.model, options);
         }
     }
 }

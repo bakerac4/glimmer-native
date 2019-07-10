@@ -37,7 +37,7 @@ function resolveFrameNode(name) {
         : undefined;
     return targetFrame;
 }
-export function navigate(componentName, options) {
+export function navigate(componentName, model, options) {
     let { frame } = options;
     const target = resolveFrame(frame);
     const targetNode = target.get('__GlimmerNativeElement__');
@@ -45,7 +45,7 @@ export function navigate(componentName, options) {
         throw new Error('Must have a valid component name (@target) to perform navigation');
     }
     if (targetNode) {
-        const element = Application.renderComponent(componentName, targetNode, null, options.context);
+        const element = Application.renderComponent(componentName, targetNode, null, { model });
         if (!(element.nativeView instanceof Page)) {
             throw new Error('Navigate requires a Glimmer Component with a page element at the root');
         }
@@ -77,7 +77,7 @@ export function navigate(componentName, options) {
         document.appendChild(newFrame);
         try {
             console.log('About to render new result');
-            const element = Application.renderComponent(componentName, newFrame, null, options.context);
+            const element = Application.renderComponent(componentName, newFrame, null, { model });
             const handler = (args) => {
                 if (args.isBackNavigation) {
                     element.nativeView.off('navigatedFrom', handler);
@@ -112,10 +112,13 @@ export function goBack(options = {}) {
     return targetFrame.goBack(backStackEntry);
 }
 const modalStack = [];
-export function showModal(componentName, options) {
+export function showModal(componentName, model, options) {
     //Get this before any potential new frames are created by component below
     let modalLauncher = topmost().currentPage;
-    const element = Application.renderComponent(componentName, modalLauncher.get('__GlimmerNativeElement__'), null, options.context);
+    let frame = new ElementNode('frame');
+    const element = Application.renderComponent(componentName, frame, null, {
+        model
+    });
     return new Promise((resolve, reject) => {
         let resolved = false;
         const closeCallback = (result) => {
@@ -123,17 +126,18 @@ export function showModal(componentName, options) {
                 return;
             resolved = true;
             try {
-                console.log('test');
+                console.log('modal closed');
+                // frame.parentNode.removeChild(frame);
             }
             finally {
                 resolve(result);
             }
         };
         modalStack.push(element);
-        modalLauncher.showModal(element.nativeView, Object.assign({}, options, { context: options.context, closeCallback }));
+        modalLauncher.showModal(element.nativeView, Object.assign({}, options, { context: model, closeCallback }));
     });
 }
-export function closeModal(result) {
+export function closeModal() {
     let modalPageInstanceInfo = modalStack.pop();
-    modalPageInstanceInfo.element.nativeView.closeModal(result);
+    modalPageInstanceInfo.nativeView.closeModal();
 }
