@@ -1,6 +1,7 @@
 // Largely taken from the Vue implimentation
 import { registerElement } from './element-registry';
 import ListView from './native/list-view';
+import TemplateElement from './native/TemplateElement';
 
 export function registerElements() {
     registerElement('head', () => null, {
@@ -48,4 +49,5 @@ export function registerElements() {
     // Not Complete
     registerElement('ListView', () => ListView);
     registerElement('RadSideDrawer', () => require('nativescript-ui-sidedrawer').RadSideDrawer);
+    registerElement('Template', () => new TemplateElement());
 }

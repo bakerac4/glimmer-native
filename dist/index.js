@@ -23,6 +23,7 @@ import setupGlimmer from './src/glimmer/setup';
 //Exports
 export { ResolverDelegate } from './src/glimmer/context';
 export { registerElements } from './src/dom/setup-registry';
+export { createElement } from './src/dom/element-registry';
 export { default as DocumentNode } from './src/dom/nodes/DocumentNode';
 export { default as ElementNode } from './src/dom/nodes/ElementNode';
 export { default as Resolver } from './src/glimmer/resolver';
@@ -30,7 +31,7 @@ export { default as NativeCapabilities } from './src/glimmer/native-capabilities
 export { NativeModifier, NativeModifierDefinitionState } from './src/glimmer/native-modifier-manager';
 export { goBack } from './src/glimmer/navigation';
 export default class Application {
-    constructor(appFolder, components) {
+    constructor(appFolder, components, helpers) {
         registerElements();
         const resolverDelegate = new ResolverDelegate();
         const resolver = new Resolver();
@@ -39,6 +40,7 @@ export default class Application {
         this.parseTemplates(appFolder);
         this.registerState(components);
         setupGlimmer(resolverDelegate, resolver);
+        this.registerHelpers(helpers);
         Application.document = new DocumentNode();
         Application.rootFrame = new ElementNode('frame');
         Application.rootFrame.setAttribute('id', 'root');
@@ -88,6 +90,11 @@ export default class Application {
             Application.resolverDelegate.registerComponent(template.name, template.handle, template.source, template.capabilities);
         });
     }
+    registerHelpers(helpers) {
+        helpers.forEach((helper) => {
+            this.registerHelper(helper.name, helper.class);
+        });
+    }
     registerState(components) {
         return __awaiter(this, void 0, void 0, function* () {
             components.forEach((component) => {
@@ -95,7 +102,7 @@ export default class Application {
             });
         });
     }
-    registerComponent(name, value) {
+    registerNativeComponent(name, value) {
         registerElement(name, value);
         const handle = Application.resolver.registerTemplateOnlyComponent();
         Application.resolverDelegate.registerComponent(name, handle, precompile(`<${name.toLowerCase()} ...attributes> {{yield}} </${name.toLowerCase()}>`), TEMPLATE_ONLY_COMPONENT);
