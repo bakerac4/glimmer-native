@@ -1,3 +1,3 @@
 import Component from '@glimmer/component';
 
-export default class Span extends Component {}
+export default class Switch extends Component {}

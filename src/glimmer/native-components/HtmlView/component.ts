@@ -1,3 +1,3 @@
 import Component from '@glimmer/component';
 
-export default class WrapLayout extends Component {}
+export default class HtmlView extends Component {}

@@ -1,2 +1,2 @@
 import { precompile } from '@glimmer/compiler';
-export default precompile(`<span ...attributes />`);
+export default precompile(`<switch ...attributes />`);

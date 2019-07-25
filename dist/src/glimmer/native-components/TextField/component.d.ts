@@ -1,3 +1,3 @@
 import Component from '@glimmer/component';
-export default class TextView extends Component {
+export default class TextField extends Component {
 }
