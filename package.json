@@ -18,7 +18,7 @@
     "main": "dist/index.js",
     "author": "Adam Baker",
     "peerDependencies": {
-        "tns-core-modules": "5.4.0"
+        "tns-core-modules": "^6.0.1"
     },
     "dependencies": {
         "@glimmer/application": "^0.13.0",
@@ -41,17 +41,10 @@
         "@glimmer/tracking": "^0.14.0-alpha.7",
         "@glimmer/util": "^0.41.0",
         "@glimmer/vm": "^0.41.0",
-        "@glimmer/wire-format": "^0.41.0",
-        "@simple-dom/document": "^1.4.0",
-        "@simple-dom/interface": "^1.4.0",
-        "@simple-dom/serializer": "^1.4.0",
-        "@simple-dom/void-map": "^1.4.0"
+        "@glimmer/wire-format": "^0.41.0"
     },
     "devDependencies": {
-        "nativescript-dev-webpack": "~0.22.0",
-        "nativescript-theme-core": "~1.0.6",
-        "tns-core-modules": "~5.4.0",
-        "nativescript-ui-sidedrawer": "6.0.0",
-        "typescript": "^3.4.5"
+        "tns-core-modules": "^6.0.1",
+        "typescript": "^3.5.3"
     }
 }
