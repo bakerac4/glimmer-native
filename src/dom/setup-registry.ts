@@ -52,6 +52,5 @@ export function registerElements() {
 
     // Not Complete
     registerElement('ListView', () => ListView);
-    registerElement('RadSideDrawer', () => require('nativescript-ui-sidedrawer').RadSideDrawer);
     registerElement('Template', () => new TemplateElement());
 }

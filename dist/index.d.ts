@@ -36,7 +36,7 @@ export default class Application {
     registerState(components: any): Promise<void>;
     registerNativeComponent(name: any, value: any): void;
     registerHelper(name: any, func: any): void;
-    boot(): Promise<{}>;
+    boot(): Promise<unknown>;
     scheduleRerender(): void;
     protected _rerender(): Promise<void>;
 }
