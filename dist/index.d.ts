@@ -3,6 +3,7 @@ import ElementNode from './src/dom/nodes/ElementNode';
 export { ResolverDelegate } from './src/glimmer/context';
 export { registerElements } from './src/dom/setup-registry';
 export { createElement } from './src/dom/element-registry';
+export { action } from './src/glimmer/decorators/action';
 export { default as DocumentNode } from './src/dom/nodes/DocumentNode';
 export { default as ElementNode } from './src/dom/nodes/ElementNode';
 export { default as Resolver } from './src/glimmer/resolver';
