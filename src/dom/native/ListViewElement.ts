@@ -1,15 +1,16 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { ItemEventData, ItemsSource, ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 
-import ElementNode from '../nodes/ElementNode';
+import { createElement } from '../element-registry';
+import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
 
-export default class ListView extends ElementNode {
+export default class ListViewElement extends NativeElementNode {
     template: any;
     yieldItem: (item) => {};
 
     constructor() {
-        super('listview');
+        super('listview', NativeListView, null);
 
         this._nativeView.on(NativeListView.itemLoadingEvent, (args) => {
             this.updateListItem(args as ItemEventData);
@@ -18,7 +19,7 @@ export default class ListView extends ElementNode {
 
     updateListItem(args: ItemEventData) {
         let item;
-        let listView = this._nativeView;
+        let listView = this.nativeView;
         let items = listView.items;
 
         if (args.index >= items.length) {
@@ -34,17 +35,17 @@ export default class ListView extends ElementNode {
 
         if (!args.view || !(args.view as any).__GlimmerComponent__) {
             // log.debug(`creating view for item at ${args.index}`)
-            let wrapper = new ElementNode('StackLayout') as ElementNode;
-            // let componentInstance = new this.itemTemplateComponent({
-            //     target: wrapper,
-            //     intro: true,
-            //     props: {
-            //         item
-            //     }
-            // });
+            let wrapper = createElement('StackLayout') as NativeElementNode;
+            let componentInstance = new this.itemTemplateComponent(null, {
+                target: wrapper,
+                intro: true,
+                props: {
+                    item
+                }
+            });
 
             let nativeEl = wrapper.nativeView;
-            // (nativeEl as any).__SvelteComponent__ = componentInstance;
+            (nativeEl as any).__GlimmerComponent__ = componentInstance;
             args.view = nativeEl;
         } else {
             let componentInstance = (args.view as any).__GlimmerComponent__;
@@ -77,11 +78,11 @@ export default class ListView extends ElementNode {
         return templateNode ? templateNode.component : null;
     }
 
-    get nativeView(): ListView {
-        return super.nativeView as ListView;
+    get nativeView(): NativeListView {
+        return super.nativeView as NativeListView;
     }
 
-    set nativeView(view: ListView) {
+    set nativeView(view: NativeListView) {
         super.nativeView = view;
     }
 }

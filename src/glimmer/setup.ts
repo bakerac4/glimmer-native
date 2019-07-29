@@ -61,6 +61,8 @@ import TabView from './native-components/TabView/component';
 import TabViewTemplate from './native-components/TabView/template';
 import TabViewItem from './native-components/TabViewItem/component';
 import TabViewItemTemplate from './native-components/TabViewItem/template';
+import Template from './native-components/Template/component';
+import TemplateTemplate from './native-components/Template/template';
 import TextField from './native-components/TextField/component';
 import TextFieldTemplate from './native-components/TextField/template';
 import TextView from './native-components/TextView/component';
@@ -122,6 +124,7 @@ export default function setupGlimmer(resolverDelegate: ResolverDelegate, resolve
     registerNativeComponent(resolver, resolverDelegate, 'Switch', Switch, SwitchTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'TabView', TabView, TabViewTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'TabViewItem', TabViewItem, TabViewItemTemplate);
+    registerNativeComponent(resolver, resolverDelegate, 'Template', Template, TemplateTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'TextField', TextField, TextFieldTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'TextView', TextView, TextViewTemplate);
     registerNativeComponent(resolver, resolverDelegate, 'WebView', WebView, WebViewTemplate);

@@ -1,17 +1,15 @@
-import { KeyframeAnimation } from 'tns-core-modules/ui/animation/keyframe-animation';
 import ViewNode from './ViewNode';
+export interface IClassList {
+    length: number;
+    add(...classNames: string[]): void;
+    remove(...classNames: string[]): void;
+}
 export default class ElementNode extends ViewNode {
-    style: any;
-    animations: Map<string, KeyframeAnimation>;
-    oldAnimations: KeyframeAnimation[];
-    constructor(tagName: any);
-    animate(options: any): void;
-    getParentPage(): ElementNode;
-    addAnimation(animation: string): void;
-    removeAnimation(animation: string): void;
-    animation: string;
-    setAttribute(key: any, value: any): void;
-    appendChild(childNode: any): void;
-    insertBefore(childNode: any, referenceNode: any): void;
-    removeChild(childNode: any): void;
+    _classList: IClassList;
+    constructor(tagName: string);
+    id: string;
+    readonly classList: IClassList;
+    appendChild(childNode: ViewNode): void;
+    insertBefore(childNode: ViewNode, referenceNode: ViewNode): void;
+    removeChild(childNode: ViewNode): void;
 }

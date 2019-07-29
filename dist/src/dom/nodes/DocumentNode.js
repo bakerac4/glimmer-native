@@ -1,6 +1,7 @@
-import ListView from '../native/list-view';
+import { createElement } from '../element-registry';
 import CommentNode from './CommentNode';
 import ElementNode from './ElementNode';
+import PropertyNode from './PropertyNode';
 import TextNode from './TextNode';
 import ViewNode from './ViewNode';
 function* elementIterator(el) {
@@ -20,13 +21,15 @@ export default class DocumentNode extends ViewNode {
     createComment(text) {
         return new CommentNode(text);
     }
+    createPropertyNode(tagName, propertyName) {
+        return new PropertyNode(tagName, propertyName);
+    }
     createElement(tagName) {
-        if (tagName === 'listview') {
-            return new ListView();
+        if (tagName.indexOf('.') >= 0) {
+            let bits = tagName.split('.', 2);
+            return this.createPropertyNode(bits[0], bits[1]);
         }
-        else {
-            return new ElementNode(tagName);
-        }
+        return createElement(tagName);
     }
     createElementNS(namespace, tagName) {
         return this.createElement(tagName);

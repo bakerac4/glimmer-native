@@ -1,4 +1,5 @@
 import { EventData, View } from 'tns-core-modules/ui/page';
+import ElementNode from '../nodes/ElementNode';
 import ViewNode from '../nodes/ViewNode';
 interface IStyleProxy {
     setProperty(propertyName: string, value: string, priority?: string): void;
@@ -12,11 +13,10 @@ export interface ComponentMeta {
     removeChild?: (parent: ViewNode, child: ViewNode) => void;
 }
 export declare type EventListener = (args: any) => void;
-export default class NativeElementNode extends ViewNode {
+export default class NativeElementNode extends ElementNode {
     style: IStyleProxy;
     _nativeView: View;
     _meta: ComponentMeta;
-    childNodes: NativeElementNode[];
     constructor(tagName: string, viewClass: typeof View, meta?: ComponentMeta);
     setStyle(property: string, value: string | number): void;
     nativeView: View;
@@ -28,6 +28,5 @@ export default class NativeElementNode extends ViewNode {
     onRemovedChild(childNode: ViewNode): void;
     setAttribute(fullkey: string, value: any): void;
     dispatchEvent(event: EventData): void;
-    firstElement(): NativeElementNode;
 }
 export {};

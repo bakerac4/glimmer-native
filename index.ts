@@ -5,11 +5,13 @@ import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
 
-import { registerElement } from './src/dom/element-registry';
+import { createElement } from './src/dom/element-registry';
+import FrameElement from './src/dom/native/FrameElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
-import { registerElements } from './src/dom/setup-registry';
+import { registerElements, registerNativeElement } from './src/dom/setup-registry';
 import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/glimmer/context';
+import { navigate } from './src/glimmer/navigation';
 import buildUserHelper from './src/glimmer/references/helper-reference';
 import Resolver from './src/glimmer/resolver';
 import setupGlimmer from './src/glimmer/setup';
@@ -19,6 +21,7 @@ export { ResolverDelegate } from './src/glimmer/context';
 export { registerElements } from './src/dom/setup-registry';
 export { createElement } from './src/dom/element-registry';
 export { action } from './src/glimmer/decorators/action';
+export { default as Navigation } from './src/glimmer/navigation';
 export { default as DocumentNode } from './src/dom/nodes/DocumentNode';
 export { default as ElementNode } from './src/dom/nodes/ElementNode';
 export { default as Resolver } from './src/glimmer/resolver';
@@ -29,11 +32,10 @@ export {
     NativeModifierDefinitionState,
     NativeModifierInstance
 } from './src/glimmer/native-modifier-manager';
-export { goBack } from './src/glimmer/navigation';
 
 export default class Application {
     public static document: DocumentNode;
-    public static rootFrame: ElementNode;
+    public static rootFrame: FrameElement;
     public static context: any;
     public artifacts: any;
     public aotRuntime: any;
@@ -63,7 +65,7 @@ export default class Application {
         this.registerHelpers(helpers);
         //-----------------------------------------------------------------
         Application.document = new DocumentNode();
-        Application.rootFrame = new ElementNode('frame');
+        Application.rootFrame = createElement('Frame') as FrameElement;
         Application.rootFrame.setAttribute('id', 'root');
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
@@ -142,7 +144,7 @@ export default class Application {
     }
 
     registerNativeComponent(name, value) {
-        registerElement(name, value);
+        registerNativeElement(name, value);
         const handle = Application.resolver.registerTemplateOnlyComponent();
         Application.resolverDelegate.registerComponent(
             name,
@@ -157,25 +159,18 @@ export default class Application {
         const handle = Application.resolver.registerHelper(helper);
         Application.resolverDelegate.registerHelper(name, handle);
     }
-
-    boot() {
-        const rootFrame = Application.rootFrame;
+    boot(name) {
+        const rootFrame = Application.rootFrame as FrameElement;
+        const navigation = navigate(name, null, {
+            frame: rootFrame
+        });
         return new Promise((resolve, reject) => {
             //wait for launch
             on(launchEvent, () => {
-                // This is super hacky and likely needs to be abstracted away.
-                rootFrame.nativeView.navigate({
-                    create: () => {
-                        return rootFrame.firstElement().nativeView;
-                    }
-                });
+                resolve(navigation);
             });
             try {
-                run({
-                    create() {
-                        return rootFrame.nativeView;
-                    }
-                });
+                run({ create: () => rootFrame.nativeView });
             } catch (e) {
                 reject(e);
             }
@@ -189,12 +184,12 @@ export default class Application {
         this._scheduled = true;
         setTimeout(async () => {
             this._scheduled = false;
-            await this._rerender();
+            await Application._rerender();
             this._rendering = false;
         }, 0);
     }
 
-    protected async _rerender() {
+    static async _rerender() {
         try {
             Application.aotRuntime.env.begin();
             await Application.result.rerender();

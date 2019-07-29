@@ -1,17 +1,18 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { ListView as NativeListView } from 'tns-core-modules/ui/list-view';
-import ElementNode from '../nodes/ElementNode';
+import { createElement } from '../element-registry';
+import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
-export default class ListView extends ElementNode {
+export default class ListViewElement extends NativeElementNode {
     constructor() {
-        super('listview');
+        super('listview', NativeListView, null);
         this._nativeView.on(NativeListView.itemLoadingEvent, (args) => {
             this.updateListItem(args);
         });
     }
     updateListItem(args) {
         let item;
-        let listView = this._nativeView;
+        let listView = this.nativeView;
         let items = listView.items;
         if (args.index >= items.length) {
             console.log(`Got request for item at index that didn't exist ${args.index}`);
@@ -25,16 +26,16 @@ export default class ListView extends ElementNode {
         }
         if (!args.view || !args.view.__GlimmerComponent__) {
             // log.debug(`creating view for item at ${args.index}`)
-            let wrapper = new ElementNode('StackLayout');
-            // let componentInstance = new this.itemTemplateComponent({
-            //     target: wrapper,
-            //     intro: true,
-            //     props: {
-            //         item
-            //     }
-            // });
+            let wrapper = createElement('StackLayout');
+            let componentInstance = new this.itemTemplateComponent(null, {
+                target: wrapper,
+                intro: true,
+                props: {
+                    item
+                }
+            });
             let nativeEl = wrapper.nativeView;
-            // (nativeEl as any).__SvelteComponent__ = componentInstance;
+            nativeEl.__GlimmerComponent__ = componentInstance;
             args.view = nativeEl;
         }
         else {

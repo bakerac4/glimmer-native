@@ -1,18 +1,19 @@
+import FrameElement from './src/dom/native/FrameElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 export { ResolverDelegate } from './src/glimmer/context';
 export { registerElements } from './src/dom/setup-registry';
 export { createElement } from './src/dom/element-registry';
 export { action } from './src/glimmer/decorators/action';
+export { default as Navigation } from './src/glimmer/navigation';
 export { default as DocumentNode } from './src/dom/nodes/DocumentNode';
 export { default as ElementNode } from './src/dom/nodes/ElementNode';
 export { default as Resolver } from './src/glimmer/resolver';
 export { default as NativeCapabilities } from './src/glimmer/native-capabilities';
 export { NativeModifierConstructor, NativeModifier, NativeModifierDefinitionState, NativeModifierInstance } from './src/glimmer/native-modifier-manager';
-export { goBack } from './src/glimmer/navigation';
 export default class Application {
     static document: DocumentNode;
-    static rootFrame: ElementNode;
+    static rootFrame: FrameElement;
     static context: any;
     artifacts: any;
     aotRuntime: any;
@@ -36,7 +37,7 @@ export default class Application {
     registerState(components: any): Promise<void>;
     registerNativeComponent(name: any, value: any): void;
     registerHelper(name: any, func: any): void;
-    boot(): Promise<unknown>;
+    boot(name: any): Promise<unknown>;
     scheduleRerender(): void;
-    protected _rerender(): Promise<void>;
+    static _rerender(): Promise<void>;
 }
