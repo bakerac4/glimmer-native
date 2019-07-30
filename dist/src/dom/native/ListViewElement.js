@@ -1,12 +1,17 @@
-// import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { ListView as NativeListView } from 'tns-core-modules/ui/list-view';
+import Application from '../../..';
+import GlimmerResolverDelegate from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
-import TemplateElement from './TemplateElement';
 export default class ListViewElement extends NativeElementNode {
     constructor() {
         super('listview', NativeListView, null);
-        this._nativeView.on(NativeListView.itemLoadingEvent, (args) => {
+        this.template = null;
+        // const observerable = new ObservableArray(this.component.items);
+        // this.items.addEventListener(Observable.propertyChangeEvent, (args) => {
+        //     console.log('In event listener');
+        // });
+        this.nativeView.on(NativeListView.itemLoadingEvent, (args) => {
             this.updateListItem(args);
         });
     }
@@ -27,21 +32,24 @@ export default class ListViewElement extends NativeElementNode {
         if (!args.view || !args.view.__GlimmerComponent__) {
             // log.debug(`creating view for item at ${args.index}`)
             let wrapper = createElement('StackLayout');
-            let componentInstance = new this.itemTemplateComponent(null, {
-                target: wrapper,
-                intro: true,
-                props: {
-                    item
-                }
-            });
+            wrapper.setAttribute('class', 'list-view-item');
+            const component = GlimmerResolverDelegate.lookupComponent(this.template);
+            const compiled = component.compilable.compile(Application.context);
+            let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled, { item });
             let nativeEl = wrapper.nativeView;
-            nativeEl.__GlimmerComponent__ = componentInstance;
+            nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
         }
         else {
             let componentInstance = args.view.__GlimmerComponent__;
+            let state = componentInstance.state;
+            state.update({ item });
+            componentInstance.runtime.env.begin();
+            componentInstance.result.rerender();
+            componentInstance.runtime.env.commit();
+            // Application._rerender();
             // log.debug(`updating view for ${args.index} which is a ${args.view}`)
-            componentInstance.set({ item });
+            // componentInstance.set({ item });
         }
         // if (!args.view) {
         //     // // Create label if it is not already created.
@@ -62,8 +70,7 @@ export default class ListViewElement extends NativeElementNode {
         // (<any>args.view) = nativeView.items[args.index].title;
     }
     get itemTemplateComponent() {
-        const templateNode = this.childNodes.find((x) => x instanceof TemplateElement);
-        return templateNode ? templateNode.component : null;
+        return this.template;
     }
     get nativeView() {
         return super.nativeView;

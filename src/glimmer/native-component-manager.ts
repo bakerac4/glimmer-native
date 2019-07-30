@@ -82,13 +82,13 @@ export default class NativeComponentManager implements VMComponentManager<Compon
         return EMPTY_SELF as any;
     }
     didCreateElement() {}
-    didRenderLayout(bucket: any, bounds: any) {
+    didRenderLayout(bucket: ComponentStateBucket, bounds: Bounds) {
         if (!bucket) {
             return;
         }
         bucket.component.bounds = new Bounds(bounds);
     }
-    didCreate(bucket: any) {
+    didCreate(bucket: ComponentStateBucket) {
         // console.log('in did created component manager');
         if (!bucket) {
             return;
@@ -96,13 +96,13 @@ export default class NativeComponentManager implements VMComponentManager<Compon
         // console.log('in did created component manager - about to call didInsertElement');
         bucket.component.didInsertElement();
     }
-    getTag(bucket: any) {
+    getTag(bucket: ComponentStateBucket) {
         if (!bucket) {
             return CONSTANT_TAG;
         }
         return bucket.tag;
     }
-    update(bucket: any) {
+    update(bucket: ComponentStateBucket) {
         if (!bucket) {
             return;
         }
@@ -110,7 +110,7 @@ export default class NativeComponentManager implements VMComponentManager<Compon
     }
     didUpdateLayout() {}
     didUpdate() {}
-    getDestructor(bucket: any) {
+    getDestructor(bucket: ComponentStateBucket) {
         if (!bucket) {
             return NOOP_DESTROYABLE;
         }

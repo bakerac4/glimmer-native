@@ -1,3 +1,6 @@
 import Component from '@glimmer/component';
-export default class ListView extends Component {
+export interface Args {
+    items: any;
+}
+export default class ListView extends Component<Args> {
 }

@@ -1,18 +1,23 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
+import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { ItemEventData, ItemsSource, ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 
+import Application from '../../..';
+import GlimmerResolverDelegate from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
-import TemplateElement from './TemplateElement';
 
 export default class ListViewElement extends NativeElementNode {
-    template: any;
-    yieldItem: (item) => {};
+    template: GlimmerComponent = null;
+    items: any;
 
     constructor() {
         super('listview', NativeListView, null);
-
-        this._nativeView.on(NativeListView.itemLoadingEvent, (args) => {
+        // const observerable = new ObservableArray(this.component.items);
+        // this.items.addEventListener(Observable.propertyChangeEvent, (args) => {
+        //     console.log('In event listener');
+        // });
+        this.nativeView.on(NativeListView.itemLoadingEvent, (args) => {
             this.updateListItem(args as ItemEventData);
         });
     }
@@ -36,46 +41,28 @@ export default class ListViewElement extends NativeElementNode {
         if (!args.view || !(args.view as any).__GlimmerComponent__) {
             // log.debug(`creating view for item at ${args.index}`)
             let wrapper = createElement('StackLayout') as NativeElementNode;
-            let componentInstance = new this.itemTemplateComponent(null, {
-                target: wrapper,
-                intro: true,
-                props: {
-                    item
-                }
-            });
-
+            wrapper.setAttribute('class', 'list-view-item');
+            const component = GlimmerResolverDelegate.lookupComponent(this.template);
+            const compiled = component.compilable.compile(Application.context);
+            let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled, { item });
             let nativeEl = wrapper.nativeView;
-            (nativeEl as any).__GlimmerComponent__ = componentInstance;
+            (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
         } else {
+            //Get the component instance which we classify as the rendering result, runtime and state
             let componentInstance = (args.view as any).__GlimmerComponent__;
-            // log.debug(`updating view for ${args.index} which is a ${args.view}`)
-            componentInstance.set({ item });
+            let state = componentInstance.state;
+            //Update the state with the new item
+            state.update({ item });
+            //and now tell glimmer to re-render
+            componentInstance.runtime.env.begin();
+            componentInstance.result.rerender();
+            componentInstance.runtime.env.commit();
         }
-
-        // if (!args.view) {
-        //     // // Create label if it is not already created.
-        //     this.yieldItem(item);
-        //     // const count = template._nativeView.getChildrenCount();
-        //     template._nativeView.eachChildView((view) => {
-        //         view.item = item;
-        //     });
-        //     // template._nativeView.item = item;
-        //     args.view = template._nativeView;
-        //     args.view.className = 'list-group-item';
-
-        //     // let nativeEl = wrapper.nativeView;
-        //     // (nativeEl as any).__SvelteComponent__ = componentInstance;
-        //     // args.view = nativeEl;
-        // }
-        // const nativeView = this.nativeView as any;
-        // (<any>args.view).text = nativeView.items[args.index].title;
-        // (<any>args.view) = nativeView.items[args.index].title;
     }
 
     get itemTemplateComponent() {
-        const templateNode = this.childNodes.find((x) => x instanceof TemplateElement) as TemplateElement;
-        return templateNode ? templateNode.component : null;
+        return this.template;
     }
 
     get nativeView(): NativeListView {

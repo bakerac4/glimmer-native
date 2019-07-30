@@ -2,7 +2,19 @@ import Component from '@glimmer/component';
 
 // import ElementNode from '../src/dom/nodes/ElementNode';
 
-export default class ListView extends Component {
+export interface Args {
+    items: any;
+}
+export default class ListView extends Component<Args> {
+    // public loadingEvent = NativeListView.itemLoadingEvent;
+    // itemsObservable: any;
+    // // constructor(owner, args) {
+    // //     super(owner, args);
+    // //     this.itemsObservable = fromObject({
+    // //         items: this.args.items
+    // //     });
+    // // }
+    // onItemLoading() {}
     // item: any;
     // constructor(owner, args) {
     //     super(owner, args);

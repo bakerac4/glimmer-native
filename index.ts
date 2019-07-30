@@ -85,10 +85,10 @@ export default class Application {
         const compiled = component.compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name);
         // const compiled = component.compilable.compile(Application.context);
-        return Application._renderComponent(name, containerElement, nextSibling, compiled, state);
+        return Application._renderPage(name, containerElement, nextSibling, compiled, state);
     }
 
-    static _renderComponent(name, containerElement, nextSibling, compilable, data = {}): ElementNode {
+    static _renderPage(name, containerElement, nextSibling, compilable, data = {}): ElementNode {
         let state = State(data);
         const artifact = artifacts(Application.context);
         Application.aotRuntime = AotRuntime(Application.document as any, artifact, Application.resolver);
@@ -96,13 +96,40 @@ export default class Application {
         let iterator = renderAot(Application.aotRuntime, compilable, cursor, state);
         try {
             const result = renderSync(Application.aotRuntime.env, iterator);
-            console.log('Application Rendered');
+            console.log(`Page ${name} Rendered`);
             Application.result = result;
             Application._rendered = true;
             let node = result.firstNode() as any;
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
+            node._meta.component = {
+                state
+            };
+            return node as any;
+        } catch (error) {
+            console.log(`Error rendering page ${name}: ${error}`);
+        }
+    }
+
+    static _renderComponent(name, containerElement, nextSibling, compilable, data = {}): ElementNode {
+        let state = State(data);
+        const artifact = artifacts(Application.context);
+        const runtime = AotRuntime(Application.document as any, artifact, Application.resolver);
+        const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
+        let iterator = renderAot(runtime, compilable, cursor, state);
+        try {
+            const result = renderSync(runtime.env, iterator);
+            console.log(`Component ${name} Rendered`);
+            let node = result.firstNode() as any;
+            while (!node._nativeView) {
+                node = node.nextSibling;
+            }
+            node._meta.component = {
+                result,
+                runtime,
+                state
+            };
             return node as any;
         } catch (error) {
             console.log(`Error rendering component ${name}: ${error}`);

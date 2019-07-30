@@ -25,13 +25,13 @@ export default class NativeComponentManager implements VMComponentManager<Compon
     create(environment: any, definition: any, args: any, _dynamicScope: any, _caller: any, _hasDefaultBlock: any): ComponentStateBucket;
     getSelf(bucket: ComponentStateBucket): PathReference;
     didCreateElement(): void;
-    didRenderLayout(bucket: any, bounds: any): void;
-    didCreate(bucket: any): void;
-    getTag(bucket: any): any;
-    update(bucket: any): void;
+    didRenderLayout(bucket: ComponentStateBucket, bounds: Bounds): void;
+    didCreate(bucket: ComponentStateBucket): void;
+    getTag(bucket: ComponentStateBucket): import("@glimmer/reference").TagWrapper<import("@glimmer/reference").RevisionTag>;
+    update(bucket: ComponentStateBucket): void;
     didUpdateLayout(): void;
     didUpdate(): void;
-    getDestructor(bucket: any): {
+    getDestructor(bucket: ComponentStateBucket): {
         destroy(): void;
     };
 }

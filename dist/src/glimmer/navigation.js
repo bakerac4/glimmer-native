@@ -128,8 +128,8 @@ export function back(options = {}) {
                 throw new Error("Couldn't find the destination page in the frames backstack");
             }
         }
-        let currentPage = targetFrame.currentPage;
-        currentPage.__GlimmerNativeElement__.destroy();
+        // let currentPage = targetFrame.currentPage as any;
+        // currentPage.__GlimmerNativeElement__.destroy();
         return targetFrame.goBack(backStackEntry);
     });
 }
