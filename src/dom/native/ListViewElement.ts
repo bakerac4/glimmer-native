@@ -13,10 +13,6 @@ export default class ListViewElement extends NativeElementNode {
 
     constructor() {
         super('listview', NativeListView, null);
-        // const observerable = new ObservableArray(this.component.items);
-        // this.items.addEventListener(Observable.propertyChangeEvent, (args) => {
-        //     console.log('In event listener');
-        // });
         this.nativeView.on(NativeListView.itemLoadingEvent, (args) => {
             this.updateListItem(args as ItemEventData);
         });
@@ -39,12 +35,16 @@ export default class ListViewElement extends NativeElementNode {
         }
 
         if (!args.view || !(args.view as any).__GlimmerComponent__) {
-            // log.debug(`creating view for item at ${args.index}`)
+            //Create the wrapper element
             let wrapper = createElement('StackLayout') as NativeElementNode;
             wrapper.setAttribute('class', 'list-view-item');
+
+            //Render the component with the passed in name into the wrapper element
             const component = GlimmerResolverDelegate.lookupComponent(this.template);
             const compiled = component.compilable.compile(Application.context);
             let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled, { item });
+
+            //set the view as the native element that was generated and pass the rendering results as the component
             let nativeEl = wrapper.nativeView;
             (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
