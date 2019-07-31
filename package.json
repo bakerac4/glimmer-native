@@ -26,7 +26,7 @@
         "@glimmer/blueprint": "~0.13.0",
         "@glimmer/bundle-compiler": "^0.41.0",
         "@glimmer/compiler": "^0.41.0",
-        "@glimmer/component": "^0.14.0-alpha.7",
+        "@glimmer/component": "^0.14.0-alpha.9",
         "@glimmer/encoder": "^0.41.0",
         "@glimmer/inline-precompile": "^1.0.0",
         "@glimmer/interfaces": "^0.41.0",
@@ -38,7 +38,7 @@
         "@glimmer/runtime": "^0.41.0",
         "@glimmer/syntax": "^0.41.0",
         "@glimmer/test-helpers": "^0.31.1",
-        "@glimmer/tracking": "^0.14.0-alpha.7",
+        "@glimmer/tracking": "^0.14.0-alpha.9",
         "@glimmer/util": "^0.41.0",
         "@glimmer/vm": "^0.41.0",
         "@glimmer/wire-format": "^0.41.0"
