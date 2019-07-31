@@ -1,5 +1,17 @@
 # Glimmer Native Changelog
 
+### v0.0.4 (July 31, 2019)
+
+-   Added ListView
+-   Added HtmlView, ListPicker, Switch & TextField
+-   Improved modifier to allow for event params
+-   Register Glimmer Helpers automatically
+-   Fixing component `args` property to be in the correct location
+-   Allow passing of data through LinkTo
+-   Providing navigation through Glimmer Native via the `Navigation` class.
+-   Provide ability to register native component (From Nativescript marketplace)
+-   Upgrade to Nativescript 6
+
 ### v0.0.3 (June 11, 2019)
 
 -   [#5](https://github.com/bakerac4/glimmer-native/pull/5) [BUGFIX] Fix `if` block and `if` helper.
