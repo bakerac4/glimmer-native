@@ -1,7 +1,12 @@
 # Glimmer Native Changelog
 
+### v0.0.5 (August 1, 2019)
+
+-   [#13](https://github.com/bakerac4/glimmer-native/pull/13) [BUGFIX] Fixed back rendering issue when closing modal
+
 ### v0.0.4 (July 31, 2019)
 
+-   [#12](https://github.com/bakerac4/glimmer-native/pull/12)
 -   Added ListView
 -   Added HtmlView, ListPicker, Switch & TextField
 -   Improved modifier to allow for event params
