@@ -19,10 +19,17 @@ export default class setModifier<NativeModifierInstance> {
         // console.log(`Modifier Did Insert Element: ${_params}`);
         // this.addEventListener(..._params);
     }
-    // didUpdate(element, _params: unknown[], _hash: Dict<unknown>) {
-    //     element.removeEventListener(_params[0], _params[1]);
-    //     console.log(`Modifier Did Update Element: ${_params}`);
-    // }
+    didUpdate(element, _params: unknown[], _hash: Dict<unknown>) {
+        const property: any = _params[0];
+        const value = _params[1];
+        const native = _params[2] !== false ? true : false;
+        if (native) {
+            element._nativeView[property] = value;
+        } else {
+            element[property] = value;
+        }
+        console.log(`Modifier Did Update Element: ${_params}`);
+    }
     // willDestroyElement() {
     //     this.element.removeEventListeners(this.eventName, this.callback);
     //     console.log(`Modifier Will Destroy Element`);

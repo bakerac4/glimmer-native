@@ -4,4 +4,5 @@ export default class setModifier<NativeModifierInstance> {
     property: any;
     value: any;
     didInsertElement(element: any, _params: unknown[], _hash: Dict<unknown>): void;
+    didUpdate(element: any, _params: unknown[], _hash: Dict<unknown>): void;
 }

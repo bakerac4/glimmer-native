@@ -1,63 +1,34 @@
-import { getViewClass } from '../element-registry';
 import ViewNode from './ViewNode';
-function camelize(kebab) {
-    return kebab.replace(/[\-]+(\w)/g, (m, l) => l.toUpperCase());
-}
-const EVENT_ATTRIBUTES = Object.freeze(['tap']);
 export default class ElementNode extends ViewNode {
     constructor(tagName) {
         super();
         this.nodeType = 1;
         this.tagName = tagName;
-        //there are some special elements that don't exist natively
-        const viewClass = getViewClass(tagName);
-        if (viewClass) {
-            this._nativeView = new viewClass();
-            this._nativeView.__GlimmerNativeElement__ = this;
-            console.log(`${this} has view class`);
-            EVENT_ATTRIBUTES.forEach((event) => {
-                console.log(`Checking for atttribute ${event}`);
-                let attribute = this.getAttribute(event);
-                console.log(`Attribute ${event}: ${attribute}`);
-                // console.log(`Native view attribute ${event}: ${this._nativeView.getAttribute(event)}`);
-                if (attribute) {
-                    this.addEventListener(event, attribute);
-                }
-            });
-        }
-        console.log(`created ${this} ${this._nativeView}`);
-        let setStyle = (value) => {
-            this.setAttribute('style', value);
-        };
-        let getStyle = () => {
-            return this.getAttribute('style');
-        };
-        this.style = {
-            setProperty: (propertyName, value, priority) => {
-                this.setStyle(camelize(propertyName), value);
-            },
-            removeProperty: (propertyName) => {
-                this.setStyle(camelize(propertyName), null);
-            },
-            get cssText() {
-                console.log('got css text');
-                return getStyle();
-            },
-            set cssText(value) {
-                console.log('set css text');
-                setStyle(value);
-            }
-        };
     }
-    setAttribute(key, value) {
-        console.log(`setAttribute: ${key} - ${value}`);
-        if (key.startsWith('on:')) {
-            key = key.substr(3);
-            this.addEventListener(key, value);
+    get id() {
+        return this.getAttribute('id');
+    }
+    set id(value) {
+        this.setAttribute('id', value);
+    }
+    get classList() {
+        if (!this._classList) {
+            const getClasses = () => (this.getAttribute('class') || '').split(/\s+/).filter((k) => k != '');
+            this._classList = {
+                add: (...classNames) => {
+                    this.setAttribute('class', [...new Set(getClasses().concat(classNames))].join(' '));
+                },
+                remove: (...classNames) => {
+                    this.setAttribute('class', getClasses()
+                        .filter((i) => classNames.indexOf(i) == -1)
+                        .join(' '));
+                },
+                get length() {
+                    return getClasses().length;
+                }
+            };
         }
-        else {
-            super.setAttribute(key, value);
-        }
+        return this._classList;
     }
     appendChild(childNode) {
         super.appendChild(childNode);

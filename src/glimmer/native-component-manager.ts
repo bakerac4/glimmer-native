@@ -5,8 +5,8 @@ import { CONSTANT_TAG, PathReference, Tag } from '@glimmer/reference';
 
 const EMPTY_SELF = new RootReference(null);
 const NOOP_DESTROYABLE = { destroy() {} };
-const DESTROYING = Symbol('destroying');
-const DESTROYED = Symbol('destroyed');
+export const DESTROYING = Symbol('destroying');
+export const DESTROYED = Symbol('destroyed');
 
 export class Bounds {
     private _bounds: any;
@@ -37,10 +37,8 @@ export class ComponentStateBucket {
                 ComponentClass = ComponentClass.class;
             }
 
-            this.component = new ComponentClass({
-                args: this.namedArgsSnapshot(),
-                debugName: name
-            });
+            this.component = new ComponentClass({}, this.namedArgsSnapshot());
+            this.component.debugName = name;
         }
     }
 
@@ -84,27 +82,27 @@ export default class NativeComponentManager implements VMComponentManager<Compon
         return EMPTY_SELF as any;
     }
     didCreateElement() {}
-    didRenderLayout(bucket: any, bounds: any) {
+    didRenderLayout(bucket: ComponentStateBucket, bounds: Bounds) {
         if (!bucket) {
             return;
         }
         bucket.component.bounds = new Bounds(bounds);
     }
-    didCreate(bucket: any) {
-        console.log('in did created component manager');
+    didCreate(bucket: ComponentStateBucket) {
+        // console.log('in did created component manager');
         if (!bucket) {
             return;
         }
-        console.log('in did created component manager - about to call didInsertElement');
+        // console.log('in did created component manager - about to call didInsertElement');
         bucket.component.didInsertElement();
     }
-    getTag(bucket: any) {
+    getTag(bucket: ComponentStateBucket) {
         if (!bucket) {
             return CONSTANT_TAG;
         }
         return bucket.tag;
     }
-    update(bucket: any) {
+    update(bucket: ComponentStateBucket) {
         if (!bucket) {
             return;
         }
@@ -112,7 +110,7 @@ export default class NativeComponentManager implements VMComponentManager<Compon
     }
     didUpdateLayout() {}
     didUpdate() {}
-    getDestructor(bucket: any) {
+    getDestructor(bucket: ComponentStateBucket) {
         if (!bucket) {
             return NOOP_DESTROYABLE;
         }

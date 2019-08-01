@@ -2,8 +2,8 @@ import { RootReference } from '@glimmer/component';
 import { CONSTANT_TAG } from '@glimmer/reference';
 const EMPTY_SELF = new RootReference(null);
 const NOOP_DESTROYABLE = { destroy() { } };
-const DESTROYING = Symbol('destroying');
-const DESTROYED = Symbol('destroyed');
+export const DESTROYING = Symbol('destroying');
+export const DESTROYED = Symbol('destroyed');
 export class Bounds {
     constructor(__bounds) {
         this._bounds = __bounds;
@@ -23,10 +23,8 @@ export class ComponentStateBucket {
             if (ComponentClass.class !== undefined) {
                 ComponentClass = ComponentClass.class;
             }
-            this.component = new ComponentClass({
-                args: this.namedArgsSnapshot(),
-                debugName: name
-            });
+            this.component = new ComponentClass({}, this.namedArgsSnapshot());
+            this.component.debugName = name;
         }
     }
     get tag() {
@@ -72,11 +70,11 @@ export default class NativeComponentManager {
         bucket.component.bounds = new Bounds(bounds);
     }
     didCreate(bucket) {
-        console.log('in did created component manager');
+        // console.log('in did created component manager');
         if (!bucket) {
             return;
         }
-        console.log('in did created component manager - about to call didInsertElement');
+        // console.log('in did created component manager - about to call didInsertElement');
         bucket.component.didInsertElement();
     }
     getTag(bucket) {

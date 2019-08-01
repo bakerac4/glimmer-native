@@ -1,6 +1,7 @@
-import ListView from '../native/list-view';
+import { createElement } from '../element-registry';
 import CommentNode from './CommentNode';
 import ElementNode from './ElementNode';
+import PropertyNode from './PropertyNode';
 import TextNode from './TextNode';
 import ViewNode from './ViewNode';
 
@@ -17,28 +18,24 @@ export default class DocumentNode extends ViewNode {
         super();
         this.tagName = 'docNode';
         this.nodeType = 9;
-        //this.documentElement = new ElementNode('document')
-
         this.head = new ElementNode('head');
         this.appendChild(this.head);
-        /*// make static methods accessible via this
-        this.createComment = DocumentNode.createComment
-        this.createElement = DocumentNode.createElement
-        this.createElementNS = DocumentNode.createElementNS
-        this.createTextNode = DocumentNode.createTextNode*/
-        console.log(`created ${this}`);
     }
 
     createComment(text) {
         return new CommentNode(text);
     }
 
+    createPropertyNode(tagName: string, propertyName: string): PropertyNode {
+        return new PropertyNode(tagName, propertyName);
+    }
+
     createElement(tagName) {
-        if (tagName === 'listview') {
-            return new ListView();
-        } else {
-            return new ElementNode(tagName);
+        if (tagName.indexOf('.') >= 0) {
+            let bits = tagName.split('.', 2);
+            return this.createPropertyNode(bits[0], bits[1]);
         }
+        return createElement(tagName);
     }
 
     createElementNS(namespace, tagName) {

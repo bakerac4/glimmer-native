@@ -4,6 +4,5 @@ export default class CommentNode extends ElementNode {
         super('comment');
         this.nodeType = 8;
         this.text = text;
-        console.log(`created ${this}`);
     }
 }

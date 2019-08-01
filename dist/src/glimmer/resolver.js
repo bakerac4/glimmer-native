@@ -1,8 +1,8 @@
 import { TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
-import { NativeModifierManager, NativeModifierDefinitionState } from './native-modifier-manager';
-import NativeComponentManager from './native-component-manager';
-import CAPABILITIES from './native-capabilities';
 import { unreachable } from '@glimmer/util';
+import CAPABILITIES from './native-capabilities';
+import NativeComponentManager from './native-component-manager';
+import { NativeModifierDefinitionState, NativeModifierManager } from './native-modifier-manager';
 class NativeComponentDefinition {
     constructor(name, manager, ComponentClass, handle) {
         this.name = name;
@@ -26,9 +26,9 @@ export default class Resolver {
         this.managers = {};
     }
     resolve(handle) {
-        console.log('in resolver resolve');
+        // console.log('in resolver resolve');
         let value = this.table[handle];
-        return (value);
+        return value;
     }
     managerFor(managerId = 'main') {
         let manager = this.managers[managerId];

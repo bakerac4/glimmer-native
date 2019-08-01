@@ -3,8 +3,10 @@ import { LayoutBase } from 'tns-core-modules/ui/layouts/layout-base';
 import { ContentView, EventData, isAndroid, isIOS, Page, View } from 'tns-core-modules/ui/page';
 import { CssAnimationParser } from 'tns-core-modules/ui/styling/css-animation-parser';
 
+import ElementNode from '../nodes/ElementNode';
 import ViewNode from '../nodes/ViewNode';
 
+// import { logger as log } from '../basicdom';
 interface IStyleProxy {
     setProperty(propertyName: string, value: string, priority?: string): void;
     removeProperty(property: string): void;
@@ -28,14 +30,14 @@ const defaultViewMeta = {
     skipAddToDom: false
 };
 
-export default class NativeElementNode extends ViewNode {
+export default class NativeElementNode extends ElementNode {
     style: IStyleProxy;
     _nativeView: View;
     _meta: ComponentMeta;
-    childNodes: NativeElementNode[];
 
     constructor(tagName: string, viewClass: typeof View, meta: ComponentMeta = null) {
-        super();
+        super(tagName);
+
         this.nodeType = 1;
         this.tagName = tagName;
 
@@ -44,7 +46,7 @@ export default class NativeElementNode extends ViewNode {
         this._nativeView = new (viewClass as any)();
         (this._nativeView as any).__GlimmerNativeElement__ = this;
 
-        console.log(`created ${this} ${this._nativeView}`);
+        // log.debug(`created ${this} ${this._nativeView}`);
 
         //TODO these style shims mess up the code, extract to external modules
 
@@ -67,7 +69,7 @@ export default class NativeElementNode extends ViewNode {
         let oldAnimations: KeyframeAnimation[] = [];
 
         const addAnimation = (animation: string) => {
-            console.log(`Adding animation ${animation}`);
+            // log.debug(`Adding animation ${animation}`);
             if (!this.nativeView) {
                 throw Error('Attempt to apply animation to tag without a native view' + this.tagName);
             }
@@ -113,7 +115,7 @@ export default class NativeElementNode extends ViewNode {
         };
 
         const removeAnimation = (animation: string) => {
-            console.log(`Removing animation ${animation}`);
+            // log.debug(`Removing animation ${animation}`);
             if (animations.has(animation)) {
                 let animationInstance = animations.get(animation);
                 animations.delete(animation);
@@ -141,7 +143,7 @@ export default class NativeElementNode extends ViewNode {
             },
 
             set animation(value: string) {
-                console.log(`setting animation ${value}`);
+                // log.debug(`setting animation ${value}`);
                 let new_animations = value.trim() == '' ? [] : value.split(',').map((a) => a.trim());
                 //add new ones
                 for (let anim of new_animations) {
@@ -158,12 +160,12 @@ export default class NativeElementNode extends ViewNode {
             },
 
             get cssText(): string {
-                console.log('got css text');
+                // log.debug('got css text');
                 return getStyleAttribute();
             },
 
             set cssText(value: string) {
-                console.log('set css text');
+                // log.debug('set css text');
                 setStyleAttribute(value);
             }
         };
@@ -171,7 +173,7 @@ export default class NativeElementNode extends ViewNode {
 
     /* istanbul ignore next */
     setStyle(property: string, value: string | number) {
-        console.log(`setStyle ${this} ${property} ${value}`);
+        // log.debug(`setStyle ${this} ${property} ${value}`);
 
         if (!(value = value.toString().trim()).length) {
             return;
@@ -202,13 +204,13 @@ export default class NativeElementNode extends ViewNode {
 
     /* istanbul ignore next */
     addEventListener(event: string, handler: EventListener) {
-        console.log(`add event listener ${this} ${event}`);
+        // log.debug(`add event listener ${this} ${event}`);
         this.nativeView.on(event, handler);
     }
 
     /* istanbul ignore next */
     removeEventListener(event: string, handler?: EventListener) {
-        console.log(`remove event listener ${this} ${event}`);
+        // log.debug(`remove event listener ${this} ${event}`);
         this.nativeView.off(event, handler);
     }
 
@@ -289,11 +291,11 @@ export default class NativeElementNode extends ViewNode {
                 setTarget = setTarget[key];
             } else {
                 try {
-                    console.log(`setAttr ${this} ${resolvedKeys.join('.')} ${value}`);
+                    // log.debug(`setAttr ${this} ${resolvedKeys.join('.')} ${value}`);
                     setTarget[key] = value;
                 } catch (e) {
                     // ignore but log
-                    console.log(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
+                    // log.error(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
                 }
             }
         }
@@ -305,15 +307,6 @@ export default class NativeElementNode extends ViewNode {
             event.eventName = (event as any).type;
             this.nativeView.notify(event);
         }
-    }
-
-    firstElement() {
-        for (var child of this.childNodes) {
-            if (child.nodeType == 1) {
-                return child;
-            }
-        }
-        return null;
     }
 }
 
