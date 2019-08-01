@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Frame, topmost } from 'tns-core-modules/ui/frame';
 import { Page } from 'tns-core-modules/ui/page';
 import Application from '../..';
+import { createElement } from '../dom/element-registry';
 import FrameElement from '../dom/native/FrameElement';
 import ElementNode from '../dom/nodes/ElementNode';
 function resolveFrame(frame) {
@@ -136,11 +137,22 @@ export function back(options = {}) {
 const modalStack = [];
 export function showModal(componentName, model, options) {
     //Get this before any potential new frames are created by component below
-    let modalLauncher = topmost().currentPage;
-    let frame = new ElementNode('frame');
+    const target = resolveFrame();
+    let modalLauncher = target.currentPage;
+    let backTarget = target.currentPage;
+    let frame = createElement('frame');
+    const targetNode = target.get('__GlimmerNativeElement__');
     const element = Application.renderComponent(componentName, frame, null, {
         model
     });
+    element._meta.component = {
+        componentName,
+        targetNode,
+        model,
+        glimmerResult: Application.result,
+        runtime: Application.aotRuntime,
+        backTarget
+    };
     return new Promise((resolve, reject) => {
         let resolved = false;
         const closeCallback = (result) => {
@@ -148,7 +160,12 @@ export function showModal(componentName, model, options) {
                 return;
             resolved = true;
             try {
-                console.log('modal closed');
+                const target = element;
+                const page = target._meta.component.backTarget;
+                const { glimmerResult, runtime } = page.__GlimmerNativeElement__._meta.component;
+                Application.result = glimmerResult;
+                Application.aotRuntime = runtime;
+                Application._rerender();
                 // frame.parentNode.removeChild(frame);
             }
             finally {
