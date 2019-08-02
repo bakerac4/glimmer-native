@@ -7,7 +7,7 @@
 ### v0.0.4 (July 31, 2019)
 
 -   [#12](https://github.com/bakerac4/glimmer-native/pull/12)
--   Added ListView
+-   Added ListView (Provides native view recycling to allow for large lists)
 -   Added HtmlView, ListPicker, Switch & TextField
 -   Improved modifier to allow for event params
 -   Register Glimmer Helpers automatically
