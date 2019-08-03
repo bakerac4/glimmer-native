@@ -61,7 +61,7 @@ You MUST have the top level element be a `Page` component in order to navigate t
 
 ### Example
 
-```
+```hbs
 <Page class="page">
     <ActionBar class="action-bar">
         <Label text={{this.title}} class="action-label" />
@@ -89,7 +89,7 @@ You MUST have the top level element be a `Page` component in order to navigate t
 
 and the component ts file:
 
-```
+```js
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 
