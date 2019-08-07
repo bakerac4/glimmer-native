@@ -1,7 +1,6 @@
 import { isAndroid, isIOS } from 'tns-core-modules/platform';
 import { isBoolean } from 'tns-core-modules/utils/types';
 import { getViewMeta, normalizeElementName } from '../element-registry';
-import { insertChild, removeChild } from '../utils';
 const XML_ATTRIBUTES = Object.freeze(['tap', 'style', 'rows', 'columns', 'fontAttributes']);
 export default class ViewNode {
     constructor() {
@@ -141,6 +140,8 @@ export default class ViewNode {
             this.nativeView.notify(event);
         }
     }
+    onInsertedChild(childNode, index) { }
+    onRemovedChild(childNode) { }
     insertBefore(childNode, referenceNode) {
         if (!childNode) {
             throw new Error(`Can't insert child.`);
@@ -170,7 +171,7 @@ export default class ViewNode {
         this.childNodes[index - 1].nextSibling = childNode;
         referenceNode.prevSibling = childNode;
         this.childNodes.splice(index, 0, childNode);
-        insertChild(this, childNode, index);
+        this.onInsertedChild(childNode, index);
     }
     appendChild(childNode) {
         if (!childNode) {
@@ -192,7 +193,7 @@ export default class ViewNode {
             this.lastChild.nextSibling = childNode;
         }
         this.childNodes.push(childNode);
-        insertChild(this, childNode, this.childNodes.length - 1);
+        this.onInsertedChild(childNode, this.childNodes.length - 1);
     }
     removeChild(childNode) {
         if (!childNode) {
@@ -217,7 +218,7 @@ export default class ViewNode {
         // childNode.prevSibling = null;
         // childNode.nextSibling = null;
         this.childNodes = this.childNodes.filter((node) => node !== childNode);
-        removeChild(this, childNode);
+        this.onRemovedChild(childNode);
     }
     firstElement() {
         for (var child of this.childNodes) {

@@ -38,6 +38,8 @@ export default class ViewNode {
     addEventListener(event: any, handler: any): void;
     removeEventListener(event: any, handler: any): void;
     dispatchEvent(event: EventData): void;
+    onInsertedChild(childNode: ViewNode, index: number): void;
+    onRemovedChild(childNode: ViewNode): void;
     insertBefore(childNode: any, referenceNode: any): void;
     appendChild(childNode: any): void;
     removeChild(childNode: any): void;
