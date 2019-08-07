@@ -166,7 +166,6 @@ export function showModal(componentName, model, options) {
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
                 Application._rerender();
-                // frame.parentNode.removeChild(frame);
             }
             finally {
                 resolve(result);

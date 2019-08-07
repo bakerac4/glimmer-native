@@ -1,3 +1,3 @@
 import { precompile } from '@glimmer/compiler';
 
-export default precompile(`<label ...attributes />`);
+export default precompile(`<label ...attributes>{{yield}}</label>`);
