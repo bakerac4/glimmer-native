@@ -207,9 +207,9 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
     });
 }
 
-export function closeModal(): void {
+export function closeModal(returnValue?): void {
     let modalPageInstanceInfo = modalStack.pop();
-    modalPageInstanceInfo.nativeView.closeModal();
+    modalPageInstanceInfo.nativeView.closeModal(returnValue);
 }
 
 class Navigation {

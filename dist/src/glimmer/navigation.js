@@ -175,9 +175,9 @@ export function showModal(componentName, model, options) {
         modalLauncher.showModal(element.nativeView, Object.assign({}, options, { context: model, closeCallback }));
     });
 }
-export function closeModal() {
+export function closeModal(returnValue) {
     let modalPageInstanceInfo = modalStack.pop();
-    modalPageInstanceInfo.nativeView.closeModal();
+    modalPageInstanceInfo.nativeView.closeModal(returnValue);
 }
 class Navigation {
     constructor() {

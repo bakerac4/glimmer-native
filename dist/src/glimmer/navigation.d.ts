@@ -39,7 +39,7 @@ export interface ShowModalOptions {
     stretched: boolean;
 }
 export declare function showModal<T>(componentName: string, model: any, options?: ShowModalOptions): Promise<T>;
-export declare function closeModal(): void;
+export declare function closeModal(returnValue?: any): void;
 declare class Navigation {
     static instance: Navigation;
     static pages: any;
