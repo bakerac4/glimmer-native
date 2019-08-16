@@ -28,6 +28,7 @@ export { action } from './src/glimmer/decorators/action';
 export { default as Navigation } from './src/glimmer/navigation';
 export { default as DocumentNode } from './src/dom/nodes/DocumentNode';
 export { default as ElementNode } from './src/dom/nodes/ElementNode';
+export { default as NativeElementNode } from './src/dom/native/NativeElementNode';
 export { default as Resolver } from './src/glimmer/resolver';
 export { default as NativeCapabilities } from './src/glimmer/native-capabilities';
 export { NativeModifier, NativeModifierDefinitionState } from './src/glimmer/native-modifier-manager';

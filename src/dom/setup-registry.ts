@@ -6,6 +6,7 @@ import FrameElement from './native/FrameElement';
 import ListViewElement from './native/ListViewElement';
 import NativeElementNode, { ComponentMeta } from './native/NativeElementNode';
 import PageElement from './native/PageElement';
+import RadListViewElement from './native/RadListViewElement';
 import TemplateElement from './native/TemplateElement';
 
 export function registerNativeElement(elementName: string, resolver: () => typeof View, meta: ComponentMeta = null) {
@@ -83,6 +84,7 @@ export function registerElements() {
 
     // Not Complete
     registerElement('ListView', () => new ListViewElement());
+    registerElement('RadListView', () => new RadListViewElement());
     registerElement('Template', () => new TemplateElement());
     registerElement('Frame', () => new FrameElement());
     registerElement('Page', () => new PageElement());

@@ -3,6 +3,7 @@ import FrameElement from './native/FrameElement';
 import ListViewElement from './native/ListViewElement';
 import NativeElementNode from './native/NativeElementNode';
 import PageElement from './native/PageElement';
+import RadListViewElement from './native/RadListViewElement';
 import TemplateElement from './native/TemplateElement';
 export function registerNativeElement(elementName, resolver, meta = null) {
     registerElement(elementName, () => new NativeElementNode(elementName, resolver(), meta));
@@ -65,6 +66,7 @@ export function registerElements() {
     registerNativeElement('WrapLayout', () => require('tns-core-modules/ui/layouts/wrap-layout').WrapLayout);
     // Not Complete
     registerElement('ListView', () => new ListViewElement());
+    registerElement('RadListView', () => new RadListViewElement());
     registerElement('Template', () => new TemplateElement());
     registerElement('Frame', () => new FrameElement());
     registerElement('Page', () => new PageElement());

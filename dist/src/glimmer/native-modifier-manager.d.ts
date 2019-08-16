@@ -1,5 +1,5 @@
+import { CapturedArguments, Destroyable, Dict, DynamicScope, GlimmerTreeChanges, ModifierManager, VMArguments } from '@glimmer/interfaces';
 import { Tag } from '@glimmer/reference';
-import { Dict, ModifierManager, GlimmerTreeChanges, Destroyable, DynamicScope, VMArguments, CapturedArguments } from '@glimmer/interfaces';
 /**
   The CustomModifierManager allows addons to provide custom modifier
   implementations that integrate seamlessly into Ember. This is accomplished

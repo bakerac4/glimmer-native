@@ -29,7 +29,7 @@ export class NativeModifierManager {
         this.installedElements.push(element);
         let firstParam = args.positional.at(0);
         let param = firstParam !== undefined && firstParam.value();
-        dom.setAttribute(element, 'data-modifier', `installed - ${param}`);
+        // dom.setAttribute(element, 'data-modifier', `installed - ${param}`);
         if (state.instance && state.instance.didInsertElement) {
             state.instance.element = element;
             state.instance.didInsertElement(element, args.positional.value(), args.named.value());
@@ -40,7 +40,7 @@ export class NativeModifierManager {
         this.updatedElements.push(element);
         let firstParam = args.positional.at(0);
         let param = firstParam !== undefined && firstParam.value();
-        dom.setAttribute(element, 'data-modifier', `updated - ${param}`);
+        // dom.setAttribute(element, 'data-modifier', `updated - ${param}`);
         if (state.instance && state.instance.didUpdate) {
             state.instance.didUpdate(element, args.positional.value(), args.named.value());
         }
@@ -54,8 +54,8 @@ export class NativeModifierManager {
                 if (state.instance && state.instance.willDestroyElement) {
                     state.instance.willDestroyElement(element);
                 }
-                dom.removeAttribute(element, 'data-modifier');
-            },
+                // dom.removeAttribute(element, 'data-modifier');
+            }
         };
     }
 }
