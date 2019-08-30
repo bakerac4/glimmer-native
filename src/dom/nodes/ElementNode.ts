@@ -5,7 +5,6 @@ import PropertyNode from './PropertyNode';
 import TextNode from './TextNode';
 import ViewNode from './ViewNode';
 
-
 // import { getViewClass } from '../element-registry';
 // import ViewNode from './ViewNode';
 

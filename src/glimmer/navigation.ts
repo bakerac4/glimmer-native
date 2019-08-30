@@ -56,7 +56,7 @@ export function navigate(componentName: string, model: any, options: NavigationO
         throw new Error('Must have a valid component name (@target) to perform navigation');
     }
     if (targetNode) {
-        const element = Application.renderComponent(componentName, targetNode, null, { model }) as any;
+        const element = Application.renderPage(componentName, targetNode, null, { model }) as any;
         element._meta.component = {
             componentName,
             targetNode,
@@ -100,7 +100,7 @@ export function navigate(componentName: string, model: any, options: NavigationO
 
         try {
             console.log('About to render new result');
-            const element = Application.renderComponent(componentName, newFrame, null, { model });
+            const element = Application.renderPage(componentName, newFrame, null, { model });
             const handler = (args: NavigatedData) => {
                 if (args.isBackNavigation) {
                     element.nativeView.off('navigatedFrom', handler);
@@ -174,7 +174,7 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
     let backTarget = target.currentPage;
     let frame = createElement('frame');
     const targetNode = target.get('__GlimmerNativeElement__');
-    const element = Application.renderComponent(componentName, frame, null, {
+    const element = Application.renderPage(componentName, frame, null, {
         model
     });
     element._meta.component = {

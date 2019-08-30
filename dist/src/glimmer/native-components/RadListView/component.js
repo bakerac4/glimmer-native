@@ -8,6 +8,7 @@ import Component from '@glimmer/component';
 import { action } from '../../decorators/action';
 export default class RadListView extends Component {
     loaded(event) {
+        // this.args.loaded(event);
         const view = event.object;
         const keys = Object.keys(this.args);
         const nativeKeys = keys.filter((item) => item.startsWith('native'));
@@ -15,6 +16,7 @@ export default class RadListView extends Component {
             const actualKey = key.split(':')[1];
             view[actualKey] = this.args[key];
         });
+        // return true;
     }
 }
 __decorate([

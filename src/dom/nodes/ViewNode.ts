@@ -296,6 +296,10 @@ export default class ViewNode {
         this.onRemovedChild(childNode);
     }
 
+    removeChildren() {
+        this.childNodes = [];
+    }
+
     firstElement() {
         for (var child of this.childNodes) {
             if (child.nodeType == 1) {

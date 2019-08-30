@@ -7,10 +7,12 @@ import { action } from '../../decorators/action';
 export interface Args {
     items: any;
     layout: any;
+    loaded: any;
 }
 export default class RadListView extends Component<Args> {
     @action
     loaded(event) {
+        // this.args.loaded(event);
         const view = event.object;
         const keys = Object.keys(this.args);
         const nativeKeys = keys.filter((item) => item.startsWith('native'));
@@ -18,6 +20,7 @@ export default class RadListView extends Component<Args> {
             const actualKey = key.split(':')[1];
             view[actualKey] = this.args[key];
         });
+        // return true;
     }
     // public loadingEvent = NativeListView.itemLoadingEvent;
     // itemsObservable: any;

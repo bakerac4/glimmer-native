@@ -239,6 +239,11 @@ export default class NativeElementNode extends ElementNode {
             this.nativeView.notify(event);
         }
     }
+    removeChildren() {
+        this.childNodes.forEach((child) => {
+            this.removeChild(child);
+        });
+    }
 }
 //TODO merge these into the class above
 function insertChild(parentNode, childNode, atIndex = -1) {

@@ -19,6 +19,7 @@ import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/gli
 import { navigate } from './src/glimmer/navigation';
 import buildUserHelper from './src/glimmer/references/helper-reference';
 import Resolver from './src/glimmer/resolver';
+import NativeComponentResult from './src/glimmer/result';
 import setupGlimmer from './src/glimmer/setup';
 //Exports
 export { ResolverDelegate } from './src/glimmer/context';
@@ -59,7 +60,7 @@ export default class Application {
         let main = Compilable(`<${name} />`).compile(Application.context);
         Application._renderComponent(name, containerElement, nextSibling, main);
     }
-    static renderComponent(name, containerElement, nextSibling = null, state) {
+    static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
         let component = Compilable(`<${name} @model={{this.model}} />`);
         const compiled = component.compile(Application.context);
@@ -82,9 +83,7 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = {
-                state
-            };
+            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node;
         }
         catch (error) {
@@ -104,11 +103,7 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = {
-                result,
-                runtime,
-                state
-            };
+            node._meta.component = new NativeComponentResult(name, result, state, runtime);
             return node;
         }
         catch (error) {
