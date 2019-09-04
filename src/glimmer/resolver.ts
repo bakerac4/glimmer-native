@@ -1,4 +1,12 @@
-import { AotRuntimeResolver, ComponentDefinition, Dict, Invocation, ModuleLocator } from '@glimmer/interfaces';
+import { DefinitionState } from '@glimmer/component/dist/types/src/component-definition';
+import {
+    AotRuntimeResolver,
+    ComponentDefinition,
+    Dict,
+    Invocation,
+    ModuleLocator,
+    ProgramSymbolTable
+} from '@glimmer/interfaces';
 import { TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { unreachable } from '@glimmer/util';
 
@@ -15,9 +23,16 @@ class NativeComponentDefinition implements ComponentDefinition {
     manager: NativeComponentManager;
     ComponentClass: any;
     handle: number;
-    state: object;
+    state: DefinitionState;
+    symbolTable?: ProgramSymbolTable;
 
-    constructor(name: string, manager: NativeComponentManager, ComponentClass: any, handle: number) {
+    constructor(
+        name: string,
+        manager: NativeComponentManager,
+        ComponentClass: any,
+        handle: number,
+        symbolTable?: ProgramSymbolTable
+    ) {
         this.name = name;
         this.manager = manager;
         this.ComponentClass = ComponentClass;
@@ -26,7 +41,8 @@ class NativeComponentDefinition implements ComponentDefinition {
             name,
             capabilities: CAPABILITIES,
             ComponentClass,
-            handle
+            handle,
+            symbolTable
         };
     }
     toJSON() {

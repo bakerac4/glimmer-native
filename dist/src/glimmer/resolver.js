@@ -4,7 +4,7 @@ import CAPABILITIES from './native-capabilities';
 import NativeComponentManager from './native-component-manager';
 import { NativeModifierDefinitionState, NativeModifierManager } from './native-modifier-manager';
 class NativeComponentDefinition {
-    constructor(name, manager, ComponentClass, handle) {
+    constructor(name, manager, ComponentClass, handle, symbolTable) {
         this.name = name;
         this.manager = manager;
         this.ComponentClass = ComponentClass;
@@ -13,7 +13,8 @@ class NativeComponentDefinition {
             name,
             capabilities: CAPABILITIES,
             ComponentClass,
-            handle
+            handle,
+            symbolTable
         };
     }
     toJSON() {

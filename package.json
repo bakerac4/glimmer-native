@@ -41,11 +41,11 @@
         "@glimmer/tracking": "^0.14.0-alpha.9",
         "@glimmer/util": "^0.41.0",
         "@glimmer/vm": "^0.41.0",
-        "@glimmer/wire-format": "^0.41.0",
-        "nativescript-ui-listview": "^7.0.2"
+        "@glimmer/wire-format": "^0.41.0"
     },
     "devDependencies": {
         "tns-core-modules": "^6.0.1",
+        "nativescript-ui-listview": "^7.0.2",
         "typescript": "^3.5.3"
     }
 }
