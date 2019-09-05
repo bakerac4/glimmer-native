@@ -1,3 +1,4 @@
+import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { ListViewEventData, ListViewViewType, RadListView } from 'nativescript-ui-listview';
 import { View } from 'tns-core-modules/ui/core/view/view';
 
@@ -5,6 +6,7 @@ import Application from '../../..';
 import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
+import TemplateElement from './TemplateElement';
 
 export default class RadListViewElement extends NativeElementNode {
     lastItemSelected: any;
@@ -20,14 +22,20 @@ export default class RadListViewElement extends NativeElementNode {
         });
     }
 
+    get itemTemplateComponent(): GlimmerComponent {
+        const templateNode = this.childNodes.find((x) => x instanceof TemplateElement) as TemplateElement;
+        return templateNode ? templateNode.component : null;
+    }
+
     loadView(viewType: string): View {
         if (viewType === ListViewViewType.ItemView) {
             console.log('creating view for ', viewType);
             let wrapper = createElement('StackLayout') as NativeElementNode;
             // const component = GlimmerResolverDelegate.lookupComponent(this.template);
-            let component = Compilable(`<${this.template} @item={{this.item}} />`);
+            const template = this.itemTemplateComponent as any;
+            let component = Compilable(`<${template.args.name} @item={{this.item}} />`);
             const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled);
+            let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled, template.args);
 
             let nativeEl = wrapper.nativeView;
             (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
@@ -53,8 +61,10 @@ export default class RadListViewElement extends NativeElementNode {
 
         if (args.view && (args.view as any).__GlimmerComponent__) {
             let componentInstance = (args.view as any).__GlimmerComponent__;
+            const template = this.itemTemplateComponent as any;
             // Update the state with the new item
             componentInstance.update({
+                ...template.args,
                 item
             });
         } else {
