@@ -1,4 +1,5 @@
 import { precompile } from '@glimmer/compiler';
+import { Cursor } from '@glimmer/interfaces';
 import { Context } from '@glimmer/opcode-compiler';
 import { artifacts } from '@glimmer/program';
 import { State } from '@glimmer/reference';
@@ -73,14 +74,6 @@ export default class Application {
         Application.context = Context(GlimmerResolverDelegate);
     }
 
-    renderMain(name, containerElement?, nextSibling = null) {
-        if (!containerElement) {
-            containerElement = Application.rootFrame;
-        }
-        let main = Compilable(`<${name} />`).compile(Application.context);
-        Application._renderComponent(name, containerElement, nextSibling, main);
-    }
-
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
         let component = Compilable(`<${name} @model={{this.model}} />`);
@@ -112,12 +105,13 @@ export default class Application {
         }
     }
 
-    static _renderComponent(name, containerElement, nextSibling, compilable, data = {}): ElementNode {
+    static _renderComponent(name: string, cursor: Cursor, compilable: number, data = {}): ElementNode {
         let state = State(data);
         const artifact = artifacts(Application.context);
         const runtime = AotRuntime(Application.document as any, artifact, Application.resolver);
-        const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
         let iterator = renderAot(runtime, compilable, cursor, state);
+        // const treeBuilder = NewElementBuilder.forInitialRender(runtime.env, cursor);
+        // let iterator = renderAotMain(runtime, state, treeBuilder, compilable);
         try {
             const result = renderSync(runtime.env, iterator);
             console.log(`Component ${name} Rendered`);

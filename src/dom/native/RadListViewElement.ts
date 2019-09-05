@@ -1,4 +1,5 @@
 import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
+import { Cursor } from '@glimmer/interfaces';
 import { ListViewEventData, ListViewViewType, RadListView } from 'nativescript-ui-listview';
 import { View } from 'tns-core-modules/ui/core/view/view';
 
@@ -31,11 +32,13 @@ export default class RadListViewElement extends NativeElementNode {
         if (viewType === ListViewViewType.ItemView) {
             console.log('creating view for ', viewType);
             let wrapper = createElement('StackLayout') as NativeElementNode;
-            // const component = GlimmerResolverDelegate.lookupComponent(this.template);
             const template = this.itemTemplateComponent as any;
-            let component = Compilable(`<${template.args.name} @item={{this.item}} />`);
+            // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
+            // const compiled = component.compilable.compile(Application.context);
+            const cursor = { element: wrapper, nextSibling: null } as Cursor;
+            let component = Compilable(`<${template.args.name} @item={{this.item}} @selected={{this.selected}}/>`);
             const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled, template.args);
+            let componentInstance = Application._renderComponent(template.args.name, cursor, compiled, template.args);
 
             let nativeEl = wrapper.nativeView;
             (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
@@ -61,10 +64,10 @@ export default class RadListViewElement extends NativeElementNode {
 
         if (args.view && (args.view as any).__GlimmerComponent__) {
             let componentInstance = (args.view as any).__GlimmerComponent__;
-            const template = this.itemTemplateComponent as any;
+            const oldState = componentInstance.state.value();
             // Update the state with the new item
             componentInstance.update({
-                ...template.args,
+                ...oldState,
                 item
             });
         } else {

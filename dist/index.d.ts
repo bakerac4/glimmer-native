@@ -1,3 +1,4 @@
+import { Cursor } from '@glimmer/interfaces';
 import FrameElement from './src/dom/native/FrameElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
@@ -30,10 +31,9 @@ export default class Application {
     static aotRuntime: any;
     static outsideComponents: any;
     constructor(appFolder: any, components: any, helpers: any);
-    renderMain(name: any, containerElement?: any, nextSibling?: any): void;
     static renderPage(name: any, containerElement: any, nextSibling: any, state: any): ElementNode;
     static _renderPage(name: any, containerElement: any, nextSibling: any, compilable: any, data?: {}): ElementNode;
-    static _renderComponent(name: any, containerElement: any, nextSibling: any, compilable: any, data?: {}): ElementNode;
+    static _renderComponent(name: string, cursor: Cursor, compilable: number, data?: {}): ElementNode;
     parseTemplates(folder: any): void;
     registerHelpers(helpers: any): void;
     registerState(components: any): Promise<void>;

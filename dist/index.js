@@ -53,13 +53,6 @@ export default class Application {
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
     }
-    renderMain(name, containerElement, nextSibling = null) {
-        if (!containerElement) {
-            containerElement = Application.rootFrame;
-        }
-        let main = Compilable(`<${name} />`).compile(Application.context);
-        Application._renderComponent(name, containerElement, nextSibling, main);
-    }
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
         let component = Compilable(`<${name} @model={{this.model}} />`);
@@ -90,12 +83,13 @@ export default class Application {
             console.log(`Error rendering page ${name}: ${error}`);
         }
     }
-    static _renderComponent(name, containerElement, nextSibling, compilable, data = {}) {
+    static _renderComponent(name, cursor, compilable, data = {}) {
         let state = State(data);
         const artifact = artifacts(Application.context);
         const runtime = AotRuntime(Application.document, artifact, Application.resolver);
-        const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
         let iterator = renderAot(runtime, compilable, cursor, state);
+        // const treeBuilder = NewElementBuilder.forInitialRender(runtime.env, cursor);
+        // let iterator = renderAotMain(runtime, state, treeBuilder, compilable);
         try {
             const result = renderSync(runtime.env, iterator);
             console.log(`Component ${name} Rendered`);

@@ -1,4 +1,5 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
+import { Cursor } from '@glimmer/interfaces';
 import { ItemEventData, ItemsSource, ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 
 import Application from '../../..';
@@ -42,7 +43,8 @@ export default class ListViewElement extends NativeElementNode {
             const component = GlimmerResolverDelegate.lookupComponent(this.template);
             const compiled = component.compilable.compile(Application.context);
             // const args = Object.assign({}, this.args, item);
-            let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled, item);
+            const cursor = { element: wrapper, nextSibling: null } as Cursor;
+            let componentInstance = Application._renderComponent(this.template, cursor, compiled, item);
             // let componentInstance = Applicaton._renderWithCurriedComponentDefinition(this.template.inner.name, wrapper, null, compiled, this.template.inner.state)
 
             //set the view as the native element that was generated and pass the rendering results as the component
