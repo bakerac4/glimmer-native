@@ -1,3 +1,3 @@
-import Component from '@glimmer/component';
+import NativeComponent from '../../native-component';
 
-export default class Page extends Component {}
+export default class Page extends NativeComponent {}

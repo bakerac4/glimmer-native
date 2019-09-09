@@ -28,7 +28,7 @@ export class ComponentStateBucket {
     public component: any;
     private args: any;
 
-    constructor(definition: any, args: any) {
+    constructor(definition: any, args: any, manager: NativeComponentManager) {
         let { ComponentClass, name } = definition;
         this.args = args;
 
@@ -37,7 +37,7 @@ export class ComponentStateBucket {
                 ComponentClass = ComponentClass.class;
             }
 
-            this.component = new ComponentClass({}, this.namedArgsSnapshot());
+            this.component = new ComponentClass(this, this.namedArgsSnapshot(), manager);
             this.component.debugName = name;
         }
     }
@@ -72,7 +72,7 @@ export default class NativeComponentManager implements VMComponentManager<Compon
 
     create(environment: any, definition: any, args: any, _dynamicScope: any, _caller: any, _hasDefaultBlock: any) {
         if (definition.ComponentClass) {
-            return new ComponentStateBucket(definition, args.capture());
+            return new ComponentStateBucket(definition, args.capture(), this);
         }
     }
     getSelf(bucket: ComponentStateBucket): PathReference {

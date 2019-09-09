@@ -122,7 +122,7 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = new NativeComponentResult(name, result, state, runtime);
+            node.meta.component = new NativeComponentResult(name, result, state, runtime);
             return node as any;
         } catch (error) {
             console.log(`Error rendering component ${name}: ${error}`);
