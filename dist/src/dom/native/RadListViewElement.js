@@ -21,13 +21,14 @@ export default class RadListViewElement extends NativeElementNode {
         if (viewType === ListViewViewType.ItemView) {
             console.log('creating view for ', viewType);
             let wrapper = createElement('StackLayout');
+            wrapper.setAttribute('class', 'list-view-item');
             const template = this.itemTemplateComponent;
             // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
             // const compiled = component.compilable.compile(Application.context);
             const cursor = { element: wrapper, nextSibling: null };
-            let component = Compilable(`<${template.args.name} @item={{this.item}} @selected={{this.selected}}/>`);
+            let component = Compilable(template.args.src);
             const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(template.args.name, cursor, compiled, template.args);
+            let componentInstance = Application._renderComponent(null, cursor, compiled, template.args);
             let nativeEl = wrapper.nativeView;
             nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
             return nativeEl;

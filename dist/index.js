@@ -83,7 +83,7 @@ export default class Application {
             console.log(`Error rendering page ${name}: ${error}`);
         }
     }
-    static _renderComponent(name, cursor, compilable, data = {}) {
+    static _renderComponent(name, cursor, compilable, data) {
         let state = State(data);
         const artifact = artifacts(Application.context);
         const runtime = AotRuntime(Application.document, artifact, Application.resolver);

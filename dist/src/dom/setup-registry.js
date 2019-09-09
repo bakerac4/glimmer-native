@@ -5,6 +5,7 @@ import NativeElementNode from './native/NativeElementNode';
 import PageElement from './native/PageElement';
 import RadListViewElement from './native/RadListViewElement';
 import TemplateElement from './native/TemplateElement';
+import ElementNode from './nodes/ElementNode';
 export function registerNativeElement(elementName, resolver, meta = null) {
     registerElement(elementName, () => new NativeElementNode(elementName, resolver(), meta));
 }
@@ -70,4 +71,5 @@ export function registerElements() {
     registerElement('Template', () => new TemplateElement());
     registerElement('Frame', () => new FrameElement());
     registerElement('Page', () => new PageElement());
+    registerElement('Fragment', () => new ElementNode('fragment'));
 }

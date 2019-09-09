@@ -1,6 +1,6 @@
 import { precompile } from '@glimmer/compiler';
-import { Cursor } from '@glimmer/interfaces';
-import { Context } from '@glimmer/opcode-compiler';
+import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@glimmer/interfaces';
+import { Context, MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
 import { artifacts } from '@glimmer/program';
 import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
@@ -39,19 +39,22 @@ export {
 export default class Application {
     public static document: DocumentNode;
     public static rootFrame: FrameElement;
-    public static context: any;
-    public artifacts: any;
-    public aotRuntime: any;
+    public static context: {
+        program: ProgramCompilationContext;
+        macros: MacrosImpl;
+    };
+    public artifacts: CompilerArtifacts;
+    public aotRuntime: AotRuntimeContext;
     public _scheduled: boolean;
     public _rendering: boolean;
-    public resolver: any;
-    public resolverDelegate: any;
+    public resolver: Resolver;
+    public resolverDelegate: ResolverDelegate;
     public main: any;
-    static resolver: any;
-    static resolverDelegate: any;
-    static result: any;
+    static resolver: Resolver;
+    static resolverDelegate: ResolverDelegate;
+    static result: RenderResult;
     static _rendered: boolean;
-    static aotRuntime: any;
+    static aotRuntime: AotRuntimeContext;
     static outsideComponents: any = [];
 
     constructor(appFolder, components, helpers) {
@@ -105,7 +108,7 @@ export default class Application {
         }
     }
 
-    static _renderComponent(name: string, cursor: Cursor, compilable: number, data = {}): ElementNode {
+    static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): ElementNode {
         let state = State(data);
         const artifact = artifacts(Application.context);
         const runtime = AotRuntime(Application.document as any, artifact, Application.resolver);

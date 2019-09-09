@@ -104,8 +104,8 @@ export function navigate(componentName: string, model: any, options: NavigationO
             const handler = (args: NavigatedData) => {
                 if (args.isBackNavigation) {
                     element.nativeView.off('navigatedFrom', handler);
-                    const destructor = Application.resolver.managerFor().getDestructor();
-                    destructor.destroy();
+                    // const destructor = Application.resolver.managerFor().getDestructor()
+                    // destructor.destroy();
                 }
             };
             element.nativeView.on('navigatedFrom', handler);
