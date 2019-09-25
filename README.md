@@ -41,6 +41,7 @@ There is a default set of Glimmer Components available to you that render native
 -   Span
 -   [StackLayout](https://docs.nativescript.org/angular/ui/layouts/layout-containers#stacklayout)
 -   [ScrollView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/scroll-view)
+-   [Tabs](https://docs.nativescript.org/ui/components/tabs)
 -   [TabView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/tab-view)
 -   [TabViewItem](https://docs.nativescript.org/angular/ui/ng-ui-widgets/tab-view)
 -   [TextField](https://docs.nativescript.org/angular/ui/ng-ui-widgets/text-field)
