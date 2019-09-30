@@ -328,7 +328,10 @@ function insertChild(parentNode: ViewNode, childNode: ViewNode, atIndex = -1) {
     }
 
     if (parentNode.meta && typeof parentNode.meta.insertChild === 'function') {
-        return parentNode.meta.insertChild(parentNode, childNode, atIndex);
+        //our dom includes "textNode" and "commentNode" which does not appear in the nativeview's children.
+        //we recalculate the index required for the insert operation buy only including native element nodes in the count
+        let nativeIndex = parentNode.childNodes.filter((e) => e instanceof NativeElementNode).indexOf(childNode);
+        return parentNode.meta.insertChild(parentNode, childNode, nativeIndex);
     }
 
     const parentView = parentNode.nativeView;

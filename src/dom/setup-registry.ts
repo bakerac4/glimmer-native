@@ -1,4 +1,5 @@
 // Largely taken from the Vue implimentation
+import { FormattedString, Span } from 'tns-core-modules/text/formatted-string';
 import { View } from 'tns-core-modules/ui/page/page';
 
 import { registerElement } from './element-registry';
@@ -9,6 +10,7 @@ import PageElement from './native/PageElement';
 import RadListViewElement from './native/RadListViewElement';
 import TemplateElement from './native/TemplateElement';
 import ElementNode from './nodes/ElementNode';
+import ViewNode from './nodes/ViewNode';
 
 export function registerNativeElement(elementName: string, resolver: () => typeof View, meta: ComponentMeta = null) {
     registerElement(elementName, () => new NativeElementNode(elementName, resolver(), meta));
@@ -64,7 +66,13 @@ export function registerElements() {
     registerNativeElement('DatePicker', () => require('tns-core-modules/ui/date-picker').DatePicker);
     registerNativeElement('DockLayout', () => require('tns-core-modules/ui/layouts/dock-layout').DockLayout);
     registerNativeElement('FlexboxLayout', () => require('tns-core-modules/ui/layouts/flexbox-layout').FlexboxLayout);
-    registerNativeElement('FormattedString', () => require('tns-core-modules/text/formatted-string').FormattedString);
+    registerNativeElement('FormattedString', () => require('tns-core-modules/text/formatted-string').FormattedString, {
+        insertChild(parentNode: ViewNode, childNode: ViewNode, atIndex) {
+            const parent = parentNode.nativeView as FormattedString;
+            const child = childNode.nativeView as Span;
+            parent.spans.splice(atIndex, 0, child);
+        }
+    });
     registerNativeElement('GridLayout', () => require('tns-core-modules/ui/layouts/grid-layout').GridLayout);
     registerNativeElement('HtmlView', () => require('tns-core-modules/ui/html-view').HtmlView);
     registerNativeElement('Image', () => require('tns-core-modules/ui/image').Image);

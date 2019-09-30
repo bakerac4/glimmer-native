@@ -47,7 +47,13 @@ export function registerElements() {
     registerNativeElement('DatePicker', () => require('tns-core-modules/ui/date-picker').DatePicker);
     registerNativeElement('DockLayout', () => require('tns-core-modules/ui/layouts/dock-layout').DockLayout);
     registerNativeElement('FlexboxLayout', () => require('tns-core-modules/ui/layouts/flexbox-layout').FlexboxLayout);
-    registerNativeElement('FormattedString', () => require('tns-core-modules/text/formatted-string').FormattedString);
+    registerNativeElement('FormattedString', () => require('tns-core-modules/text/formatted-string').FormattedString, {
+        insertChild(parentNode, childNode, atIndex) {
+            const parent = parentNode.nativeView;
+            const child = childNode.nativeView;
+            parent.spans.splice(atIndex, 0, child);
+        }
+    });
     registerNativeElement('GridLayout', () => require('tns-core-modules/ui/layouts/grid-layout').GridLayout);
     registerNativeElement('HtmlView', () => require('tns-core-modules/ui/html-view').HtmlView);
     registerNativeElement('Image', () => require('tns-core-modules/ui/image').Image);
