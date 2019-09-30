@@ -19,35 +19,36 @@ Places this borrows code/concepts from:
 
 There is a default set of Glimmer Components available to you that render native elements
 
--   AbsoluteLayout
--   ActionBar
--   ActionItem
--   ActivityIndicator
+-   [AbsoluteLayout](https://docs.nativescript.org/angular/ui/layouts/layout-containers#absolutelayout)
+-   [ActionBar](https://docs.nativescript.org/angular/ui/ng-ui-widgets/action-bar)
+-   [ActionItem](https://docs.nativescript.org/angular/ui/ng-ui-widgets/action-bar#action-items)
+-   [ActivityIndicator](https://docs.nativescript.org/angular/ui/ng-ui-widgets/activity-indicator)
 -   Border
 -   Comment
--   Button
--   DatePicker
--   DockLayout
--   FlexboxLayout
+-   [Button](https://docs.nativescript.org/angular/ui/ng-ui-widgets/button)
+-   [DatePicker](https://docs.nativescript.org/angular/ui/ng-ui-widgets/date-picker)
+-   [DockLayout](https://docs.nativescript.org/angular/ui/layouts/layout-containers#docklayout)
+-   [FlexboxLayout](https://docs.nativescript.org/angular/ui/layouts/layout-containers#flexboxlayout)
 -   FormattedString
--   GridLayout
--   HtmlView
--   Image
--   Label
--   ListPicker
--   ListView
+-   [GridLayout](https://docs.nativescript.org/angular/ui/layouts/layout-containers#gridlayout)
+-   [HtmlView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/htmlview)
+-   [Image](https://docs.nativescript.org/angular/ui/ng-ui-widgets/image)
+-   [Label](https://docs.nativescript.org/angular/ui/ng-ui-widgets/label)
+-   [ListPicker](https://docs.nativescript.org/angular/ui/ng-ui-widgets/listpicker)
+-   [ListView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/listview)
 -   NavigationButton
 -   Page
 -   Span
--   StackLayout
--   ScrollView
--   TabView
--   TabViewItem
--   TextField
--   TextView
--   Switch
--   WebView
--   WrapLayout
+-   [StackLayout](https://docs.nativescript.org/angular/ui/layouts/layout-containers#stacklayout)
+-   [ScrollView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/scroll-view)
+-   [Tabs](https://docs.nativescript.org/ui/components/tabs)
+-   [TabView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/tab-view)
+-   [TabViewItem](https://docs.nativescript.org/angular/ui/ng-ui-widgets/tab-view)
+-   [TextField](https://docs.nativescript.org/angular/ui/ng-ui-widgets/text-field)
+-   [TextView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/text-view)
+-   [Switch](https://docs.nativescript.org/angular/ui/ng-ui-widgets/switch)
+-   [WebView](https://docs.nativescript.org/angular/ui/ng-ui-widgets/web-view)
+-   [WrapLayout](https://docs.nativescript.org/angular/ui/layouts/layout-containers#wraplayout)
 
 ### Event handling
 

@@ -28,7 +28,6 @@ export default class setModifier<NativeModifierInstance> {
         } else {
             element[property] = value;
         }
-        console.log(`Modifier Did Update Element: ${_params}`);
     }
     // willDestroyElement() {
     //     this.element.removeEventListeners(this.eventName, this.callback);

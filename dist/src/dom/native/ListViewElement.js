@@ -32,7 +32,10 @@ export default class ListViewElement extends NativeElementNode {
             //Render the component with the passed in name into the wrapper element
             const component = GlimmerResolverDelegate.lookupComponent(this.template);
             const compiled = component.compilable.compile(Application.context);
-            let componentInstance = Application._renderComponent(this.template, wrapper, null, compiled, { item });
+            // const args = Object.assign({}, this.args, item);
+            const cursor = { element: wrapper, nextSibling: null };
+            let componentInstance = Application._renderComponent(this.template, cursor, compiled, item);
+            // let componentInstance = Applicaton._renderWithCurriedComponentDefinition(this.template.inner.name, wrapper, null, compiled, this.template.inner.state)
             //set the view as the native element that was generated and pass the rendering results as the component
             let nativeEl = wrapper.nativeView;
             nativeEl.__GlimmerComponent__ = componentInstance._meta.component;

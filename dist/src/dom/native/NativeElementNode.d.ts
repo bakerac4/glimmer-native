@@ -28,5 +28,6 @@ export default class NativeElementNode extends ElementNode {
     onRemovedChild(childNode: ViewNode): void;
     setAttribute(fullkey: string, value: any): void;
     dispatchEvent(event: EventData): void;
+    removeChildren(): void;
 }
 export {};

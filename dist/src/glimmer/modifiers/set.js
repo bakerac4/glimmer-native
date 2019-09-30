@@ -23,6 +23,5 @@ export default class setModifier {
         else {
             element[property] = value;
         }
-        console.log(`Modifier Did Update Element: ${_params}`);
     }
 }

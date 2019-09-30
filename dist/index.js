@@ -19,6 +19,7 @@ import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/gli
 import { navigate } from './src/glimmer/navigation';
 import buildUserHelper from './src/glimmer/references/helper-reference';
 import Resolver from './src/glimmer/resolver';
+import NativeComponentResult from './src/glimmer/result';
 import setupGlimmer from './src/glimmer/setup';
 //Exports
 export { ResolverDelegate } from './src/glimmer/context';
@@ -28,6 +29,7 @@ export { action } from './src/glimmer/decorators/action';
 export { default as Navigation } from './src/glimmer/navigation';
 export { default as DocumentNode } from './src/dom/nodes/DocumentNode';
 export { default as ElementNode } from './src/dom/nodes/ElementNode';
+export { default as NativeElementNode } from './src/dom/native/NativeElementNode';
 export { default as Resolver } from './src/glimmer/resolver';
 export { default as NativeCapabilities } from './src/glimmer/native-capabilities';
 export { NativeModifier, NativeModifierDefinitionState } from './src/glimmer/native-modifier-manager';
@@ -51,14 +53,7 @@ export default class Application {
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
     }
-    renderMain(name, containerElement, nextSibling = null) {
-        if (!containerElement) {
-            containerElement = Application.rootFrame;
-        }
-        let main = Compilable(`<${name} />`).compile(Application.context);
-        Application._renderComponent(name, containerElement, nextSibling, main);
-    }
-    static renderComponent(name, containerElement, nextSibling = null, state) {
+    static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
         let component = Compilable(`<${name} @model={{this.model}} />`);
         const compiled = component.compile(Application.context);
@@ -81,21 +76,20 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = {
-                state
-            };
+            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node;
         }
         catch (error) {
             console.log(`Error rendering page ${name}: ${error}`);
         }
     }
-    static _renderComponent(name, containerElement, nextSibling, compilable, data = {}) {
+    static _renderComponent(name, cursor, compilable, data) {
         let state = State(data);
         const artifact = artifacts(Application.context);
         const runtime = AotRuntime(Application.document, artifact, Application.resolver);
-        const cursor = { element: containerElement ? containerElement : Application.rootFrame, nextSibling };
         let iterator = renderAot(runtime, compilable, cursor, state);
+        // const treeBuilder = NewElementBuilder.forInitialRender(runtime.env, cursor);
+        // let iterator = renderAotMain(runtime, state, treeBuilder, compilable);
         try {
             const result = renderSync(runtime.env, iterator);
             console.log(`Component ${name} Rendered`);
@@ -103,11 +97,7 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = {
-                result,
-                runtime,
-                state
-            };
+            node._meta.component = new NativeComponentResult(name, result, state, runtime);
             return node;
         }
         catch (error) {

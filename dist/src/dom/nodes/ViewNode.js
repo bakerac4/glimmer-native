@@ -220,6 +220,9 @@ export default class ViewNode {
         this.childNodes = this.childNodes.filter((node) => node !== childNode);
         this.onRemovedChild(childNode);
     }
+    removeChildren() {
+        this.childNodes = [];
+    }
     firstElement() {
         for (var child of this.childNodes) {
             if (child.nodeType == 1) {

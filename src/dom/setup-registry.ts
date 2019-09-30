@@ -6,7 +6,9 @@ import FrameElement from './native/FrameElement';
 import ListViewElement from './native/ListViewElement';
 import NativeElementNode, { ComponentMeta } from './native/NativeElementNode';
 import PageElement from './native/PageElement';
+import RadListViewElement from './native/RadListViewElement';
 import TemplateElement from './native/TemplateElement';
+import ElementNode from './nodes/ElementNode';
 
 export function registerNativeElement(elementName: string, resolver: () => typeof View, meta: ComponentMeta = null) {
     registerElement(elementName, () => new NativeElementNode(elementName, resolver(), meta));
@@ -74,6 +76,16 @@ export function registerElements() {
     registerNativeElement('StackLayout', () => require('tns-core-modules/ui/layouts/stack-layout').StackLayout);
     registerNativeElement('ScrollView', () => require('tns-core-modules/ui/scroll-view').ScrollView);
     registerNativeElement('Switch', () => require('tns-core-modules/ui/switch').Switch);
+    registerNativeElement(
+        'TabContentItem',
+        () => require('tns-core-modules/ui/tab-navigation-base/tab-content-item').TabContentItem
+    );
+    registerNativeElement('Tabs', () => require('tns-core-modules/ui/tabs').Tabs);
+    registerNativeElement('TabStrip', () => require('tns-core-modules/ui/tab-navigation-base/tab-strip').TabStrip);
+    registerNativeElement(
+        'TabStripItem',
+        () => require('tns-core-modules/ui/tab-navigation-base/tab-strip-item').TabStripItem
+    );
     registerNativeElement('TabView', () => require('tns-core-modules/ui/tab-view').TabView);
     registerNativeElement('TabViewItem', () => require('tns-core-modules/ui/tab-view').TabViewItem);
     registerNativeElement('TextField', () => require('tns-core-modules/ui/text-field').TextField);
@@ -83,7 +95,9 @@ export function registerElements() {
 
     // Not Complete
     registerElement('ListView', () => new ListViewElement());
+    registerElement('RadListView', () => new RadListViewElement());
     registerElement('Template', () => new TemplateElement());
     registerElement('Frame', () => new FrameElement());
     registerElement('Page', () => new PageElement());
+    registerElement('Fragment', () => new ElementNode('fragment'));
 }

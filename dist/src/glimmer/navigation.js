@@ -49,7 +49,7 @@ export function navigate(componentName, model, options) {
         throw new Error('Must have a valid component name (@target) to perform navigation');
     }
     if (targetNode) {
-        const element = Application.renderComponent(componentName, targetNode, null, { model });
+        const element = Application.renderPage(componentName, targetNode, null, { model });
         element._meta.component = {
             componentName,
             targetNode,
@@ -86,12 +86,12 @@ export function navigate(componentName, model, options) {
         document.appendChild(newFrame);
         try {
             console.log('About to render new result');
-            const element = Application.renderComponent(componentName, newFrame, null, { model });
+            const element = Application.renderPage(componentName, newFrame, null, { model });
             const handler = (args) => {
                 if (args.isBackNavigation) {
                     element.nativeView.off('navigatedFrom', handler);
-                    const destructor = Application.resolver.managerFor().getDestructor();
-                    destructor.destroy();
+                    // const destructor = Application.resolver.managerFor().getDestructor()
+                    // destructor.destroy();
                 }
             };
             element.nativeView.on('navigatedFrom', handler);
@@ -142,7 +142,7 @@ export function showModal(componentName, model, options) {
     let backTarget = target.currentPage;
     let frame = createElement('frame');
     const targetNode = target.get('__GlimmerNativeElement__');
-    const element = Application.renderComponent(componentName, frame, null, {
+    const element = Application.renderPage(componentName, frame, null, {
         model
     });
     element._meta.component = {
@@ -175,9 +175,9 @@ export function showModal(componentName, model, options) {
         modalLauncher.showModal(element.nativeView, Object.assign({}, options, { context: model, closeCallback }));
     });
 }
-export function closeModal() {
+export function closeModal(returnValue) {
     let modalPageInstanceInfo = modalStack.pop();
-    modalPageInstanceInfo.nativeView.closeModal();
+    modalPageInstanceInfo.nativeView.closeModal(returnValue);
 }
 class Navigation {
     constructor() {

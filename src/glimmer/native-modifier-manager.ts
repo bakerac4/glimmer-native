@@ -1,13 +1,13 @@
-import { Tag } from '@glimmer/reference';
 import {
-    Dict,
-    ModifierManager,
-    GlimmerTreeChanges,
-    Destroyable,
-    DynamicScope,
-    VMArguments,
     CapturedArguments,
+    Destroyable,
+    Dict,
+    DynamicScope,
+    GlimmerTreeChanges,
+    ModifierManager,
+    VMArguments
 } from '@glimmer/interfaces';
+import { Tag } from '@glimmer/reference';
 
 /**
   The CustomModifierManager allows addons to provide custom modifier
@@ -40,9 +40,7 @@ export class NativeModifier {
         public state: NativeModifierDefinitionState,
         public args: CapturedArguments,
         public dom: GlimmerTreeChanges
-    ) {
-
-    }
+    ) {}
 }
 
 export class NativeModifierDefinitionState {
@@ -61,8 +59,7 @@ export interface NativeModifierInstance {
     willDestroyElement(element: any): void;
 }
 
-export class NativeModifierManager
-    implements ModifierManager<NativeModifier, NativeModifierDefinitionState> {
+export class NativeModifierManager implements ModifierManager<NativeModifier, NativeModifierDefinitionState> {
     public installedElements: any[] = [];
     public updatedElements: any[] = [];
     public destroyedModifiers: NativeModifier[] = [];
@@ -85,7 +82,7 @@ export class NativeModifierManager
         this.installedElements.push(element);
         let firstParam = args.positional.at(0);
         let param = firstParam !== undefined && firstParam.value();
-        dom.setAttribute(element, 'data-modifier', `installed - ${param}`);
+        // dom.setAttribute(element, 'data-modifier', `installed - ${param}`);
 
         if (state.instance && state.instance.didInsertElement) {
             state.instance.element = element;
@@ -99,7 +96,7 @@ export class NativeModifierManager
         this.updatedElements.push(element);
         let firstParam = args.positional.at(0);
         let param = firstParam !== undefined && firstParam.value();
-        dom.setAttribute(element, 'data-modifier', `updated - ${param}`);
+        // dom.setAttribute(element, 'data-modifier', `updated - ${param}`);
 
         if (state.instance && state.instance.didUpdate) {
             state.instance.didUpdate(element, args.positional.value(), args.named.value());
@@ -108,16 +105,16 @@ export class NativeModifierManager
         return;
     }
 
-  getDestructor(modifier: NativeModifier): Destroyable {
-    return {
-        destroy: () => {
-            this.destroyedModifiers.push(modifier);
-            let { element, dom, state } = modifier;
-            if (state.instance && state.instance.willDestroyElement) {
-                state.instance.willDestroyElement(element);
+    getDestructor(modifier: NativeModifier): Destroyable {
+        return {
+            destroy: () => {
+                this.destroyedModifiers.push(modifier);
+                let { element, dom, state } = modifier;
+                if (state.instance && state.instance.willDestroyElement) {
+                    state.instance.willDestroyElement(element);
+                }
+                // dom.removeAttribute(element, 'data-modifier');
             }
-            dom.removeAttribute(element, 'data-modifier');
-        },
-    };
-  }
+        };
+    }
 }

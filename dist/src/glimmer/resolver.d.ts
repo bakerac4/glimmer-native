@@ -1,4 +1,5 @@
-import { AotRuntimeResolver, ComponentDefinition, Dict, Invocation, ModuleLocator } from '@glimmer/interfaces';
+import { DefinitionState } from '@glimmer/component/dist/types/src/component-definition';
+import { AotRuntimeResolver, ComponentDefinition, Dict, Invocation, ModuleLocator, ProgramSymbolTable } from '@glimmer/interfaces';
 import NativeComponentManager from './native-component-manager';
 export interface TemplateMeta {
     specifier: string;
@@ -8,8 +9,9 @@ declare class NativeComponentDefinition implements ComponentDefinition {
     manager: NativeComponentManager;
     ComponentClass: any;
     handle: number;
-    state: object;
-    constructor(name: string, manager: NativeComponentManager, ComponentClass: any, handle: number);
+    state: DefinitionState;
+    symbolTable?: ProgramSymbolTable;
+    constructor(name: string, manager: NativeComponentManager, ComponentClass: any, handle: number, symbolTable?: ProgramSymbolTable);
     toJSON(): {
         GlimmerDebug: string;
     };
