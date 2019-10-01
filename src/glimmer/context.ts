@@ -1,6 +1,9 @@
-import { precompile } from '@glimmer/compiler';
+import { precompile, TemplateCompiler } from '@glimmer/compiler';
 import { Component } from '@glimmer/opcode-compiler';
+import { preprocess, traverse } from '@glimmer/syntax';
 import { strip } from '@glimmer/util';
+
+import AST from './ast/template';
 
 // /**
 //  * Ideally we precompile all the templates through a
@@ -8,6 +11,13 @@ import { strip } from '@glimmer/util';
 //  * for demo purposes.
 //  */
 export function Compilable(source: any) {
+    const ast = preprocess(source);
+    const transform = AST(ast);
+    traverse(ast, transform.visitor);
+    // const template = AST(template1);
+    const compiled = TemplateCompiler.compile(ast);
+
+    // const template2 = templateCompileFunction(source);
     // console.log('In Compilable: ' + source);
     const precompiled = precompile(source);
     // console.log('Precompiled');
