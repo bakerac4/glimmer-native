@@ -1,9 +1,32 @@
-import { precompile, TemplateCompiler } from '@glimmer/compiler';
+import { precompile, PrecompileOptions, TemplateCompiler } from '@glimmer/compiler';
 import { Component } from '@glimmer/opcode-compiler';
-import { preprocess, traverse } from '@glimmer/syntax';
+import { ASTPlugin, ASTPluginEnvironment, preprocess, PreprocessOptions, Syntax, traverse } from '@glimmer/syntax';
 import { strip } from '@glimmer/util';
 
+import { GlimmerRewriter } from './ast/rewriter';
 import AST from './ast/template';
+
+export interface ASTPluginBuilder {
+    (env: ASTPluginEnvironment): ASTPlugin;
+}
+
+// export interface ASTPluginEnvironment {
+//     meta?: any;
+//     syntax: Syntax;
+// }
+
+// export interface ASTPlugin {
+//     name: string;
+//     visitor: NodeVisitor;
+// }
+
+// export interface Syntax {
+//     parse: typeof preprocess;
+//     builders: typeof builders;
+//     print: typeof print;
+//     traverse: typeof traverse;
+//     Walker: typeof Walker;
+// }
 
 // /**
 //  * Ideally we precompile all the templates through a
@@ -11,15 +34,27 @@ import AST from './ast/template';
 //  * for demo purposes.
 //  */
 export function Compilable(source: any) {
-    const ast = preprocess(source);
-    const transform = AST(ast);
-    traverse(ast, transform.visitor);
+    const preprocessOptions: PreprocessOptions = {
+        mode: 'codemod'
+    };
+    const ast = preprocess(source, preprocessOptions);
+    const rewriter = new GlimmerRewriter({} as Syntax);
+
+    // const transform = AST(ast);
+    traverse(ast, rewriter.visitor);
     // const template = AST(template1);
     const compiled = TemplateCompiler.compile(ast);
 
     // const template2 = templateCompileFunction(source);
     // console.log('In Compilable: ' + source);
-    const precompiled = precompile(source);
+    let options = {
+        meta: {},
+        plugins: {
+            ast: [AST]
+        }
+    } as PrecompileOptions;
+
+    const precompiled = precompile(source, options);
     // console.log('Precompiled');
     const component = Component(precompiled);
     // console.log(`Compiled Component: ${component}`);
