@@ -1,8 +1,7 @@
-import { precompile, TemplateCompiler } from '@glimmer/compiler';
+import { precompile } from '@glimmer/compiler';
 import { Component } from '@glimmer/opcode-compiler';
-import { preprocess, traverse } from '@glimmer/syntax';
+import { preprocess } from '@glimmer/syntax';
 import { strip } from '@glimmer/util';
-import { GlimmerRewriter } from './ast/rewriter';
 import AST from './ast/template';
 // export interface ASTPluginEnvironment {
 //     meta?: any;
@@ -29,11 +28,11 @@ export function Compilable(source) {
         mode: 'codemod'
     };
     const ast = preprocess(source, preprocessOptions);
-    const rewriter = new GlimmerRewriter({});
+    // const rewriter = new GlimmerRewriter({} as Syntax);
     // const transform = AST(ast);
-    traverse(ast, rewriter.visitor);
+    // traverse(ast, rewriter.visitor);
     // const template = AST(template1);
-    const compiled = TemplateCompiler.compile(ast);
+    // const compiled = TemplateCompiler.compile(ast);
     // const template2 = templateCompileFunction(source);
     // console.log('In Compilable: ' + source);
     let options = {
