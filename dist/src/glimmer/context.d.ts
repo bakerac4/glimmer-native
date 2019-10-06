@@ -1,7 +1,3 @@
-import { ASTPlugin, ASTPluginEnvironment } from '@glimmer/syntax';
-export interface ASTPluginBuilder {
-    (env: ASTPluginEnvironment): ASTPlugin;
-}
 export declare function Compilable(source: any): import("@glimmer/interfaces").CompilableTemplate<import("@glimmer/interfaces").ProgramSymbolTable>;
 export declare class ResolverDelegate {
     static components: any;

@@ -1,5 +1,11 @@
 import { ASTPlugin, NodeVisitor, Syntax } from '@glimmer/syntax';
 
+// export class GlimmerRewriterBuilder implements ASTPluginBuilder {
+//     test(env: ASTPluginEnvironment) {
+//         return new GlimmerRewriter(env.syntax) as ASTPlugin;
+//     }
+// }
+
 export class GlimmerRewriter implements ASTPlugin {
     syntax: Syntax;
     builder: any;

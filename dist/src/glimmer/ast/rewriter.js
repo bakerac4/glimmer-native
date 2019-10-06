@@ -1,3 +1,8 @@
+// export class GlimmerRewriterBuilder implements ASTPluginBuilder {
+//     test(env: ASTPluginEnvironment) {
+//         return new GlimmerRewriter(env.syntax) as ASTPlugin;
+//     }
+// }
 export class GlimmerRewriter {
     constructor(syntax) {
         this.templates = [];

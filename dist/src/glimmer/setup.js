@@ -3,6 +3,7 @@ import LinkToTemplate from './components/LinkTo/template';
 import buildAction from './helpers/action';
 import hash from './helpers/hash';
 import ifHelper from './helpers/if';
+import registerComponent from './helpers/register-component';
 import onModifier from './modifiers/on';
 import setModifier from './modifiers/set';
 import setargsModifier from './modifiers/setargs';
@@ -88,6 +89,7 @@ export default function setupGlimmer(resolverDelegate, resolver) {
     const hashHandle = resolver.registerHelper(hash);
     const glimmerIfHelper = buildUserHelper(ifHelper);
     const ifHandle = resolver.registerHelper(glimmerIfHelper);
+    const registerComponentHandle = resolver.registerHelper(registerComponent);
     const onModifierHandle = resolver.registerModifier(onModifier);
     const setModifierHandle = resolver.registerModifier(setModifier);
     const setargsModifierHandle = resolver.registerModifier(setargsModifier);
@@ -95,6 +97,7 @@ export default function setupGlimmer(resolverDelegate, resolver) {
     resolverDelegate.registerHelper('action', actionHandle);
     resolverDelegate.registerHelper('hash', hashHandle);
     resolverDelegate.registerHelper('if', ifHandle);
+    resolverDelegate.registerHelper('register-component', registerComponentHandle);
     resolverDelegate.registerModifier('on', onModifierHandle);
     resolverDelegate.registerModifier('set', setModifierHandle);
     resolverDelegate.registerModifier('setargs', setargsModifierHandle);

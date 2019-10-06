@@ -4,7 +4,7 @@ import { ListViewEventData, ListViewViewType, RadListView } from 'nativescript-u
 import { View } from 'tns-core-modules/ui/core/view/view';
 
 import Application from '../../..';
-import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
+import GlimmerResolverDelegate from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
@@ -34,11 +34,11 @@ export default class RadListViewElement extends NativeElementNode {
             let wrapper = createElement('StackLayout') as NativeElementNode;
             wrapper.setAttribute('class', 'list-view-item');
             const template = this.itemTemplateComponent as any;
-            // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
-            // const compiled = component.compilable.compile(Application.context);
+            const component = GlimmerResolverDelegate.lookupComponent('my-insane-component');
+            const compiled = component.compilable.compile(Application.context);
             const cursor = { element: wrapper, nextSibling: null } as Cursor;
-            let component = Compilable(template.args.src);
-            const compiled = component.compile(Application.context);
+            // let component = Compilable(template.args.src);
+            // const compiled = component.compile(Application.context);
             let componentInstance = Application._renderComponent(null, cursor, compiled, template.args);
 
             let nativeEl = wrapper.nativeView;

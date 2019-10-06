@@ -1,13 +1,13 @@
 import { precompile, PrecompileOptions } from '@glimmer/compiler';
 import { Component } from '@glimmer/opcode-compiler';
-import { ASTPlugin, ASTPluginEnvironment, preprocess, PreprocessOptions } from '@glimmer/syntax';
+import { ASTPlugin, ASTPluginEnvironment } from '@glimmer/syntax';
 import { strip } from '@glimmer/util';
 
-import AST from './ast/template';
+import { GlimmerRewriter } from './ast/rewriter';
 
-export interface ASTPluginBuilder {
-    (env: ASTPluginEnvironment): ASTPlugin;
-}
+// export interface ASTPluginBuilder {
+//     (env: ASTPluginEnvironment): ASTPlugin;
+// }
 
 // export interface ASTPluginEnvironment {
 //     meta?: any;
@@ -33,11 +33,13 @@ export interface ASTPluginBuilder {
 //  * for demo purposes.
 //  */
 export function Compilable(source: any) {
-    const preprocessOptions: PreprocessOptions = {
-        mode: 'codemod'
+    // const preprocessOptions: PreprocessOptions = {
+    //     mode: 'codemod'
+    // };
+    // const ast = preprocess(source, preprocessOptions);
+    const rewriter = function(env: ASTPluginEnvironment) {
+        return new GlimmerRewriter(env.syntax) as ASTPlugin;
     };
-    const ast = preprocess(source, preprocessOptions);
-    // const rewriter = new GlimmerRewriter({} as Syntax);
 
     // const transform = AST(ast);
     // traverse(ast, rewriter.visitor);
@@ -49,7 +51,7 @@ export function Compilable(source: any) {
     let options = {
         meta: {},
         plugins: {
-            ast: [AST]
+            ast: [rewriter]
         }
     } as PrecompileOptions;
 
@@ -96,7 +98,7 @@ export class ResolverDelegate {
         return {
             handle,
             source,
-            compilable: Component(source),
+            compilable: Compilable(source),
             capabilities
         };
     }

@@ -1,8 +1,10 @@
 import { precompile } from '@glimmer/compiler';
 import { Component } from '@glimmer/opcode-compiler';
-import { preprocess } from '@glimmer/syntax';
 import { strip } from '@glimmer/util';
-import AST from './ast/template';
+import { GlimmerRewriter } from './ast/rewriter';
+// export interface ASTPluginBuilder {
+//     (env: ASTPluginEnvironment): ASTPlugin;
+// }
 // export interface ASTPluginEnvironment {
 //     meta?: any;
 //     syntax: Syntax;
@@ -24,11 +26,13 @@ import AST from './ast/template';
 //  * for demo purposes.
 //  */
 export function Compilable(source) {
-    const preprocessOptions = {
-        mode: 'codemod'
+    // const preprocessOptions: PreprocessOptions = {
+    //     mode: 'codemod'
+    // };
+    // const ast = preprocess(source, preprocessOptions);
+    const rewriter = function (env) {
+        return new GlimmerRewriter(env.syntax);
     };
-    const ast = preprocess(source, preprocessOptions);
-    // const rewriter = new GlimmerRewriter({} as Syntax);
     // const transform = AST(ast);
     // traverse(ast, rewriter.visitor);
     // const template = AST(template1);
@@ -38,7 +42,7 @@ export function Compilable(source) {
     let options = {
         meta: {},
         plugins: {
-            ast: [AST]
+            ast: [rewriter]
         }
     };
     const precompiled = precompile(source, options);
