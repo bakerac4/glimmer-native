@@ -1,6 +1,5 @@
 import { precompile } from '@glimmer/compiler';
 import { Component } from '@glimmer/opcode-compiler';
-import { strip } from '@glimmer/util';
 import { GlimmerRewriter } from './ast/rewriter';
 // export interface ASTPluginBuilder {
 //     (env: ASTPluginEnvironment): ASTPlugin;
@@ -55,7 +54,7 @@ export class ResolverDelegate {
     registerComponent(name, handle, source, capabilities) {
         // console.log(`addComponent: ${name}`);
         ResolverDelegate.components[name] = {
-            source: strip `${source}`,
+            source: source,
             handle,
             capabilities
         };
@@ -80,7 +79,7 @@ export class ResolverDelegate {
         return {
             handle,
             source,
-            compilable: Component(source),
+            compilable: source,
             capabilities
         };
     }

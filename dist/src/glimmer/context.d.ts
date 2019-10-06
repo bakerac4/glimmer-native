@@ -9,7 +9,7 @@ export declare class ResolverDelegate {
     static lookupComponent(name: any): {
         handle: any;
         source: any;
-        compilable: import("@glimmer/interfaces").CompilableTemplate<import("@glimmer/interfaces").ProgramSymbolTable>;
+        compilable: any;
         capabilities: any;
     };
     static lookupModifier(name: any): any;

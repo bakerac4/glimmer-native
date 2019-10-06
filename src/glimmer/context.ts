@@ -98,7 +98,7 @@ export class ResolverDelegate {
         return {
             handle,
             source,
-            compilable: Compilable(source),
+            compilable: Component(source),
             capabilities
         };
     }
