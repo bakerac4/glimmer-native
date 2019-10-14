@@ -1,11 +1,13 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
+import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { Cursor } from '@glimmer/interfaces';
 import { ItemEventData, ItemsSource, ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 
 import Application from '../../..';
-import GlimmerResolverDelegate from '../../glimmer/context';
+import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
+import TemplateElement from './TemplateElement';
 
 export default class ListViewElement extends NativeElementNode {
     template: any = null;
@@ -36,36 +38,49 @@ export default class ListViewElement extends NativeElementNode {
 
         if (!args.view || !(args.view as any).__GlimmerComponent__) {
             //Create the wrapper element
+            // let wrapper = createElement('StackLayout') as NativeElementNode;
+            // wrapper.setAttribute('class', 'list-view-item');
+
+            // //Render the component with the passed in name into the wrapper element
+            // const component = GlimmerResolverDelegate.lookupComponent(this.template);
+            // const compiled = component.compilable.compile(Application.context);
+            // // const args = Object.assign({}, this.args, item);
+            // const cursor = { element: wrapper, nextSibling: null } as Cursor;
+            // let componentInstance = Application._renderComponent(this.template, cursor, compiled, item);
+            // // let componentInstance = Applicaton._renderWithCurriedComponentDefinition(this.template.inner.name, wrapper, null, compiled, this.template.inner.state)
+
+            // //set the view as the native element that was generated and pass the rendering results as the component
+            // let nativeEl = wrapper.nativeView;
+            // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
+            // args.view = nativeEl;
             let wrapper = createElement('StackLayout') as NativeElementNode;
             wrapper.setAttribute('class', 'list-view-item');
-
-            //Render the component with the passed in name into the wrapper element
-            const component = GlimmerResolverDelegate.lookupComponent(this.template);
-            const compiled = component.compilable.compile(Application.context);
-            // const args = Object.assign({}, this.args, item);
+            const template = this.itemTemplateComponent as any;
+            // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
+            // const compiled = component.compilable.compile(Application.context);
             const cursor = { element: wrapper, nextSibling: null } as Cursor;
-            let componentInstance = Application._renderComponent(this.template, cursor, compiled, item);
-            // let componentInstance = Applicaton._renderWithCurriedComponentDefinition(this.template.inner.name, wrapper, null, compiled, this.template.inner.state)
+            let component = Compilable(template.args.src);
+            const compiled = component.compile(Application.context);
+            let componentInstance = Application._renderComponent(null, cursor, compiled, { ...template.args, item });
 
-            //set the view as the native element that was generated and pass the rendering results as the component
             let nativeEl = wrapper.nativeView;
             (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
         } else {
             //Get the component instance which we classify as the rendering result, runtime and state
             let componentInstance = (args.view as any).__GlimmerComponent__;
-            let state = componentInstance.state;
-            //Update the state with the new item
-            state.update({ item });
-            //and now tell glimmer to re-render
-            componentInstance.runtime.env.begin();
-            componentInstance.result.rerender();
-            componentInstance.runtime.env.commit();
+            const oldState = componentInstance.state.value();
+            // Update the state with the new item
+            componentInstance.update({
+                ...oldState,
+                item
+            });
         }
     }
 
-    get itemTemplateComponent() {
-        return this.template;
+    get itemTemplateComponent(): GlimmerComponent {
+        const templateNode = this.childNodes.find((x) => x instanceof TemplateElement) as TemplateElement;
+        return templateNode ? templateNode.component : null;
     }
 
     get nativeView(): NativeListView {

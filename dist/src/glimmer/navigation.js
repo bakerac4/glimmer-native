@@ -1,8 +1,9 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -75,7 +76,7 @@ export function navigate(componentName, model, options) {
         element.nativeView.on('navigatingFrom', function (args) {
             onNavigatedFrom(args, element);
         });
-        target.navigate(Object.assign({}, options, { create: () => {
+        target.navigate(Object.assign(Object.assign({}, options), { create: () => {
                 return element.nativeView;
             } }));
     }
@@ -95,7 +96,7 @@ export function navigate(componentName, model, options) {
                 }
             };
             element.nativeView.on('navigatedFrom', handler);
-            topmost().navigate(Object.assign({}, options, { create: () => {
+            topmost().navigate(Object.assign(Object.assign({}, options), { create: () => {
                     return element.nativeView;
                 } }));
             console.log('New page rendered');
@@ -172,7 +173,7 @@ export function showModal(componentName, model, options) {
             }
         };
         modalStack.push(element);
-        modalLauncher.showModal(element.nativeView, Object.assign({}, options, { context: model, closeCallback }));
+        modalLauncher.showModal(element.nativeView, Object.assign(Object.assign({}, options), { context: model, closeCallback }));
     });
 }
 export function closeModal(returnValue) {
