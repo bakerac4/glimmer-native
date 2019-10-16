@@ -54,6 +54,9 @@ export default class Application {
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
     }
+    static addListItem(viewNode) {
+        this.listItems.push(viewNode);
+    }
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
         let component = Compilable(`<${name} @model={{this.model}} />`);
@@ -77,7 +80,8 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            node._meta.nativeComponentResult = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            Application.renderedPage = node;
             return node;
         }
         catch (error) {
@@ -187,3 +191,4 @@ export default class Application {
     }
 }
 Application.outsideComponents = [];
+Application.listItems = [];

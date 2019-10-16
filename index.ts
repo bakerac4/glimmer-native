@@ -56,6 +56,8 @@ export default class Application {
     static _rendered: boolean;
     static aotRuntime: AotRuntimeContext;
     static outsideComponents: any = [];
+    static listItems = [];
+    static renderedPage: any;
 
     constructor(appFolder, components, helpers) {
         registerElements();
@@ -75,6 +77,10 @@ export default class Application {
         Application.rootFrame.setAttribute('id', 'root');
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
+    }
+
+    static addListItem(viewNode) {
+        this.listItems.push(viewNode);
     }
 
     static renderPage(name, containerElement, nextSibling = null, state) {
@@ -101,7 +107,8 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            node._meta.nativeComponentResult = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            Application.renderedPage = node;
             return node as any;
         } catch (error) {
             console.log(`Error rendering page ${name}: ${error}`);

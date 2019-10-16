@@ -36,7 +36,10 @@ export default class Application {
     static _rendered: boolean;
     static aotRuntime: AotRuntimeContext;
     static outsideComponents: any;
+    static listItems: any[];
+    static renderedPage: any;
     constructor(appFolder: any, components: any, helpers: any);
+    static addListItem(viewNode: any): void;
     static renderPage(name: any, containerElement: any, nextSibling: any, state: any): ElementNode;
     static _renderPage(name: any, containerElement: any, nextSibling: any, compilable: any, data?: {}): ElementNode;
     static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): ElementNode;

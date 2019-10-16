@@ -3,8 +3,8 @@ import { Cursor } from '@glimmer/interfaces';
 import { ListViewEventData, ListViewViewType, RadListView } from 'nativescript-ui-listview';
 import { View } from 'tns-core-modules/ui/core/view/view';
 
-import Application from '../../..';
-import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
+import Application from '../../../';
+import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
@@ -31,18 +31,35 @@ export default class RadListViewElement extends NativeElementNode {
     loadView(viewType: string): View {
         if (viewType === ListViewViewType.ItemView) {
             console.log('creating view for ', viewType);
+            const template = this.itemTemplateComponent as any;
             let wrapper = createElement('StackLayout') as NativeElementNode;
             wrapper.setAttribute('class', 'list-view-item');
-            const template = this.itemTemplateComponent as any;
+            let modifiedTemplate = `
+                {{#in-element this.wrapper insertBefore=null}} ${template.args.src} {{/in-element}}
+            `;
+            let component = Compilable(modifiedTemplate);
+            // let component = Compilable(`
+            //     {{#-in-element this.applicationPage}}
+            //         {{#-in-elment this.wrapper}} ${template.args.src}{{/-in-element}}
+            //     {{/-in-element}}
+            // `);
+            // const template = this.itemTemplateComponent as any;
+
             // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
             // const compiled = component.compilable.compile(Application.context);
             const cursor = { element: wrapper, nextSibling: null } as Cursor;
-            let component = Compilable(template.args.src);
+            // let component = Compilable(template.args.src);
             const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(null, cursor, compiled, template.args);
+            let componentNode = Application._renderComponent(null, cursor, compiled, {
+                applicationPage: Application.renderedPage.childNodes[1],
+                wrapper: Application.renderedPage.childNodes[1],
+                ...template.args
+            });
 
-            let nativeEl = wrapper.nativeView;
-            (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
+            let nativeEl = componentNode.nativeView;
+            nativeEl.parent = null;
+            nativeEl.parentNode = null;
+            (nativeEl as any).__GlimmerComponent__ = componentNode._meta.component;
             return nativeEl;
         }
     }
@@ -71,6 +88,13 @@ export default class RadListViewElement extends NativeElementNode {
                 ...oldState,
                 item
             });
+            // const pageNode = Application.renderedPage;
+            // const oldState = pageNode._meta.nativeComponentResult.state.value();
+            // Application.renderedPage._meta.nativeComponentResult.update({
+            //     ...oldState,
+            //     item
+            // });
+            // Application._rerender();
         } else {
             console.log('got invalid update call with', args.index, args.view);
         }
