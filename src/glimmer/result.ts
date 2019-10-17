@@ -14,10 +14,10 @@ export default class NativeComponentResult {
         this.runtime = runtime;
     }
 
-    update(state) {
+    async update(state) {
         this.state.update(state);
         this.runtime.env.begin();
-        this.result.rerender();
+        await this.result.rerender();
         this.runtime.env.commit();
     }
 
