@@ -180,6 +180,12 @@ export default class Application {
             try {
                 Application.aotRuntime.env.begin();
                 yield Application.result.rerender();
+                this.listItems.forEach((item) => {
+                    const component = item._meta.component;
+                    component.runtime.env.begin();
+                    component.result.rerender();
+                    component.runtime.env.commit();
+                });
                 Application.aotRuntime.env.commit();
                 Application._rendered = true;
                 console.log('Result Re-rendered');

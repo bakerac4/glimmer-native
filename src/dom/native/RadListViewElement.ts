@@ -1,10 +1,8 @@
 import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
-import { Cursor } from '@glimmer/interfaces';
 import { ListViewEventData, ListViewViewType, RadListView } from 'nativescript-ui-listview';
 import { View } from 'tns-core-modules/ui/core/view/view';
 
 import Application from '../../../';
-import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
@@ -12,6 +10,7 @@ import TemplateElement from './TemplateElement';
 export default class RadListViewElement extends NativeElementNode {
     lastItemSelected: any;
     component: any;
+    items = [];
     constructor() {
         super('radlistview', RadListView, null);
 
@@ -31,35 +30,15 @@ export default class RadListViewElement extends NativeElementNode {
     loadView(viewType: string): View {
         if (viewType === ListViewViewType.ItemView) {
             console.log('creating view for ', viewType);
-            const template = this.itemTemplateComponent as any;
-            let wrapper = createElement('StackLayout') as NativeElementNode;
-            wrapper.setAttribute('class', 'list-view-item');
-            let modifiedTemplate = `
-                {{#in-element this.wrapper insertBefore=null}} ${template.args.src} {{/in-element}}
-            `;
-            let component = Compilable(modifiedTemplate);
-            // let component = Compilable(`
-            //     {{#-in-element this.applicationPage}}
-            //         {{#-in-elment this.wrapper}} ${template.args.src}{{/-in-element}}
-            //     {{/-in-element}}
-            // `);
             // const template = this.itemTemplateComponent as any;
+            let wrapper = createElement('StackLayout') as NativeElementNode;
+            wrapper.setAttribute('id', `list-view-${this.items.length}`);
+            wrapper.setAttribute('class', 'list-view-item');
 
-            // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
-            // const compiled = component.compilable.compile(Application.context);
-            const cursor = { element: wrapper, nextSibling: null } as Cursor;
-            // let component = Compilable(template.args.src);
-            const compiled = component.compile(Application.context);
-            let componentNode = Application._renderComponent(null, cursor, compiled, {
-                applicationPage: Application.renderedPage.childNodes[1],
-                wrapper: Application.renderedPage.childNodes[1],
-                ...template.args
-            });
-
-            let nativeEl = componentNode.nativeView;
-            nativeEl.parent = null;
-            nativeEl.parentNode = null;
-            (nativeEl as any).__GlimmerComponent__ = componentNode._meta.component;
+            let nativeEl = wrapper.nativeView;
+            let template = this.itemTemplateComponent as any;
+            this.items.push(wrapper);
+            Application.addListItem({ id: this.items.length, node: wrapper, template: template.args.src });
             return nativeEl;
         }
     }
