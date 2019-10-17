@@ -13,14 +13,15 @@
         "ember"
     ],
     "scripts": {
-        "build": "tsc --skipLibCheck"
+        "build": "tsc --skipLibCheck",
+        "test": "jest"
     },
     "main": "dist/index.js",
     "author": "Adam Baker",
     "peerDependencies": {
         "tns-core-modules": "^6.0.1"
-    },
-    "dependencies": {
+	},
+	"dependencies": {
         "@glimmer/application": "^0.13.0",
         "@glimmer/application-pipeline": "^0.15.0",
         "@glimmer/blueprint": "~0.13.0",
@@ -45,7 +46,10 @@
     },
     "devDependencies": {
         "tns-core-modules": "^6.0.1",
+        "typescript": "^3.5.3",
+        "@types/jest": "24.0.17",
+        "jest": "24.8.0",
+        "ts-jest": "24.0.2"
         "nativescript-ui-listview": "^7.0.2",
-        "typescript": "^3.5.3"
     }
 }
