@@ -59,11 +59,11 @@ export default class Application {
     }
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
-        let component = Compilable(`<${name} @model={{this.model}} />`);
+        let component = Compilable(`<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`);
         const compiled = component.compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name);
         // const compiled = component.compilable.compile(Application.context);
-        return Application._renderPage(name, containerElement, nextSibling, compiled, state);
+        return Application._renderPage(name, containerElement, nextSibling, compiled, Object.assign(Object.assign({}, state), { listViewItems: Application.listItems }));
     }
     static _renderPage(name, containerElement, nextSibling, compilable, data = {}) {
         let state = State(data);
@@ -180,12 +180,6 @@ export default class Application {
             try {
                 Application.aotRuntime.env.begin();
                 yield Application.result.rerender();
-                this.listItems.forEach((item) => {
-                    const component = item._meta.component;
-                    component.runtime.env.begin();
-                    component.result.rerender();
-                    component.runtime.env.commit();
-                });
                 Application.aotRuntime.env.commit();
                 Application._rendered = true;
                 console.log('Result Re-rendered');

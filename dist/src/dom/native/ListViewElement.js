@@ -1,6 +1,5 @@
 import { ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 import Application from '../../..';
-import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
@@ -8,6 +7,7 @@ export default class ListViewElement extends NativeElementNode {
     constructor() {
         super('listview', NativeListView, null);
         this.template = null;
+        this.numberViewsCreated = 0;
         this.nativeView.on(NativeListView.itemLoadingEvent, (args) => {
             this.updateListItem(args);
         });
@@ -26,7 +26,7 @@ export default class ListViewElement extends NativeElementNode {
         else {
             item = items[args.index];
         }
-        if (!args.view || !args.view.__GlimmerComponent__) {
+        if (!args.view) {
             //Create the wrapper element
             // let wrapper = createElement('StackLayout') as NativeElementNode;
             // wrapper.setAttribute('class', 'list-view-item');
@@ -41,26 +41,38 @@ export default class ListViewElement extends NativeElementNode {
             // let nativeEl = wrapper.nativeView;
             // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             // args.view = nativeEl;
+            let numberViewsCreated = this.numberViewsCreated;
             let wrapper = createElement('StackLayout');
             wrapper.setAttribute('class', 'list-view-item');
+            wrapper.setAttribute('id', `list-view-${numberViewsCreated}`);
             const template = this.itemTemplateComponent;
             // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
             // const compiled = component.compilable.compile(Application.context);
-            const cursor = { element: wrapper, nextSibling: null };
-            let component = Compilable(template.args.src);
-            const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(null, cursor, compiled, Object.assign(Object.assign({}, template.args), { item }));
+            // const cursor = { element: wrapper, nextSibling: null } as Cursor;
+            // let component = Compilable(template.args.src);
+            // const compiled = component.compile(Application.context);
+            // let componentInstance = Application._renderComponent(null, cursor, compiled, { ...template.args, item });
             let nativeEl = wrapper.nativeView;
-            nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
+            Application.addListItem({ id: numberViewsCreated, node: wrapper, template: template.args.src, item });
+            // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
+            this.numberViewsCreated = this.numberViewsCreated + 1;
         }
         else {
             //Get the component instance which we classify as the rendering result, runtime and state
             let componentInstance = args.view.__GlimmerComponent__;
-            const oldState = componentInstance.state.value();
-            // Update the state with the new item
-            componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
+            const listItem = Application.listItems.find((item) => `list-view-${item.id}` === args.view.id);
+            listItem.item = item;
+            // const oldState = componentInstance.state.value();
+            // // Update the state with the new item
+            // componentInstance.update({
+            //     ...oldState,
+            //     item
+            // });
         }
+        const oldState = Application.renderedPage._meta.nativeComponentResult.state.value();
+        Application.renderedPage._meta.nativeComponentResult.update(Object.assign(Object.assign({}, oldState), { listViewItems: Application.listItems }));
+        Application._rerender();
     }
     get itemTemplateComponent() {
         const templateNode = this.childNodes.find((x) => x instanceof TemplateElement);

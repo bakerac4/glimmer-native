@@ -4,6 +4,7 @@ import NativeElementNode from './NativeElementNode';
 export default class ListViewElement extends NativeElementNode {
     template: any;
     items: any;
+    numberViewsCreated: number;
     constructor();
     updateListItem(args: ItemEventData): void;
     readonly itemTemplateComponent: GlimmerComponent;

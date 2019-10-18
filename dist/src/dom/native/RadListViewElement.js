@@ -1,12 +1,12 @@
 import { ListViewViewType, RadListView } from 'nativescript-ui-listview';
 import Application from '../../../';
-import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
 export default class RadListViewElement extends NativeElementNode {
     constructor() {
         super('radlistview', RadListView, null);
+        this.items = [];
         let nativeView = this.nativeView;
         nativeView.itemViewLoader = (viewType) => this.loadView(viewType);
         this.nativeView.on(RadListView.itemLoadingEvent, (args) => {
@@ -20,21 +20,14 @@ export default class RadListViewElement extends NativeElementNode {
     loadView(viewType) {
         if (viewType === ListViewViewType.ItemView) {
             console.log('creating view for ', viewType);
-            const template = this.itemTemplateComponent;
+            // const template = this.itemTemplateComponent as any;
             let wrapper = createElement('StackLayout');
+            wrapper.setAttribute('id', `list-view-${this.items.length}`);
             wrapper.setAttribute('class', 'list-view-item');
-            let modifiedTemplate = `
-                {{#in-element this.wrapper insertBefore=null}} ${template.args.src} {{/in-element}}
-            `;
-            let component = Compilable(modifiedTemplate);
-            const cursor = { element: wrapper, nextSibling: null };
-            const compiled = component.compile(Application.context);
-            let componentNode = Application._renderComponent(null, cursor, compiled, Object.assign({ wrapper: Application.renderedPage.childNodes[1] }, template.args));
-            let nativeEl = componentNode.nativeView;
-            nativeEl.parent = null;
-            nativeEl.parentNode = null;
-            Application.addListItem(componentNode);
-            nativeEl.__GlimmerComponent__ = componentNode._meta.component;
+            let nativeEl = wrapper.nativeView;
+            let template = this.itemTemplateComponent;
+            this.items.push(wrapper);
+            Application.addListItem({ id: this.items.length, node: wrapper, template: template.args.src });
             return nativeEl;
         }
     }

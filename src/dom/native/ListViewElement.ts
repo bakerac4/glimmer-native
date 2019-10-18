@@ -1,10 +1,8 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
-import { Cursor } from '@glimmer/interfaces';
 import { ItemEventData, ItemsSource, ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 
 import Application from '../../..';
-import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
@@ -12,6 +10,7 @@ import TemplateElement from './TemplateElement';
 export default class ListViewElement extends NativeElementNode {
     template: any = null;
     items: any;
+    numberViewsCreated: number = 0;
 
     constructor() {
         super('listview', NativeListView, null);
@@ -36,7 +35,7 @@ export default class ListViewElement extends NativeElementNode {
             item = (items as any)[args.index];
         }
 
-        if (!args.view || !(args.view as any).__GlimmerComponent__) {
+        if (!args.view) {
             //Create the wrapper element
             // let wrapper = createElement('StackLayout') as NativeElementNode;
             // wrapper.setAttribute('class', 'list-view-item');
@@ -53,29 +52,41 @@ export default class ListViewElement extends NativeElementNode {
             // let nativeEl = wrapper.nativeView;
             // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             // args.view = nativeEl;
+            let numberViewsCreated = this.numberViewsCreated;
             let wrapper = createElement('StackLayout') as NativeElementNode;
             wrapper.setAttribute('class', 'list-view-item');
+            wrapper.setAttribute('id', `list-view-${numberViewsCreated}`);
             const template = this.itemTemplateComponent as any;
             // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
             // const compiled = component.compilable.compile(Application.context);
-            const cursor = { element: wrapper, nextSibling: null } as Cursor;
-            let component = Compilable(template.args.src);
-            const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(null, cursor, compiled, { ...template.args, item });
+            // const cursor = { element: wrapper, nextSibling: null } as Cursor;
+            // let component = Compilable(template.args.src);
+            // const compiled = component.compile(Application.context);
+            // let componentInstance = Application._renderComponent(null, cursor, compiled, { ...template.args, item });
 
             let nativeEl = wrapper.nativeView;
-            (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
+            Application.addListItem({ id: numberViewsCreated, node: wrapper, template: template.args.src, item });
+            // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
+            this.numberViewsCreated = this.numberViewsCreated + 1;
         } else {
             //Get the component instance which we classify as the rendering result, runtime and state
             let componentInstance = (args.view as any).__GlimmerComponent__;
-            const oldState = componentInstance.state.value();
-            // Update the state with the new item
-            componentInstance.update({
-                ...oldState,
-                item
-            });
+            const listItem = Application.listItems.find((item) => `list-view-${item.id}` === args.view.id);
+            listItem.item = item;
+            // const oldState = componentInstance.state.value();
+            // // Update the state with the new item
+            // componentInstance.update({
+            //     ...oldState,
+            //     item
+            // });
         }
+        const oldState = Application.renderedPage._meta.nativeComponentResult.state.value();
+        Application.renderedPage._meta.nativeComponentResult.update({
+            ...oldState,
+            listViewItems: Application.listItems
+        });
+        Application._rerender();
     }
 
     get itemTemplateComponent(): GlimmerComponent {

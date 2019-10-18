@@ -5,6 +5,7 @@ import NativeElementNode from './NativeElementNode';
 export default class RadListViewElement extends NativeElementNode {
     lastItemSelected: any;
     component: any;
+    items: any[];
     constructor();
     readonly itemTemplateComponent: GlimmerComponent;
     loadView(viewType: string): View;
