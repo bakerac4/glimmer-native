@@ -1,5 +1,6 @@
 import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@glimmer/interfaces';
 import { MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
+import { UpdatableReference } from '@glimmer/reference';
 import FrameElement from './src/dom/native/FrameElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
@@ -38,6 +39,9 @@ export default class Application {
     static outsideComponents: any;
     static listItems: any[];
     static renderedPage: any;
+    static state: UpdatableReference<any>;
+    static _scheduled: boolean;
+    static _rendering: boolean;
     constructor(appFolder: any, components: any, helpers: any);
     static addListItem(viewNode: any): void;
     static renderPage(name: any, containerElement: any, nextSibling: any, state: any): ElementNode;
@@ -50,5 +54,7 @@ export default class Application {
     registerHelper(name: any, func: any): void;
     boot(name: any): Promise<unknown>;
     scheduleRerender(): void;
+    static scheduleRerender(): Promise<void>;
+    static rerenderForListView(): Promise<void>;
     static _rerender(): Promise<void>;
 }

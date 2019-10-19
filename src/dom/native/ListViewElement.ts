@@ -69,6 +69,12 @@ export default class ListViewElement extends NativeElementNode {
             // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
             this.numberViewsCreated = this.numberViewsCreated + 1;
+            const oldState = Application.state.value();
+            Application.state.forceUpdate({
+                ...oldState,
+                listViewItems: Application.listItems
+            });
+            Application.scheduleRerender();
         } else {
             //Get the component instance which we classify as the rendering result, runtime and state
             let componentInstance = (args.view as any).__GlimmerComponent__;
@@ -80,13 +86,14 @@ export default class ListViewElement extends NativeElementNode {
             //     ...oldState,
             //     item
             // });
+            const oldState = Application.state.value();
+            Application.state.forceUpdate({
+                ...oldState,
+                listViewItems: Application.listItems
+            });
+            // Application._rerender();
+            Application.scheduleRerender();
         }
-        const oldState = Application.renderedPage._meta.nativeComponentResult.state.value();
-        Application.renderedPage._meta.nativeComponentResult.update({
-            ...oldState,
-            listViewItems: Application.listItems
-        });
-        Application._rerender();
     }
 
     get itemTemplateComponent(): GlimmerComponent {

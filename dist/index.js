@@ -75,6 +75,7 @@ export default class Application {
             const result = renderSync(Application.aotRuntime.env, iterator);
             console.log(`Page ${name} Rendered`);
             Application.result = result;
+            Application.state = state;
             Application._rendered = true;
             let node = result.firstNode();
             while (!node._nativeView) {
@@ -174,6 +175,33 @@ export default class Application {
             yield Application._rerender();
             this._rendering = false;
         }), 0);
+    }
+    static scheduleRerender() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this._scheduled || !Application._rendered)
+                return;
+            this._rendering = true;
+            this._scheduled = true;
+            setTimeout(() => __awaiter(this, void 0, void 0, function* () {
+                this._scheduled = false;
+                yield Application._rerender();
+                this._rendering = false;
+            }), 0);
+        });
+    }
+    static rerenderForListView() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                Application.aotRuntime.env.begin();
+                yield Application.result.rerender();
+                Application.aotRuntime.env.commit();
+                Application._rendered = true;
+                console.log('Result Re-rendered');
+            }
+            catch (error) {
+                console.log(`Error in re-render: ${error}`);
+            }
+        });
     }
     static _rerender() {
         return __awaiter(this, void 0, void 0, function* () {

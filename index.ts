@@ -2,7 +2,7 @@ import { precompile } from '@glimmer/compiler';
 import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@glimmer/interfaces';
 import { Context, MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
 import { artifacts } from '@glimmer/program';
-import { State } from '@glimmer/reference';
+import { State, UpdatableReference } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
 
@@ -58,6 +58,9 @@ export default class Application {
     static outsideComponents: any = [];
     static listItems = [];
     static renderedPage: any;
+    static state: UpdatableReference<any>;
+    static _scheduled: boolean;
+    static _rendering: boolean;
 
     constructor(appFolder, components, helpers) {
         registerElements();
@@ -105,6 +108,7 @@ export default class Application {
             const result = renderSync(Application.aotRuntime.env, iterator);
             console.log(`Page ${name} Rendered`);
             Application.result = result;
+            Application.state = state;
             Application._rendered = true;
             let node = result.firstNode() as any;
             while (!node._nativeView) {
@@ -217,6 +221,30 @@ export default class Application {
             await Application._rerender();
             this._rendering = false;
         }, 0);
+    }
+
+    static async scheduleRerender() {
+        if (this._scheduled || !Application._rendered) return;
+
+        this._rendering = true;
+        this._scheduled = true;
+        setTimeout(async () => {
+            this._scheduled = false;
+            await Application._rerender();
+            this._rendering = false;
+        }, 0);
+    }
+
+    static async rerenderForListView() {
+        try {
+            Application.aotRuntime.env.begin();
+            await Application.result.rerender();
+            Application.aotRuntime.env.commit();
+            Application._rendered = true;
+            console.log('Result Re-rendered');
+        } catch (error) {
+            console.log(`Error in re-render: ${error}`);
+        }
     }
 
     static async _rerender() {
