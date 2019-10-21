@@ -52,7 +52,7 @@ export default class RadListViewElement extends NativeElementNode {
             let componentInstance = args.view.__GlimmerComponent__;
             const oldState = componentInstance.state.value();
             // Update the state with the new item
-            componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
+            componentInstance.update(Object.assign({}, oldState, { item }));
         }
         else {
             console.log('got invalid update call with', args.index, args.view);
