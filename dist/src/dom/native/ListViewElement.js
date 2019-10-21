@@ -49,7 +49,7 @@ export default class ListViewElement extends NativeElementNode {
             const cursor = { element: wrapper, nextSibling: null };
             let component = Compilable(template.args.src);
             const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(null, cursor, compiled, Object.assign(Object.assign({}, template.args), { item }));
+            let componentInstance = Application._renderComponent(null, cursor, compiled, Object.assign({}, template.args, { item }));
             let nativeEl = wrapper.nativeView;
             nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
@@ -59,7 +59,7 @@ export default class ListViewElement extends NativeElementNode {
             let componentInstance = args.view.__GlimmerComponent__;
             const oldState = componentInstance.state.value();
             // Update the state with the new item
-            componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
+            componentInstance.update(Object.assign({}, oldState, { item }));
         }
     }
     get itemTemplateComponent() {
