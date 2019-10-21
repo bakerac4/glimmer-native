@@ -6,7 +6,7 @@ export default class ListViewElement extends NativeElementNode {
     items: any;
     numberViewsCreated: number;
     constructor();
-    updateListItem(args: ItemEventData): void;
+    updateListItem(args: ItemEventData): Promise<void>;
     readonly itemTemplateComponent: GlimmerComponent;
     nativeView: NativeListView;
 }

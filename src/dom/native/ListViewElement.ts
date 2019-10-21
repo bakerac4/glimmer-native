@@ -19,7 +19,7 @@ export default class ListViewElement extends NativeElementNode {
         });
     }
 
-    updateListItem(args: ItemEventData) {
+    async updateListItem(args: ItemEventData) {
         let item;
         let listView = this.nativeView;
         let items = listView.items;
@@ -67,14 +67,15 @@ export default class ListViewElement extends NativeElementNode {
             let nativeEl = wrapper.nativeView;
             Application.addListItem({ id: numberViewsCreated, node: wrapper, template: template.args.src, item });
             // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
-            args.view = nativeEl;
+
             this.numberViewsCreated = this.numberViewsCreated + 1;
             const oldState = Application.state.value();
             Application.state.forceUpdate({
                 ...oldState,
                 listViewItems: Application.listItems
             });
-            Application.scheduleRerender();
+            await Application._rerender();
+            args.view = nativeEl;
         } else {
             //Get the component instance which we classify as the rendering result, runtime and state
             let componentInstance = (args.view as any).__GlimmerComponent__;
@@ -92,7 +93,7 @@ export default class ListViewElement extends NativeElementNode {
                 listViewItems: Application.listItems
             });
             // Application._rerender();
-            Application.scheduleRerender();
+            await Application._rerender();
         }
     }
 
