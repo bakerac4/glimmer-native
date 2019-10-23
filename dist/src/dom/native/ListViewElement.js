@@ -7,8 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { artifacts } from '@glimmer/program';
+import { State } from '@glimmer/reference';
+import { AotRuntime, renderAot, renderSync } from '@glimmer/runtime';
 import { ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 import Application from '../../..';
+import { Compilable } from '../../glimmer/context';
+import NativeComponentResult from '../../glimmer/result';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
@@ -54,40 +59,72 @@ export default class ListViewElement extends NativeElementNode {
                 let numberViewsCreated = this.numberViewsCreated;
                 let wrapper = createElement('StackLayout');
                 wrapper.setAttribute('class', 'list-view-item');
-                wrapper.setAttribute('id', `list-view-${numberViewsCreated}`);
+                wrapper.setAttribute('id', `listViewItem${numberViewsCreated}`);
                 const template = this.itemTemplateComponent;
                 // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
                 // const compiled = component.compilable.compile(Application.context);
-                // const cursor = { element: wrapper, nextSibling: null } as Cursor;
-                // let component = Compilable(template.args.src);
-                // const compiled = component.compile(Application.context);
-                // let componentInstance = Application._renderComponent(null, cursor, compiled, { ...template.args, item });
+                const cursor = { element: wrapper, nextSibling: null };
+                let component = Compilable(template.args.src);
+                const compiled = component.compile(Application.context);
+                let componentInstance = this._renderComponent(null, cursor, compiled, Object.assign(Object.assign({}, template.args), { item }));
                 let nativeEl = wrapper.nativeView;
-                Application.addListItem({ id: numberViewsCreated, node: wrapper, template: template.args.src, item });
-                // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
-                this.numberViewsCreated = this.numberViewsCreated + 1;
-                const oldState = Application.state.value();
-                Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: Application.listItems }));
-                yield Application._rerender();
+                // Application.addListItem({
+                //     id: `listViewItem${numberViewsCreated}`,
+                //     node: wrapper,
+                //     template: template.args.src,
+                //     item
+                // });
+                // // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
+                // this.numberViewsCreated = this.numberViewsCreated + 1;
+                // const oldState = Application.state.value();
+                // Application.state.forceUpdate({
+                //     ...oldState,
+                //     ...Application.listItems
+                // });
                 args.view = nativeEl;
+                // await Application.scheduleRerender();
+                // args.view.layout();
             }
             else {
                 //Get the component instance which we classify as the rendering result, runtime and state
                 let componentInstance = args.view.__GlimmerComponent__;
-                const listItem = Application.listItems.find((item) => `list-view-${item.id}` === args.view.id);
-                listItem.item = item;
+                const oldState = componentInstance.state.value();
+                componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
+                // const listItem = Application.listItems[args.view.id];
+                // listItem.item = item;
                 // const oldState = componentInstance.state.value();
                 // // Update the state with the new item
                 // componentInstance.update({
                 //     ...oldState,
                 //     item
                 // });
-                const oldState = Application.state.value();
-                Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: Application.listItems }));
+                // const oldState = Application.state.value();
+                Application.state.dirty();
                 // Application._rerender();
-                yield Application._rerender();
+                Application._rerender();
             }
         });
+    }
+    _renderComponent(name, cursor, compilable, data) {
+        let state = State(data);
+        const artifact = artifacts(Application.context);
+        const runtime = AotRuntime(Application.document, artifact, Application.resolver);
+        let iterator = renderAot(runtime, compilable, cursor, state);
+        // const treeBuilder = NewElementBuilder.forInitialRender(runtime.env, cursor);
+        // let iterator = renderAotMain(runtime, state, treeBuilder, compilable);
+        try {
+            const result = renderSync(Application.aotRuntime.env, iterator);
+            console.log(`Component ${name} Rendered`);
+            let node = result.firstNode();
+            while (!node._nativeView) {
+                node = node.nextSibling;
+            }
+            node._meta.component = new NativeComponentResult(name, result, state, runtime);
+            return node;
+        }
+        catch (error) {
+            console.log(`Error rendering component ${name}: ${error}`);
+        }
     }
     get itemTemplateComponent() {
         const templateNode = this.childNodes.find((x) => x instanceof TemplateElement);

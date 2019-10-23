@@ -37,7 +37,7 @@ export default class Application {
     static _rendered: boolean;
     static aotRuntime: AotRuntimeContext;
     static outsideComponents: any;
-    static listItems: any[];
+    static listItems: {};
     static renderedPage: any;
     static state: UpdatableReference<any>;
     static _scheduled: boolean;
