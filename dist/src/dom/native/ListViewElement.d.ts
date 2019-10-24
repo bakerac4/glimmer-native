@@ -8,6 +8,7 @@ export default class ListViewElement extends NativeElementNode {
     templates: {};
     constructor();
     registerTemplate(name?: string): void;
+    renderItem(template: any, item: any): import("tns-core-modules/ui/page/page").View;
     updateListItem(args: ItemEventData): void;
     getItemTemplateComponent(name: any): GlimmerComponent;
     nativeView: NativeListView;

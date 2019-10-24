@@ -20,6 +20,17 @@ export default class ListViewElement extends NativeElementNode {
         // this.templates.push(new GlimmerKeyedTemplate(name));
         this.setAttribute('_itemTemplatesInternal', this.templates);
     }
+    renderItem(template, item) {
+        let wrapper = createElement('StackLayout');
+        wrapper.setAttribute('class', 'list-view-item');
+        // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
+        // const compiled = component.compilable.compile(Application.context);
+        const cursor = { element: wrapper, nextSibling: null };
+        let componentInstance = Application._renderComponent(null, cursor, template.compiled, Object.assign(Object.assign({}, template.args), { item }));
+        let nativeEl = wrapper.nativeView;
+        nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
+        return nativeEl;
+    }
     updateListItem(args) {
         let item;
         let listView = this.nativeView;
@@ -49,18 +60,14 @@ export default class ListViewElement extends NativeElementNode {
             // let nativeEl = wrapper.nativeView;
             // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
             // args.view = nativeEl;
-            let wrapper = createElement('StackLayout');
-            wrapper.setAttribute('class', 'list-view-item');
             const templateSelector = args.object.itemTemplateSelector;
-            const name = templateSelector(item, args.index, args.object.items);
+            let name = null;
+            if (templateSelector) {
+                name = templateSelector(item, args.index, args.object.items);
+            }
             const template = this.getItemTemplateComponent(name);
-            // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
-            // const compiled = component.compilable.compile(Application.context);
-            const cursor = { element: wrapper, nextSibling: null };
-            let componentInstance = Application._renderComponent(null, cursor, template.compiled, Object.assign(Object.assign({}, template.args), { item }));
-            let nativeEl = wrapper.nativeView;
-            nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
-            args.view = nativeEl;
+            const element = this.renderItem(template, item);
+            args.view = element;
         }
         else {
             //Get the component instance which we classify as the rendering result, runtime and state

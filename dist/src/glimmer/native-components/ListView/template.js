@@ -3,7 +3,7 @@ export default precompile(`<listview
         ...attributes
         {{set 'items' @items}}
         {{set 'itemTemplateSelector' @itemTemplateSelector}}
-        {{set '_itemTemplatesInternal' this.keyedTemplates}}
+        {{set 'itemTemplates' this.keyedTemplates}}
         {{set 'template' @template false}}
     >
 
