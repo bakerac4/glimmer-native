@@ -27,7 +27,7 @@ export default class NativeComponentManager implements VMComponentManager<Compon
     didCreateElement(): void;
     didRenderLayout(bucket: ComponentStateBucket, bounds: Bounds): void;
     didCreate(bucket: ComponentStateBucket): void;
-    getTag(bucket: ComponentStateBucket): import("@glimmer/reference").TagWrapper<import("@glimmer/reference").RevisionTag>;
+    getTag(bucket: ComponentStateBucket): Tag;
     update(bucket: ComponentStateBucket): void;
     didUpdateLayout(): void;
     didUpdate(): void;
