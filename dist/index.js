@@ -55,15 +55,15 @@ export default class Application {
         Application.context = Context(GlimmerResolverDelegate);
     }
     static addListItem(viewNode) {
-        this.listItems[viewNode.id] = viewNode;
+        this.listItems.push(viewNode);
     }
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
-        let component = Compilable(`<${name} @model={{this.model}} @listViewItem0={{this.listViewItem0}} @listViewItem1={{this.listViewItem1}} @listViewItem2={{this.listViewItem2}} @listViewItem3={{this.listViewItem3}} @listViewItem4={{this.listViewItem4}} @listViewItem5={{this.listViewItem5}} @listViewItem6={{this.listViewItem6}} @listViewItem7={{this.listViewItem7}} @listViewItem8={{this.listViewItem8}} @listViewItem9={{this.listViewItem9}} @listViewItem10={{this.listViewItem10}} @listViewItem11={{this.listViewItem11}} @listViewItem12={{this.listViewItem12}} @listViewItem13={{this.listViewItem13}} @listViewItem14={{this.listViewItem14}} @listViewItem15={{this.listViewItem15}} />`);
+        let component = Compilable(`<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`);
         const compiled = component.compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name);
         // const compiled = component.compilable.compile(Application.context);
-        return Application._renderPage(name, containerElement, nextSibling, compiled, Object.assign(Object.assign({}, state), Application.listItems));
+        return Application._renderPage(name, containerElement, nextSibling, compiled, Object.assign(Object.assign({}, state), { listViewItems: [...Application.listItems] }));
     }
     static _renderPage(name, containerElement, nextSibling, compilable, data = {}) {
         let state = State(data);
@@ -219,4 +219,4 @@ export default class Application {
     }
 }
 Application.outsideComponents = [];
-Application.listItems = {};
+Application.listItems = [];

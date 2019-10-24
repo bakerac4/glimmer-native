@@ -15,10 +15,10 @@ export default class NativeComponentResult {
     }
 
     async update(state) {
-        return this.state.update(state);
-        // this.runtime.env.begin();
-        // await this.result.rerender();
-        // this.runtime.env.commit();
+        this.state.update(state);
+        this.runtime.env.begin();
+        await this.result.rerender();
+        this.runtime.env.commit();
     }
 
     toJSON() {

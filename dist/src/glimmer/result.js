@@ -16,10 +16,10 @@ export default class NativeComponentResult {
     }
     update(state) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.state.update(state);
-            // this.runtime.env.begin();
-            // await this.result.rerender();
-            // this.runtime.env.commit();
+            this.state.update(state);
+            this.runtime.env.begin();
+            yield this.result.rerender();
+            this.runtime.env.commit();
         });
     }
     toJSON() {
