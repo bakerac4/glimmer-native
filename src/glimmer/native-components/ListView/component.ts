@@ -12,8 +12,12 @@ export default class ListView extends Component<Args> {
     // @action
     get keyedTemplates(): any {
         const keyedTemplateNames = this.args.keyedTemplates;
-        return keyedTemplateNames.map((name) => {
-            return new GlimmerKeyedTemplate(name);
-        });
+        if (Array.isArray(keyedTemplateNames)) {
+            return keyedTemplateNames.map((name) => {
+                return new GlimmerKeyedTemplate(name);
+            });
+        } else {
+            return [];
+        }
     }
 }
