@@ -8,9 +8,17 @@ export default class ListViewElement extends NativeElementNode {
     constructor() {
         super('listview', NativeListView, null);
         this.template = null;
+        this.templates = {};
+        // this.nativeView.on(NativeListView.loadedEvent, (args) => {
+        //     this.setAttribute('_itemTemplatesInternal', this.getKeyedTemplates());
+        // });
         this.nativeView.on(NativeListView.itemLoadingEvent, (args) => {
             this.updateListItem(args);
         });
+    }
+    registerTemplate(name = 'default') {
+        // this.templates.push(new GlimmerKeyedTemplate(name));
+        this.setAttribute('_itemTemplatesInternal', this.templates);
     }
     updateListItem(args) {
         let item;
@@ -43,13 +51,13 @@ export default class ListViewElement extends NativeElementNode {
             // args.view = nativeEl;
             let wrapper = createElement('StackLayout');
             wrapper.setAttribute('class', 'list-view-item');
-            const template = this.itemTemplateComponent;
+            const templateSelector = args.object.itemTemplateSelector;
+            const name = templateSelector(item, args.index, args.object.items);
+            const template = this.getItemTemplateComponent(name);
             // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
             // const compiled = component.compilable.compile(Application.context);
             const cursor = { element: wrapper, nextSibling: null };
-            let component = Compilable(template.args.src);
-            const compiled = component.compile(Application.context);
-            let componentInstance = Application._renderComponent(null, cursor, compiled, Object.assign({}, template.args, { item }));
+            let componentInstance = Application._renderComponent(null, cursor, template.compiled, Object.assign(Object.assign({}, template.args), { item }));
             let nativeEl = wrapper.nativeView;
             nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
             args.view = nativeEl;
@@ -59,17 +67,57 @@ export default class ListViewElement extends NativeElementNode {
             let componentInstance = args.view.__GlimmerComponent__;
             const oldState = componentInstance.state.value();
             // Update the state with the new item
-            componentInstance.update(Object.assign({}, oldState, { item }));
+            componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
         }
     }
-    get itemTemplateComponent() {
-        const templateNode = this.childNodes.find((x) => x instanceof TemplateElement);
-        return templateNode ? templateNode.component : null;
+    getItemTemplateComponent(name) {
+        if (this.templates[name]) {
+            return this.templates[name];
+        }
+        else {
+            const templateNode = this.childNodes.find((x) => {
+                if (x instanceof TemplateElement && !name) {
+                    return true;
+                }
+                else if (x instanceof TemplateElement && name) {
+                    return x.component && x.component.args.key === name;
+                }
+                else {
+                    return false;
+                }
+            });
+            if (templateNode) {
+                let component = Compilable(templateNode.component.args.src);
+                const compiled = component.compile(Application.context);
+                this.templates[name] = {
+                    compiled,
+                    args: templateNode.component.args
+                };
+                return this.templates[name];
+            }
+            else {
+                return null;
+            }
+        }
     }
     get nativeView() {
         return super.nativeView;
     }
     set nativeView(view) {
         super.nativeView = view;
+    }
+}
+export class GlimmerKeyedTemplate {
+    constructor(key) {
+        this._key = key;
+    }
+    get key() {
+        return this._key;
+    }
+    createView() {
+        // we are returning null because we don't have the data here
+        // the view will be created in the `patchTemplate` method above.
+        // see https://github.com/nativescript-vue/nativescript-vue/issues/229#issuecomment-390330474
+        return null;
     }
 }
