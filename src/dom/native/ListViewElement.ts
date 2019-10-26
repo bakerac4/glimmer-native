@@ -113,6 +113,7 @@ export default class ListViewElement extends NativeElementNode {
                 ...oldState,
                 listViewItems: [...Application.listItems]
             });
+            // Application.scheduleRerender();
             Application._rerender();
             args.view = wrapper.nativeView;
         } else {
@@ -124,7 +125,7 @@ export default class ListViewElement extends NativeElementNode {
             //     ...oldState,
             //     item
             // });
-            const listItem = Application.listItems.find(item => item.id === args.view.id);
+            const listItem = Application.listItems.find((item) => item.id === args.view.id);
             listItem.item = item;
             const oldState = Application.state.value();
             Application.state.forceUpdate({
@@ -134,6 +135,7 @@ export default class ListViewElement extends NativeElementNode {
             // Application.state.dirty();
             // Application._rerender();
             Application._rerender();
+            // Application.scheduleRerender();
         }
     }
 
