@@ -4,6 +4,7 @@ import { Cursor } from '@glimmer/interfaces';
 import { artifacts } from '@glimmer/program';
 import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync } from '@glimmer/runtime';
+import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ItemEventData, ItemsSource, ListView as NativeListView, ListView } from 'tns-core-modules/ui/list-view';
 import { KeyedTemplate } from 'tns-core-modules/ui/page/page';
 
@@ -108,13 +109,15 @@ export default class ListViewElement extends NativeElementNode {
             // Application.state.dirty();
             // Application._rerender();
 
-            const oldState = Application.state.value();
-            Application.state.forceUpdate({
-                ...oldState,
-                listViewItems: [...Application.listItems]
+            inTransaction(Application.aotRuntime.env, () => {
+                const oldState = Application.state.value();
+                Application.state.forceUpdate({
+                    ...oldState,
+                    listViewItems: [...Application.listItems]
+                });
+                // Application.scheduleRerender();
+                Application.result.rerender();
             });
-            // Application.scheduleRerender();
-            Application._rerender();
             args.view = wrapper.nativeView;
         } else {
             //Get the component instance which we classify as the rendering result, runtime and state
@@ -127,14 +130,16 @@ export default class ListViewElement extends NativeElementNode {
             // });
             const listItem = Application.listItems.find((item) => item.id === args.view.id);
             listItem.item = item;
-            const oldState = Application.state.value();
-            Application.state.forceUpdate({
-                ...oldState,
-                listViewItems: [...Application.listItems]
+
+            inTransaction(Application.aotRuntime.env, () => {
+                const oldState = Application.state.value();
+                Application.state.forceUpdate({
+                    ...oldState,
+                    listViewItems: [...Application.listItems]
+                });
+                // Application.scheduleRerender();
+                Application.result.rerender();
             });
-            // Application.state.dirty();
-            // Application._rerender();
-            Application._rerender();
             // Application.scheduleRerender();
         }
     }

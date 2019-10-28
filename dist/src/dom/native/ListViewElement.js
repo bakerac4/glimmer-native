@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { artifacts } from '@glimmer/program';
 import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync } from '@glimmer/runtime';
+import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 import Application from '../../..';
 import { Compilable } from '../../glimmer/context';
@@ -93,10 +94,12 @@ export default class ListViewElement extends NativeElementNode {
                 this.numberViewsCreated = this.numberViewsCreated + 1;
                 // Application.state.dirty();
                 // Application._rerender();
-                const oldState = Application.state.value();
-                Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
-                // Application.scheduleRerender();
-                Application._rerender();
+                inTransaction(Application.aotRuntime.env, () => {
+                    const oldState = Application.state.value();
+                    Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
+                    // Application.scheduleRerender();
+                    Application.result.rerender();
+                });
                 args.view = wrapper.nativeView;
             }
             else {
@@ -109,11 +112,12 @@ export default class ListViewElement extends NativeElementNode {
                 // });
                 const listItem = Application.listItems.find((item) => item.id === args.view.id);
                 listItem.item = item;
-                const oldState = Application.state.value();
-                Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
-                // Application.state.dirty();
-                // Application._rerender();
-                Application._rerender();
+                inTransaction(Application.aotRuntime.env, () => {
+                    const oldState = Application.state.value();
+                    Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
+                    // Application.scheduleRerender();
+                    Application.result.rerender();
+                });
                 // Application.scheduleRerender();
             }
         });
