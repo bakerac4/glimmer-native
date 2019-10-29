@@ -43,6 +43,7 @@ export default class ViewNode {
     insertBefore(childNode: any, referenceNode: any): void;
     appendChild(childNode: any): void;
     removeChild(childNode: any): void;
+    clear(node: any): void;
     removeChildren(): void;
     firstElement(): any;
 }

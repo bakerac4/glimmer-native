@@ -77,6 +77,8 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
+            node.parentNode = containerElement;
+            containerElement.childNodes.push(node);
             node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node;
         }

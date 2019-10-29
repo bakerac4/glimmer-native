@@ -28,4 +28,30 @@ export default class FrameElement extends NativeElementNode {
         // this.nativeView.navigate({ create: () => childNode.nativeView });
         return;
     }
+    removeChild(childNode) {
+        if (!childNode) {
+            return;
+        }
+        if (!childNode.parentNode) {
+            return;
+        }
+        if (childNode.parentNode !== this) {
+            return;
+        }
+        childNode.parentNode = null;
+        // if (childNode.prevSibling) {
+        //     childNode.prevSibling.nextSibling = childNode.nextSibling;
+        // }
+        // if (childNode.nextSibling) {
+        //     childNode.nextSibling.prevSibling = childNode.prevSibling;
+        // }
+        // reset the prevSibling and nextSibling. If not, a keep-alived component will
+        // still have a filled nextSibling attribute so vue will not
+        // insert the node again to the parent. See #220
+        childNode.prevSibling = null;
+        childNode.nextSibling = null;
+        this.childNodes = this.childNodes.filter((node) => node !== childNode);
+        childNode.removeChildren();
+        this.onRemovedChild(childNode);
+    }
 }

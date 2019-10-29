@@ -68,6 +68,8 @@ export function navigate(componentName, model, options) {
                 const page = target._meta.component.backTarget;
                 const { glimmerResult, runtime } = page.__GlimmerNativeElement__._meta.component;
                 element.nativeView.off('navigatedFrom', onNavigatedFrom);
+                //Now destroy the old element
+                // await Application.result.destroy();
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
                 Application._rerender();
@@ -79,6 +81,22 @@ export function navigate(componentName, model, options) {
         target.navigate(Object.assign(Object.assign({}, options), { create: () => {
                 return element.nativeView;
             } }));
+        const { glimmerResult } = element._meta.component;
+        const dispose = element.nativeView.disposeNativeView;
+        element.nativeView.disposeNativeView = (...args) => {
+            if (glimmerResult) {
+                glimmerResult.destroy();
+            }
+            element._meta.component = null;
+            dispose.call(element.nativeView, args);
+        };
+        // if (options.clearHistory) {
+        //     const page = (element as any)._meta.component.backTarget;
+        //     const { glimmerResult } = page.__GlimmerNativeElement__._meta.component;
+        //     // element.nativeView.off('navigatedFrom', onNavigatedFrom);
+        //     //Now destroy the old element
+        //     glimmerResult.destroy();
+        // }
     }
     else {
         const document = Application.document;

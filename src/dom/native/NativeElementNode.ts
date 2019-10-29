@@ -191,10 +191,6 @@ export default class NativeElementNode extends ElementNode {
     }
 
     set nativeView(view) {
-        if (this._nativeView) {
-            throw new Error(`Can't override native view.`);
-        }
-
         this._nativeView = view;
     }
 
@@ -309,10 +305,17 @@ export default class NativeElementNode extends ElementNode {
         }
     }
 
+    clear(node: any) {
+        while (node.childNodes.length) {
+            this.clear(node.firstChild);
+        }
+        node.parentNode.removeChild(node);
+    }
+
     removeChildren() {
-        this.childNodes.forEach((child) => {
-            this.removeChild(child);
-        });
+        while (this.childNodes.length) {
+            this.clear(this.firstChild);
+        }
     }
 }
 
@@ -401,4 +404,6 @@ function removeChild(parentNode: ViewNode, childNode: ViewNode) {
     } else {
         // throw new Error("Unknown parent type: " + parent);
     }
+
+    childNode.nativeView = null;
 }
