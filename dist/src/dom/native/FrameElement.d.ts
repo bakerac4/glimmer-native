@@ -6,4 +6,5 @@ export default class FrameElement extends NativeElementNode {
     setAttribute(key: string, value: any): void;
     nativeView: Frame;
     appendChild(childNode: ViewNode): void;
+    removeChild(childNode: NativeElementNode): void;
 }

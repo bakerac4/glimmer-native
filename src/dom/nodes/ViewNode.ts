@@ -77,10 +77,6 @@ export default class ViewNode {
     }
 
     set nativeView(view) {
-        if (this._nativeView) {
-            throw new Error(`Can't override native view.`);
-        }
-
         this._nativeView = view;
     }
 
@@ -292,12 +288,21 @@ export default class ViewNode {
         // childNode.nextSibling = null;
 
         this.childNodes = this.childNodes.filter((node) => node !== childNode);
-
+        childNode.removeChildren();
         this.onRemovedChild(childNode);
     }
 
+    clear(node: any) {
+        while (node.childNodes.length) {
+            this.clear(node.firstChild);
+        }
+        node.parentNode.removeChild(node);
+    }
+
     removeChildren() {
-        this.childNodes = [];
+        while (this.childNodes.length) {
+            this.clear(this.firstChild);
+        }
     }
 
     firstElement() {

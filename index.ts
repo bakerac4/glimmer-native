@@ -8,6 +8,7 @@ import { launchEvent, on, run } from 'tns-core-modules/application';
 
 import { createElement } from './src/dom/element-registry';
 import FrameElement from './src/dom/native/FrameElement';
+import PageElement from './src/dom/native/PageElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { registerElements, registerNativeElement } from './src/dom/setup-registry';
@@ -86,7 +87,7 @@ export default class Application {
         return Application._renderPage(name, containerElement, nextSibling, compiled, state);
     }
 
-    static _renderPage(name, containerElement, nextSibling, compilable, data = {}): ElementNode {
+    static _renderPage(name, containerElement: FrameElement, nextSibling, compilable, data = {}): ElementNode {
         let state = State(data);
         const artifact = artifacts(Application.context);
         Application.aotRuntime = AotRuntime(Application.document as any, artifact, Application.resolver);
@@ -101,6 +102,8 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
+            (node as PageElement).parentNode = containerElement;
+            containerElement.childNodes.push(node);
             node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node as any;
         } catch (error) {
