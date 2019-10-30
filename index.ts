@@ -8,6 +8,7 @@ import { launchEvent, on, run } from 'tns-core-modules/application';
 
 import { createElement } from './src/dom/element-registry';
 import FrameElement from './src/dom/native/FrameElement';
+import PageElement from './src/dom/native/PageElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { registerElements, registerNativeElement } from './src/dom/setup-registry';
@@ -88,9 +89,7 @@ export default class Application {
 
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
-        let component = Compilable(
-            `<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`
-        );
+        let component = Compilable(`<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`);
         const compiled = component.compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name);
         // const compiled = component.compilable.compile(Application.context);
@@ -100,7 +99,7 @@ export default class Application {
         });
     }
 
-    static _renderPage(name, containerElement, nextSibling, compilable, data = {}): ElementNode {
+    static _renderPage(name, containerElement: FrameElement, nextSibling, compilable, data = {}): ElementNode {
         let state = State(data);
         const artifact = artifacts(Application.context);
         Application.aotRuntime = AotRuntime(Application.document as any, artifact, Application.resolver);
@@ -116,7 +115,9 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.nativeComponentResult = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            (node as PageElement).parentNode = containerElement;
+            containerElement.childNodes.push(node);
+            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             Application.renderedPage = node;
             return node as any;
         } catch (error) {
