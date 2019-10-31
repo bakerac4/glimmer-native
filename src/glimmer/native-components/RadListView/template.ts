@@ -4,9 +4,8 @@ export default precompile(
     `<radListView
         ...attributes
         {{set 'items' @items}}
-        {{set 'template' @template false}}
-        {{set 'component' @component false}}
-        {{on "loaded" this.loaded}}
+        {{set 'itemTemplateSelector' @itemTemplateSelector}}
+        {{set 'itemTemplates' this.keyedTemplates}}
     >
 
         {{yield this}}
