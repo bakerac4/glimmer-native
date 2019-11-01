@@ -1,3 +1,4 @@
+import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListView as NativeListView } from 'tns-core-modules/ui/list-view';
 import Application from '../../..';
 import { Compilable } from '../../glimmer/context';
@@ -66,15 +67,19 @@ export default class ListViewElement extends NativeElementNode {
                 name = templateSelector(item, args.index, args.object.items);
             }
             const template = this.getItemTemplateComponent(name);
-            const element = this.renderItem(template, item);
-            args.view = element;
+            inTransaction(Application.aotRuntime.env, () => {
+                const element = this.renderItem(template, item);
+                args.view = element;
+            });
         }
         else {
+            inTransaction(Application.aotRuntime.env, () => {
+                let componentInstance = args.view.__GlimmerComponent__;
+                const oldState = componentInstance.state.value();
+                // Update the state with the new item
+                componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
+            });
             //Get the component instance which we classify as the rendering result, runtime and state
-            let componentInstance = args.view.__GlimmerComponent__;
-            const oldState = componentInstance.state.value();
-            // Update the state with the new item
-            componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
         }
     }
     getItemTemplateComponent(name) {

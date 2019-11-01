@@ -1,6 +1,7 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { Cursor } from '@glimmer/interfaces';
+import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ItemEventData, ItemsSource, ListView as NativeListView, ListView } from 'tns-core-modules/ui/list-view';
 import { KeyedTemplate } from 'tns-core-modules/ui/page/page';
 
@@ -9,6 +10,24 @@ import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
+
+export class GlimmerKeyedTemplate implements KeyedTemplate {
+    _key: any;
+    constructor(key) {
+        this._key = key;
+    }
+
+    get key() {
+        return this._key;
+    }
+
+    createView() {
+        // we are returning null because we don't have the data here
+        // the view will be created in the `patchTemplate` method above.
+        // see https://github.com/nativescript-vue/nativescript-vue/issues/229#issuecomment-390330474
+        return null;
+    }
+}
 
 export default class ListViewElement extends NativeElementNode {
     template: any = null;
@@ -87,17 +106,22 @@ export default class ListViewElement extends NativeElementNode {
             }
 
             const template = this.getItemTemplateComponent(name) as any;
-            const element = this.renderItem(template, item);
-            args.view = element;
-        } else {
-            //Get the component instance which we classify as the rendering result, runtime and state
-            let componentInstance = (args.view as any).__GlimmerComponent__;
-            const oldState = componentInstance.state.value();
-            // Update the state with the new item
-            componentInstance.update({
-                ...oldState,
-                item
+
+            inTransaction(Application.aotRuntime.env, () => {
+                const element = this.renderItem(template, item);
+                args.view = element;
             });
+        } else {
+            inTransaction(Application.aotRuntime.env, () => {
+                let componentInstance = (args.view as any).__GlimmerComponent__;
+                const oldState = componentInstance.state.value();
+                // Update the state with the new item
+                componentInstance.update({
+                    ...oldState,
+                    item
+                });
+            });
+            //Get the component instance which we classify as the rendering result, runtime and state
         }
     }
 
@@ -134,23 +158,5 @@ export default class ListViewElement extends NativeElementNode {
 
     set nativeView(view: NativeListView) {
         super.nativeView = view;
-    }
-}
-
-export class GlimmerKeyedTemplate implements KeyedTemplate {
-    _key: any;
-    constructor(key) {
-        this._key = key;
-    }
-
-    get key() {
-        return this._key;
-    }
-
-    createView() {
-        // we are returning null because we don't have the data here
-        // the view will be created in the `patchTemplate` method above.
-        // see https://github.com/nativescript-vue/nativescript-vue/issues/229#issuecomment-390330474
-        return null;
     }
 }
