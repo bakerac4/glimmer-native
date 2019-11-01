@@ -6,15 +6,13 @@ export default class RadListViewElement extends NativeElementNode {
     nativeView: RadListView;
     lastItemSelected: any;
     component: any;
-<<<<<<< Updated upstream
     items: any[];
-=======
     templates: {};
->>>>>>> Stashed changes
     constructor();
     readonly itemTemplateComponent: GlimmerComponent;
     loadView(viewType: string): View;
     updateListItem(args: ListViewEventData): void;
+    private updateViewWithProps;
     getItemTemplateComponent(name: any): GlimmerComponent;
     renderItem(view: any, template: any, item: any): any;
 }

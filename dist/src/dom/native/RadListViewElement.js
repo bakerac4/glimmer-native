@@ -1,17 +1,15 @@
 import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListViewViewType, RadListView } from 'nativescript-ui-listview';
-import Application from '../../../';
+import Application from '../../..';
+import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeElementNode from './NativeElementNode';
 import TemplateElement from './TemplateElement';
 export default class RadListViewElement extends NativeElementNode {
     constructor() {
         super('radlistview', RadListView, null);
-<<<<<<< Updated upstream
         this.items = [];
-=======
         this.templates = {};
->>>>>>> Stashed changes
         let nativeView = this.nativeView;
         nativeView.itemViewLoader = (viewType) => this.loadView(viewType);
         this.nativeView.on(RadListView.itemLoadingEvent, (args) => {
@@ -23,44 +21,38 @@ export default class RadListViewElement extends NativeElementNode {
         return templateNode ? templateNode.component : null;
     }
     loadView(viewType) {
-        if (viewType === ListViewViewType.ItemView) {
-            console.log('creating view for ', viewType);
-            // const template = this.itemTemplateComponent as any;
-            let wrapper = createElement('StackLayout');
-            wrapper.setAttribute('id', `list-view-${this.items.length}`);
-            wrapper.setAttribute('class', 'list-view-item');
-<<<<<<< Updated upstream
-            let nativeEl = wrapper.nativeView;
-            let template = this.itemTemplateComponent;
-            this.items.push(wrapper);
-            Application.addListItem({ id: this.items.length, node: wrapper, template: template.args.src });
-            return nativeEl;
-=======
-            return wrapper.nativeView;
-            // let wrapper = createElement('StackLayout') as NativeElementNode;
-            // wrapper.setAttribute('class', 'list-view-item');
-            // const template = this.itemTemplateComponent as any;
-            // // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
-            // // const compiled = component.compilable.compile(Application.context);
-            // const cursor = { element: wrapper, nextSibling: null } as Cursor;
-            // let component = Compilable(template.args.src);
-            // const compiled = component.compile(Application.context);
-            // let componentInstance = Application._renderComponent(null, cursor, compiled, template.args);
-            // let nativeEl = wrapper.nativeView;
-            // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
-            // return nativeEl;
-        }
-        else if (viewType === ListViewViewType.HeaderView) {
-            const template = this.getItemTemplateComponent('header');
-            if (template) {
-                return inTransaction(Application.aotRuntime.env, () => {
-                    let wrapper = createElement('StackLayout');
-                    wrapper.setAttribute('class', 'list-view-item');
-                    const view = this.renderItem(wrapper, template, {});
-                    return view;
-                });
+        if (viewType.toLowerCase() == ListViewViewType.ItemView.toLowerCase() &&
+            typeof this.nativeView.itemTemplates == 'object') {
+            let keyedTemplate = this.nativeView.itemTemplates.find((t) => t.key == 'default');
+            if (keyedTemplate) {
+                return keyedTemplate.createView();
             }
->>>>>>> Stashed changes
+        }
+        let template = this.getItemTemplateComponent(viewType);
+        if (!template)
+            return null;
+        console.log('creating view for ', viewType);
+        let wrapper = createElement('StackLayout');
+        wrapper.setAttribute('class', 'list-view-item');
+        let nativeEl = wrapper.nativeView;
+        this.items.push(wrapper);
+        Application.addListItem({ id: this.items.length, node: wrapper, template: template.args.src });
+        let builder = (props) => {
+            inTransaction(Application.aotRuntime.env, () => {
+                const view = this.renderItem(wrapper, template, props);
+                nativeEl.__GlimmerComponent__ = view;
+            });
+        };
+        //for certain view types we like to delay until we have the data
+        if (viewType.toLowerCase() == ListViewViewType.ItemView.toLowerCase() ||
+            viewType.toLowerCase() == ListViewViewType.GroupView.toLowerCase()
+        //    || viewType.toLowerCase() == ListViewViewType.ItemSwipeView.toLowerCase() doesn't work at the moment
+        ) {
+            nativeEl.__GlimmerComponentBuilder__ = builder;
+        }
+        else {
+            //otherwise, do it now
+            builder({});
         }
     }
     updateListItem(args) {
@@ -68,7 +60,7 @@ export default class RadListViewElement extends NativeElementNode {
         let listView = this.nativeView;
         let items = listView.items;
         if (args.index >= items.length) {
-            console.log("Got request for item at index that didn't exists", items, args.index);
+            this.updateViewWithProps(args.view, { item: args.view.bindingContext.category });
             return;
         }
         if (items.getItem) {
@@ -77,12 +69,29 @@ export default class RadListViewElement extends NativeElementNode {
         else {
             item = items[args.index];
         }
-        if (args.view && args.view.__GlimmerComponent__) {
-<<<<<<< Updated upstream
-            let componentInstance = args.view.__GlimmerComponent__;
-            const oldState = componentInstance.state.value();
-            // Update the state with the new item
-            componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
+        this.updateViewWithProps(args.view, { item });
+    }
+    updateViewWithProps(view, props) {
+        let componentInstance;
+        let _view = view;
+        if (!_view.__GlimmerComponent__) {
+            if (_view.__GlimmerComponentBuilder__) {
+                console.debug('mounting to view ' + view + ' with props ' + Object.keys(props).join(','));
+                _view.__GlimmerComponentBuilder__(props);
+                _view.__GlimmerComponentBuilder__ = null;
+                return;
+            }
+        }
+        if (_view.__GlimmerComponent__) {
+            componentInstance = _view.__GlimmerComponent__;
+        }
+        if (componentInstance) {
+            console.debug('updating view ' + view + ' with props ' + Object.keys(props).join(','));
+            inTransaction(Application.aotRuntime.env, () => {
+                const oldState = componentInstance.state.value();
+                // Update the state with the new item
+                componentInstance.update(Object.assign(Object.assign({}, oldState), { item: props }));
+            });
             // const pageNode = Application.renderedPage;
             // const oldState = pageNode._meta.nativeComponentResult.state.value();
             // Application.renderedPage._meta.nativeComponentResult.update({
@@ -90,28 +99,9 @@ export default class RadListViewElement extends NativeElementNode {
             //     item
             // });
             // Application._rerender();
-=======
-            inTransaction(Application.aotRuntime.env, () => {
-                let componentInstance = args.view.__GlimmerComponent__;
-                const oldState = componentInstance.state.value();
-                // Update the state with the new item
-                componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
-            });
-        }
-        else if (args.view) {
-            inTransaction(Application.aotRuntime.env, () => {
-                const templateSelector = this.nativeView.itemTemplateSelector;
-                let name = null;
-                if (templateSelector) {
-                    name = templateSelector({}, args.index, this.nativeView.items);
-                }
-                const template = this.getItemTemplateComponent(name);
-                this.renderItem(args.view.__GlimmerNativeElement__, template, item);
-            });
->>>>>>> Stashed changes
         }
         else {
-            console.log('got invalid update call with', args.index, args.view);
+            console.error("Couldn't find component for ", view);
         }
     }
     getItemTemplateComponent(name) {
