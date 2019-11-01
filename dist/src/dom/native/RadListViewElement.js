@@ -1,3 +1,4 @@
+import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListViewViewType, RadListView } from 'nativescript-ui-listview';
 import Application from '../../../';
 import { createElement } from '../element-registry';
@@ -6,7 +7,11 @@ import TemplateElement from './TemplateElement';
 export default class RadListViewElement extends NativeElementNode {
     constructor() {
         super('radlistview', RadListView, null);
+<<<<<<< Updated upstream
         this.items = [];
+=======
+        this.templates = {};
+>>>>>>> Stashed changes
         let nativeView = this.nativeView;
         nativeView.itemViewLoader = (viewType) => this.loadView(viewType);
         this.nativeView.on(RadListView.itemLoadingEvent, (args) => {
@@ -24,11 +29,38 @@ export default class RadListViewElement extends NativeElementNode {
             let wrapper = createElement('StackLayout');
             wrapper.setAttribute('id', `list-view-${this.items.length}`);
             wrapper.setAttribute('class', 'list-view-item');
+<<<<<<< Updated upstream
             let nativeEl = wrapper.nativeView;
             let template = this.itemTemplateComponent;
             this.items.push(wrapper);
             Application.addListItem({ id: this.items.length, node: wrapper, template: template.args.src });
             return nativeEl;
+=======
+            return wrapper.nativeView;
+            // let wrapper = createElement('StackLayout') as NativeElementNode;
+            // wrapper.setAttribute('class', 'list-view-item');
+            // const template = this.itemTemplateComponent as any;
+            // // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
+            // // const compiled = component.compilable.compile(Application.context);
+            // const cursor = { element: wrapper, nextSibling: null } as Cursor;
+            // let component = Compilable(template.args.src);
+            // const compiled = component.compile(Application.context);
+            // let componentInstance = Application._renderComponent(null, cursor, compiled, template.args);
+            // let nativeEl = wrapper.nativeView;
+            // (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
+            // return nativeEl;
+        }
+        else if (viewType === ListViewViewType.HeaderView) {
+            const template = this.getItemTemplateComponent('header');
+            if (template) {
+                return inTransaction(Application.aotRuntime.env, () => {
+                    let wrapper = createElement('StackLayout');
+                    wrapper.setAttribute('class', 'list-view-item');
+                    const view = this.renderItem(wrapper, template, {});
+                    return view;
+                });
+            }
+>>>>>>> Stashed changes
         }
     }
     updateListItem(args) {
@@ -46,6 +78,7 @@ export default class RadListViewElement extends NativeElementNode {
             item = items[args.index];
         }
         if (args.view && args.view.__GlimmerComponent__) {
+<<<<<<< Updated upstream
             let componentInstance = args.view.__GlimmerComponent__;
             const oldState = componentInstance.state.value();
             // Update the state with the new item
@@ -57,9 +90,67 @@ export default class RadListViewElement extends NativeElementNode {
             //     item
             // });
             // Application._rerender();
+=======
+            inTransaction(Application.aotRuntime.env, () => {
+                let componentInstance = args.view.__GlimmerComponent__;
+                const oldState = componentInstance.state.value();
+                // Update the state with the new item
+                componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
+            });
+        }
+        else if (args.view) {
+            inTransaction(Application.aotRuntime.env, () => {
+                const templateSelector = this.nativeView.itemTemplateSelector;
+                let name = null;
+                if (templateSelector) {
+                    name = templateSelector({}, args.index, this.nativeView.items);
+                }
+                const template = this.getItemTemplateComponent(name);
+                this.renderItem(args.view.__GlimmerNativeElement__, template, item);
+            });
+>>>>>>> Stashed changes
         }
         else {
             console.log('got invalid update call with', args.index, args.view);
         }
+    }
+    getItemTemplateComponent(name) {
+        if (this.templates[name]) {
+            return this.templates[name];
+        }
+        else {
+            const templateNode = this.childNodes.find((x) => {
+                if (x instanceof TemplateElement && !name) {
+                    return true;
+                }
+                else if (x instanceof TemplateElement && name) {
+                    return x.component && x.component.args.key === name;
+                }
+                else {
+                    return false;
+                }
+            });
+            if (templateNode) {
+                let component = Compilable(templateNode.component.args.src);
+                const compiled = component.compile(Application.context);
+                this.templates[name] = {
+                    compiled,
+                    args: templateNode.component.args
+                };
+                return this.templates[name];
+            }
+            else {
+                return null;
+            }
+        }
+    }
+    renderItem(view, template, item) {
+        // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
+        // const compiled = component.compilable.compile(Application.context);
+        const cursor = { element: view, nextSibling: null };
+        let componentInstance = Application._renderComponent(null, cursor, template.compiled, Object.assign(Object.assign({}, template.args), { item }));
+        let nativeEl = view.nativeView;
+        nativeEl.__GlimmerComponent__ = componentInstance._meta.component;
+        return nativeEl;
     }
 }

@@ -1,26 +1,25 @@
 import Component from '@glimmer/component';
 
-import { action } from '../../decorators/action';
+import { GlimmerKeyedTemplate } from '../../../dom/native/ListViewElement';
 
 // import ElementNode from '../src/dom/nodes/ElementNode';
 
 export interface Args {
+    keyedTemplates: any;
     items: any;
     layout: any;
     loaded: any;
 }
 export default class RadListView extends Component<Args> {
-    @action
-    loaded(event) {
-        // this.args.loaded(event);
-        const view = event.object;
-        const keys = Object.keys(this.args);
-        const nativeKeys = keys.filter((item) => item.startsWith('native'));
-        nativeKeys.forEach((key) => {
-            const actualKey = key.split(':')[1];
-            view[actualKey] = this.args[key];
-        });
-        // return true;
+    get keyedTemplates(): any {
+        const keyedTemplateNames = this.args.keyedTemplates;
+        if (Array.isArray(keyedTemplateNames)) {
+            return keyedTemplateNames.map((name) => {
+                return new GlimmerKeyedTemplate(name);
+            });
+        } else {
+            return [];
+        }
     }
     // public loadingEvent = NativeListView.itemLoadingEvent;
     // itemsObservable: any;
