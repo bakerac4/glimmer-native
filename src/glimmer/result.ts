@@ -21,6 +21,10 @@ export default class NativeComponentResult {
         this.runtime.env.commit();
     }
 
+    destroy() {
+        return this.result.destroy();
+    }
+
     toJSON() {
         return { GlimmerDebug: `<component-result name="${this.name}">` };
     }

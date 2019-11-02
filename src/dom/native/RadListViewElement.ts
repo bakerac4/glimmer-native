@@ -5,7 +5,6 @@ import { ListViewEventData, ListViewViewType, RadListView } from 'nativescript-u
 import { View } from 'tns-core-modules/ui/core/view/view';
 
 import Application from '../../..';
-import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
 import NativeComponentResult from '../../glimmer/result';
 import { createElement } from '../element-registry';
 import NativeViewElementNode from './NativeViewElementNode';
@@ -134,26 +133,26 @@ export default class RadListViewElement extends NativeViewElementNode<RadListVie
         if (this.templates[name]) {
             return this.templates[name];
         } else {
-            const templateNode = this.childNodes.find((x) => {
-                if (x instanceof TemplateElement && !name) {
-                    return true;
-                } else if (x instanceof TemplateElement && name) {
-                    return x.component && x.component.args.key === name;
-                } else {
-                    return false;
-                }
-            }) as TemplateElement;
-            if (templateNode) {
-                let component = Compilable(templateNode.component.args.src);
-                const compiled = component.compile(Application.context);
-                this.templates[name] = {
-                    compiled,
-                    args: templateNode.component.args
-                };
-                return this.templates[name];
-            } else {
-                return null;
-            }
+            // const templateNode = this.childNodes.find((x) => {
+            //     if (x instanceof TemplateElement && !name) {
+            //         return true;
+            //     } else if (x instanceof TemplateElement && name) {
+            //         return x.component && x.component.args.key === name;
+            //     } else {
+            //         return false;
+            //     }
+            // }) as TemplateElement;
+            // if (templateNode) {
+            //     let component = Compilable(templateNode.component.args.src);
+            //     const compiled = component.compile(Application.context);
+            //     this.templates[name] = {
+            //         compiled,
+            //         args: templateNode.component.args
+            //     };
+            //     return this.templates[name];
+            // } else {
+            //     return null;
+            // }
         }
     }
 

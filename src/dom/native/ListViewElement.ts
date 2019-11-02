@@ -1,11 +1,9 @@
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
-import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { View } from 'tns-core-modules/ui/core/view';
 import { ItemEventData, ItemsSource, ListView } from 'tns-core-modules/ui/list-view';
 
 import Application from '../../..';
-import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import ViewNode from '../nodes/ViewNode';
 import NativeViewElementNode from './NativeViewElementNode';
@@ -136,32 +134,32 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
         // }
     }
 
-    getItemTemplateComponent(name): GlimmerComponent {
-        if (this.templates[name]) {
-            return this.templates[name];
-        } else {
-            const templateNode = this.childNodes.find((x) => {
-                if (x instanceof TemplateElement && !name) {
-                    return true;
-                } else if (x instanceof TemplateElement && name) {
-                    return x.component && x.component.args.key === name;
-                } else {
-                    return false;
-                }
-            }) as TemplateElement;
-            if (templateNode) {
-                let component = Compilable(templateNode.component.args.src);
-                const compiled = component.compile(Application.context);
-                this.templates[name] = {
-                    compiled,
-                    args: templateNode.component.args
-                };
-                return this.templates[name];
-            } else {
-                return null;
-            }
-        }
-    }
+    // getItemTemplateComponent(name): GlimmerComponent {
+    //     if (this.templates[name]) {
+    //         return this.templates[name];
+    //     } else {
+    //         const templateNode = this.childNodes.find((x) => {
+    //             if (x instanceof TemplateElement && !name) {
+    //                 return true;
+    //             } else if (x instanceof TemplateElement && name) {
+    //                 return x.component && x.component.args.key === name;
+    //             } else {
+    //                 return false;
+    //             }
+    //         }) as TemplateElement;
+    //         if (templateNode) {
+    //             let component = Compilable(templateNode.component.args.src);
+    //             const compiled = component.compile(Application.context);
+    //             this.templates[name] = {
+    //                 compiled,
+    //                 args: templateNode.component.args
+    //             };
+    //             return this.templates[name];
+    //         } else {
+    //             return null;
+    //         }
+    //     }
+    // }
 
     get nativeView(): ListView {
         return super.nativeView as ListView;

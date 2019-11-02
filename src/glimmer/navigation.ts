@@ -9,11 +9,9 @@ import {
 import { Page } from 'tns-core-modules/ui/page';
 
 import Application from '../..';
-import { createElement } from '../dom/element-registry';
 import FrameElement from '../dom/native/FrameElement';
 import NativeViewElementNode from '../dom/native/NativeViewElementNode';
 import PageElement from '../dom/native/PageElement';
-import ElementNode from '../dom/nodes/ElementNode';
 
 export type FrameSpec = Frame | FrameElement | string;
 export interface NavigationOptions {
@@ -49,7 +47,6 @@ export function navigate(componentName: string, model: any, options: NavigationO
     }
     if (targetNode) {
         const element = Application.renderPage(componentName, targetNode, null, { model }) as PageElement;
-        const component = element.__GlimmerNativeComponent__;
         element.navigation = {
             componentName,
             targetNode,
@@ -65,12 +62,10 @@ export function navigate(componentName: string, model: any, options: NavigationO
 
         const onNavigatedFrom = async (args: NavigatedData, element: any) => {
             if (args.isBackNavigation) {
-                const target = element as NativeViewElementNode<Page>;
-                const page = (target as any)._meta.component.backTarget;
-                const { glimmerResult, runtime } = page.__GlimmerNativeElement__._meta.component;
+                const pageToDestroy = element as NativeViewElementNode<Page>;
+                const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
+                const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
                 element.nativeView.off('navigatedFrom', onNavigatedFrom);
-                //Now destroy the old element
-                // await Application.result.destroy();
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
                 Application._rerender();
@@ -88,50 +83,15 @@ export function navigate(componentName: string, model: any, options: NavigationO
             }
         });
 
-        const { glimmerResult } = element.component;
         const dispose = element.nativeView.disposeNativeView;
         element.nativeView.disposeNativeView = (...args) => {
-            if (glimmerResult) {
-                glimmerResult.destroy();
+            if (element.component) {
+                element.component.destroy();
+                element.component = null;
+                element.navigation = null;
             }
-            element.component = null;
             dispose.call(element.nativeView, args);
         };
-
-        // if (options.clearHistory) {
-        //     const page = (element as any)._meta.component.backTarget;
-        //     const { glimmerResult } = page.__GlimmerNativeElement__._meta.component;
-        //     // element.nativeView.off('navigatedFrom', onNavigatedFrom);
-        //     //Now destroy the old element
-        //     glimmerResult.destroy();
-        // }
-    } else {
-        const document = Application.document;
-        const newFrame = new ElementNode('frame');
-        newFrame.setAttribute('id', name);
-        document.appendChild(newFrame);
-
-        try {
-            console.log('About to render new result');
-            const element = Application.renderPage(componentName, newFrame, null, { model });
-            const handler = (args: NavigatedData) => {
-                if (args.isBackNavigation) {
-                    element.nativeView.off('navigatedFrom', handler);
-                    // const destructor = Application.resolver.managerFor().getDestructor()
-                    // destructor.destroy();
-                }
-            };
-            element.nativeView.on('navigatedFrom', handler);
-            topmost().navigate({
-                ...options,
-                create: () => {
-                    return element.nativeView;
-                }
-            });
-            console.log('New page rendered');
-        } catch (error) {
-            console.log(`Error in initial render: ${error}`);
-        }
     }
 
     return null;
@@ -185,12 +145,9 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
     const target = resolveFrame();
     let modalLauncher = target.currentPage;
     let backTarget = target.currentPage;
-    let frame = createElement('frame');
     const targetNode = target.get('__GlimmerNativeElement__');
-    const element = Application.renderPage(componentName, frame, null, {
-        model
-    });
-    element.component = {
+    const element = Application.renderPage(componentName, targetNode, null, { model }) as PageElement;
+    element.navigation = {
         componentName,
         targetNode,
         model,
@@ -205,9 +162,10 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
             if (resolved) return;
             resolved = true;
             try {
-                const target = element as any;
-                const page = target._meta.component.backTarget;
-                const { glimmerResult, runtime } = page.__GlimmerNativeElement__._meta.component;
+                const pageToDestroy = element as NativeViewElementNode<Page>;
+                const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
+                const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
+                element.component.destroy();
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
                 Application._rerender();
