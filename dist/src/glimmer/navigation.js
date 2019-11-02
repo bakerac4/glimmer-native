@@ -38,7 +38,8 @@ export function navigate(componentName, model, options) {
     }
     if (targetNode) {
         const element = Application.renderPage(componentName, targetNode, null, { model });
-        element._meta.component = {
+        const component = element.__GlimmerNativeComponent__;
+        element.navigation = {
             componentName,
             targetNode,
             model,
@@ -68,13 +69,13 @@ export function navigate(componentName, model, options) {
         target.navigate(Object.assign(Object.assign({}, options), { create: () => {
                 return element.nativeView;
             } }));
-        const { glimmerResult } = element._meta.component;
+        const { glimmerResult } = element.component;
         const dispose = element.nativeView.disposeNativeView;
         element.nativeView.disposeNativeView = (...args) => {
             if (glimmerResult) {
                 glimmerResult.destroy();
             }
-            element._meta.component = null;
+            element.component = null;
             dispose.call(element.nativeView, args);
         };
         // if (options.clearHistory) {

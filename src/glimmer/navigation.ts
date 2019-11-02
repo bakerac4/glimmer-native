@@ -12,6 +12,7 @@ import Application from '../..';
 import { createElement } from '../dom/element-registry';
 import FrameElement from '../dom/native/FrameElement';
 import NativeViewElementNode from '../dom/native/NativeViewElementNode';
+import PageElement from '../dom/native/PageElement';
 import ElementNode from '../dom/nodes/ElementNode';
 
 export type FrameSpec = Frame | FrameElement | string;
@@ -47,7 +48,7 @@ export function navigate(componentName: string, model: any, options: NavigationO
         throw new Error('Must have a valid component name (@target) to perform navigation');
     }
     if (targetNode) {
-        const element = Application.renderPage(componentName, targetNode, null, { model });
+        const element = Application.renderPage(componentName, targetNode, null, { model }) as PageElement;
         const component = element.__GlimmerNativeComponent__;
         element.navigation = {
             componentName,
@@ -87,13 +88,13 @@ export function navigate(componentName: string, model: any, options: NavigationO
             }
         });
 
-        const { glimmerResult } = element._meta.component;
+        const { glimmerResult } = element.component;
         const dispose = element.nativeView.disposeNativeView;
         element.nativeView.disposeNativeView = (...args) => {
             if (glimmerResult) {
                 glimmerResult.destroy();
             }
-            element._meta.component = null;
+            element.component = null;
             dispose.call(element.nativeView, args);
         };
 

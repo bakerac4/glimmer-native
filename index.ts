@@ -5,7 +5,6 @@ import { artifacts } from '@glimmer/program';
 import { State, UpdatableReference } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
-import { Page } from 'tns-core-modules/ui/page/page';
 
 import { createElement, registerElement } from './src/dom/element-registry';
 import { registerGlimmerElements } from './src/dom/glimmer-elements';
@@ -102,13 +101,7 @@ export default class Application {
         });
     }
 
-    static _renderPage(
-        name,
-        containerElement: FrameElement,
-        nextSibling,
-        compilable,
-        data = {}
-    ): NativeViewElementNode<Page> {
+    static _renderPage(name, containerElement: FrameElement, nextSibling, compilable, data = {}): PageElement {
         let state = State(data);
         const artifact = artifacts(Application.context);
         Application.aotRuntime = AotRuntime(Application.document as any, artifact, Application.resolver);
@@ -126,7 +119,7 @@ export default class Application {
             }
             (node as PageElement).parentNode = containerElement;
             containerElement.childNodes.push(node);
-            node.__GlimmerNativeComponent__ = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             Application.renderedPage = node;
             return node as any;
         } catch (error) {

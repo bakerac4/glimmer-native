@@ -1,9 +1,8 @@
 import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@glimmer/interfaces';
 import { MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
 import { UpdatableReference } from '@glimmer/reference';
-import { Page } from 'tns-core-modules/ui/page/page';
 import FrameElement from './src/dom/native/FrameElement';
-import NativeViewElementNode from './src/dom/native/NativeViewElementNode';
+import PageElement from './src/dom/native/PageElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { ResolverDelegate } from './src/glimmer/context';
@@ -45,8 +44,8 @@ export default class Application {
     static _rendering: boolean;
     constructor(appFolder: any, components: any, helpers: any);
     static addListItem(viewNode: any): void;
-    static renderPage(name: any, containerElement: any, nextSibling: any, state: any): NativeViewElementNode<Page>;
-    static _renderPage(name: any, containerElement: FrameElement, nextSibling: any, compilable: any, data?: {}): NativeViewElementNode<Page>;
+    static renderPage(name: any, containerElement: any, nextSibling: any, state: any): PageElement;
+    static _renderPage(name: any, containerElement: FrameElement, nextSibling: any, compilable: any, data?: {}): PageElement;
     static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): ElementNode;
     parseTemplates(folder: any): void;
     registerHelpers(helpers: any): void;

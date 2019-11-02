@@ -85,7 +85,7 @@ export default class Application {
             }
             node.parentNode = containerElement;
             containerElement.childNodes.push(node);
-            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             Application.renderedPage = node;
             return node;
         }
