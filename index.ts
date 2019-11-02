@@ -8,6 +8,7 @@ import { launchEvent, on, run } from 'tns-core-modules/application';
 import { Page } from 'tns-core-modules/ui/page/page';
 
 import { createElement, registerElement } from './src/dom/element-registry';
+import { registerGlimmerElements } from './src/dom/glimmer-elements';
 import FrameElement from './src/dom/native/FrameElement';
 import NativeViewElementNode from './src/dom/native/NativeViewElementNode';
 import PageElement from './src/dom/native/PageElement';
@@ -66,6 +67,7 @@ export default class Application {
 
     constructor(appFolder, components, helpers) {
         registerNativeElements();
+        registerGlimmerElements();
         const resolverDelegate = new ResolverDelegate();
         const resolver = new Resolver();
         Application.resolver = resolver;
@@ -119,12 +121,12 @@ export default class Application {
             Application.state = state;
             Application._rendered = true;
             let node = result.firstNode() as any;
-            while (node && !node._nativeView) {
+            while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
             (node as PageElement).parentNode = containerElement;
             containerElement.childNodes.push(node);
-            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            node.__GlimmerNativeComponent__ = new NativeComponentResult(name, result, state, Application.aotRuntime);
             Application.renderedPage = node;
             return node as any;
         } catch (error) {

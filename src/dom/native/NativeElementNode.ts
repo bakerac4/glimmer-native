@@ -1,8 +1,8 @@
 import { ObservableArray } from 'tns-core-modules/data/observable-array/observable-array';
 import { isAndroid, isIOS } from 'tns-core-modules/ui/page';
 
-import { ElementNode } from '../../..';
 import { registerElement } from '../element-registry';
+import ElementNode from '../nodes/ElementNode';
 import ViewNode from '../nodes/ViewNode';
 
 export enum NativeElementPropType {
@@ -83,7 +83,7 @@ export default class NativeElementNode<T> extends ElementNode {
         this._nativeElement = new elementClass();
         this._normalizedKeys = getNormalizedKeysForObject(this._nativeElement, Object.keys(this.propConfig));
 
-        (this._nativeElement as any).__SvelteNativeElement__ = this;
+        (this._nativeElement as any).__GlimmerNativeElement__ = this;
         console.debug(`created ${this} ${this._nativeElement}`);
     }
 

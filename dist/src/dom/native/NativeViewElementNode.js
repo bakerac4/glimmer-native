@@ -22,7 +22,7 @@ export default class NativeViewElementNode extends NativeElementNode {
         };
         let getParentPage = () => {
             if (this.nativeView && this.nativeView.page) {
-                return this.nativeView.page.__SvelteNativeElement__;
+                return this.nativeView.page.__GlimmerNativeElement__;
             }
             return null;
         };

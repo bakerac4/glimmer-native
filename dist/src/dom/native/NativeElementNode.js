@@ -1,7 +1,7 @@
 import { ObservableArray } from 'tns-core-modules/data/observable-array/observable-array';
 import { isAndroid, isIOS } from 'tns-core-modules/ui/page';
-import { ElementNode } from '../../..';
 import { registerElement } from '../element-registry';
+import ElementNode from '../nodes/ElementNode';
 export var NativeElementPropType;
 (function (NativeElementPropType) {
     NativeElementPropType[NativeElementPropType["Value"] = 0] = "Value";
@@ -60,7 +60,7 @@ export default class NativeElementNode extends ElementNode {
         this.propAttribute = setsParentProp;
         this._nativeElement = new elementClass();
         this._normalizedKeys = getNormalizedKeysForObject(this._nativeElement, Object.keys(this.propConfig));
-        this._nativeElement.__SvelteNativeElement__ = this;
+        this._nativeElement.__GlimmerNativeElement__ = this;
         console.debug(`created ${this} ${this._nativeElement}`);
     }
     get nativeElement() {

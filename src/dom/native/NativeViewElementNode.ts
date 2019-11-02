@@ -52,7 +52,7 @@ export default class NativeViewElementNode<T extends View> extends NativeElement
 
         let getParentPage = (): NativeViewElementNode<Page> => {
             if (this.nativeView && this.nativeView.page) {
-                return (this.nativeView.page as any).__SvelteNativeElement__;
+                return (this.nativeView.page as any).__GlimmerNativeElement__;
             }
             return null;
         };

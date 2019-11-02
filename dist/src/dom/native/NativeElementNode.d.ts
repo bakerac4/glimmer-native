@@ -1,4 +1,4 @@
-import { ElementNode } from '../../..';
+import ElementNode from '../nodes/ElementNode';
 import ViewNode from '../nodes/ViewNode';
 export declare enum NativeElementPropType {
     Value = 0,

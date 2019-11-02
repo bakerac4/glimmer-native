@@ -14,6 +14,7 @@ import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
 import { createElement, registerElement } from './src/dom/element-registry';
+import { registerGlimmerElements } from './src/dom/glimmer-elements';
 import NativeViewElementNode from './src/dom/native/NativeViewElementNode';
 import { registerNativeElements } from './src/dom/nativescript-elements';
 import DocumentNode from './src/dom/nodes/DocumentNode';
@@ -37,6 +38,7 @@ export { NativeModifier, NativeModifierDefinitionState } from './src/glimmer/nat
 export default class Application {
     constructor(appFolder, components, helpers) {
         registerNativeElements();
+        registerGlimmerElements();
         const resolverDelegate = new ResolverDelegate();
         const resolver = new Resolver();
         Application.resolver = resolver;
@@ -78,7 +80,7 @@ export default class Application {
             Application.state = state;
             Application._rendered = true;
             let node = result.firstNode();
-            while (node && !node._nativeView) {
+            while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
             node.parentNode = containerElement;

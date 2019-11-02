@@ -47,8 +47,9 @@ export function navigate(componentName: string, model: any, options: NavigationO
         throw new Error('Must have a valid component name (@target) to perform navigation');
     }
     if (targetNode) {
-        const element = Application.renderPage(componentName, targetNode, null, { model }) as any;
-        element._meta.component = {
+        const element = Application.renderPage(componentName, targetNode, null, { model });
+        const component = element.__GlimmerNativeComponent__;
+        element.navigation = {
             componentName,
             targetNode,
             model,
