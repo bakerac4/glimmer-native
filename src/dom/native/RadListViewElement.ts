@@ -8,10 +8,10 @@ import Application from '../../..';
 import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
 import NativeComponentResult from '../../glimmer/result';
 import { createElement } from '../element-registry';
-import NativeElementNode from './NativeElementNode';
+import NativeViewElementNode from './NativeViewElementNode';
 import TemplateElement from './TemplateElement';
 
-export default class RadListViewElement extends NativeElementNode {
+export default class RadListViewElement extends NativeViewElementNode<RadListView> {
     nativeView: RadListView;
     lastItemSelected: any;
     component: any;
@@ -48,7 +48,7 @@ export default class RadListViewElement extends NativeElementNode {
         if (!template) return null;
         console.log('creating view for ', viewType);
 
-        let wrapper = createElement('StackLayout') as NativeElementNode;
+        let wrapper = createElement('StackLayout') as NativeViewElementNode<View>;
         wrapper.setAttribute('class', 'list-view-item');
         let nativeEl = wrapper.nativeView;
         this.items.push(wrapper);
@@ -167,7 +167,7 @@ export default class RadListViewElement extends NativeElementNode {
         });
 
         let nativeEl = view.nativeView;
-        (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
+        (nativeEl as any).__GlimmerComponent__ = componentInstance;
         return nativeEl;
     }
 }

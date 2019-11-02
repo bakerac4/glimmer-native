@@ -13,7 +13,7 @@
         "ember"
     ],
     "scripts": {
-        "build": "tsc --skipLibCheck"
+        "build": "rm -rf dist && tsc --skipLibCheck"
     },
     "main": "dist/index.js",
     "author": "Adam Baker",

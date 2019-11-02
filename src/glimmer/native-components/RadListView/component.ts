@@ -1,7 +1,5 @@
 import Component from '@glimmer/component';
 
-import { GlimmerKeyedTemplate } from '../../../dom/native/ListViewElement';
-
 // import ElementNode from '../src/dom/nodes/ElementNode';
 
 export interface Args {
@@ -11,16 +9,16 @@ export interface Args {
     loaded: any;
 }
 export default class RadListView extends Component<Args> {
-    get keyedTemplates(): any {
-        const keyedTemplateNames = this.args.keyedTemplates;
-        if (Array.isArray(keyedTemplateNames)) {
-            return keyedTemplateNames.map((name) => {
-                return new GlimmerKeyedTemplate(name);
-            });
-        } else {
-            return [];
-        }
-    }
+    // get keyedTemplates(): any {
+    //     const keyedTemplateNames = this.args.keyedTemplates;
+    //     if (Array.isArray(keyedTemplateNames)) {
+    //         return keyedTemplateNames.map((name) => {
+    //             return new GlimmerKeyedTemplate(name);
+    //         });
+    //     } else {
+    //         return [];
+    //     }
+    // }
     // public loadingEvent = NativeListView.itemLoadingEvent;
     // itemsObservable: any;
     // // constructor(owner, args) {
