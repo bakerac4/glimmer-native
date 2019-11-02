@@ -24,6 +24,6 @@ export default class FrameElement extends NativeViewElementNode {
         //only handle page nodes
         if (!(childNode instanceof PageElement))
             return;
-        this.nativeView.navigate({ create: () => childNode.nativeView });
+        // this.nativeView.navigate({ create: () => childNode.nativeView });
     }
 }
