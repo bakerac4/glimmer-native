@@ -2,12 +2,12 @@ import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@gli
 import { MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
 import { UpdatableReference } from '@glimmer/reference';
 import FrameElement from './src/dom/native/FrameElement';
+import PageElement from './src/dom/native/PageElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { ResolverDelegate } from './src/glimmer/context';
 import Resolver from './src/glimmer/resolver';
 export { ResolverDelegate } from './src/glimmer/context';
-export { registerElements } from './src/dom/setup-registry';
 export { createElement } from './src/dom/element-registry';
 export { action } from './src/glimmer/decorators/action';
 export { default as Navigation } from './src/glimmer/navigation';
@@ -44,8 +44,8 @@ export default class Application {
     static _rendering: boolean;
     constructor(appFolder: any, components: any, helpers: any);
     static addListItem(viewNode: any): void;
-    static renderPage(name: any, containerElement: any, nextSibling: any, state: any): ElementNode;
-    static _renderPage(name: any, containerElement: FrameElement, nextSibling: any, compilable: any, data?: {}): ElementNode;
+    static renderPage(name: any, containerElement: any, nextSibling: any, state: any): PageElement;
+    static _renderPage(name: any, containerElement: FrameElement, nextSibling: any, compilable: any, data?: {}): PageElement;
     static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): ElementNode;
     parseTemplates(folder: any): void;
     registerHelpers(helpers: any): void;
@@ -53,6 +53,7 @@ export default class Application {
     registerNativeComponent(name: any, value: any): void;
     registerHelper(name: any, func: any): void;
     boot(name: any): Promise<unknown>;
+    registerNativeElement(elementName: any, resolver: any, meta?: any): void;
     scheduleRerender(): void;
     static scheduleRerender(): Promise<void>;
     static rerenderForListView(): Promise<void>;

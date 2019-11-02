@@ -1,6 +1,8 @@
 import { Page } from 'tns-core-modules/ui/page';
-import NativeElementNode from './NativeElementNode';
-export default class PageElement extends NativeElementNode {
+import NativeComponentResult from '../../glimmer/result';
+import NativeViewElementNode from './NativeViewElementNode';
+export default class PageElement extends NativeViewElementNode<Page> {
+    __GlimmerNativeComponent__: NativeComponentResult;
+    navigation: any;
     constructor();
-    nativeView: Page;
 }

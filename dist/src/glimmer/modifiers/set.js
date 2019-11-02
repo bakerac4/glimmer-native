@@ -4,7 +4,7 @@ export default class setModifier {
         const value = _params[1];
         const native = _params[2] !== false ? true : false;
         if (native) {
-            element._nativeView[property] = value;
+            element._nativeElement[property] = value;
         }
         else {
             element[property] = value;
@@ -18,7 +18,7 @@ export default class setModifier {
         const value = _params[1];
         const native = _params[2] !== false ? true : false;
         if (native) {
-            element._nativeView[property] = value;
+            element._nativeElement[property] = value;
         }
         else {
             element[property] = value;

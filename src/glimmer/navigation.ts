@@ -1,18 +1,23 @@
-import { BackstackEntry, Frame, NavigatedData, NavigationTransition, topmost } from 'tns-core-modules/ui/frame';
+import {
+    BackstackEntry,
+    Frame,
+    getFrameById,
+    NavigatedData,
+    NavigationTransition,
+    topmost
+} from 'tns-core-modules/ui/frame';
 import { Page } from 'tns-core-modules/ui/page';
 
-import Application, { NativeElementNode } from '../..';
-import { createElement } from '../dom/element-registry';
+import Application from '../..';
 import FrameElement from '../dom/native/FrameElement';
-import ElementNode from '../dom/nodes/ElementNode';
+import NativeViewElementNode from '../dom/native/NativeViewElementNode';
+import PageElement from '../dom/native/PageElement';
 
-export type FrameType = Frame | FrameElement | string;
-// import { createElement, logger as log } from "./basicdom";
-// import PageElement from "./native/PageElement";
-// import NativeElementNode from "./native/NativeElementNode";
+export type FrameSpec = Frame | FrameElement | string;
 export interface NavigationOptions {
-    frame: FrameType;
-    context?: any;
+    props?: any;
+    frame?: FrameSpec;
+
     animated?: boolean;
     backstackVisible?: boolean;
     clearHistory?: boolean;
@@ -20,30 +25,15 @@ export interface NavigationOptions {
     transitionAndroid?: NavigationTransition;
     transitioniOS?: NavigationTransition;
 }
-
-function resolveFrame(frame?: FrameType): Frame {
+function resolveFrame(frameSpec?: FrameSpec): Frame {
     let targetFrame: Frame;
-    if (!frame) targetFrame = topmost();
-    if (frame instanceof FrameElement) targetFrame = frame.nativeView as Frame;
-    if (frame instanceof Frame) targetFrame = frame;
-    if (typeof frame == 'string') {
-        const node = resolveFrameNode(frame);
-        if (node) {
-            targetFrame = node.nativeView;
-        }
-        if (!targetFrame) console.log(`Navigate could not find frame with id ${frame}`);
+    if (!frameSpec) targetFrame = topmost();
+    if (frameSpec instanceof FrameElement) targetFrame = frameSpec.nativeView as Frame;
+    if (frameSpec instanceof Frame) targetFrame = frameSpec;
+    if (typeof frameSpec == 'string') {
+        targetFrame = getFrameById(frameSpec);
+        if (!targetFrame) console.error(`Navigate could not find frame with id ${frameSpec}`);
     }
-    return targetFrame;
-}
-
-function resolveFrameNode(name: string): ElementNode {
-    let targetFrame: ElementNode;
-    const document = Application.document;
-    targetFrame = document.childNodes
-        ? document.childNodes.find((node) => {
-              return node.nativeView ? node.getAttribute('id') === name : false;
-          })
-        : undefined;
     return targetFrame;
 }
 
@@ -56,8 +46,8 @@ export function navigate(componentName: string, model: any, options: NavigationO
         throw new Error('Must have a valid component name (@target) to perform navigation');
     }
     if (targetNode) {
-        const element = Application.renderPage(componentName, targetNode, null, { model }) as any;
-        element._meta.component = {
+        const element = Application.renderPage(componentName, targetNode, null, { model }) as PageElement;
+        element.navigation = {
             componentName,
             targetNode,
             model,
@@ -72,12 +62,10 @@ export function navigate(componentName: string, model: any, options: NavigationO
 
         const onNavigatedFrom = async (args: NavigatedData, element: any) => {
             if (args.isBackNavigation) {
-                const target = element as NativeElementNode;
-                const page = (target as any)._meta.component.backTarget;
-                const { glimmerResult, runtime } = page.__GlimmerNativeElement__._meta.component;
+                const pageToDestroy = element as NativeViewElementNode<Page>;
+                const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
+                const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
                 element.nativeView.off('navigatedFrom', onNavigatedFrom);
-                //Now destroy the old element
-                // await Application.result.destroy();
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
                 Application._rerender();
@@ -95,50 +83,15 @@ export function navigate(componentName: string, model: any, options: NavigationO
             }
         });
 
-        const { glimmerResult } = element._meta.component;
         const dispose = element.nativeView.disposeNativeView;
         element.nativeView.disposeNativeView = (...args) => {
-            if (glimmerResult) {
-                glimmerResult.destroy();
+            if (element.component) {
+                element.component.destroy();
+                element.component = null;
+                element.navigation = null;
             }
-            element._meta.component = null;
             dispose.call(element.nativeView, args);
         };
-
-        // if (options.clearHistory) {
-        //     const page = (element as any)._meta.component.backTarget;
-        //     const { glimmerResult } = page.__GlimmerNativeElement__._meta.component;
-        //     // element.nativeView.off('navigatedFrom', onNavigatedFrom);
-        //     //Now destroy the old element
-        //     glimmerResult.destroy();
-        // }
-    } else {
-        const document = Application.document;
-        const newFrame = new ElementNode('frame');
-        newFrame.setAttribute('id', name);
-        document.appendChild(newFrame);
-
-        try {
-            console.log('About to render new result');
-            const element = Application.renderPage(componentName, newFrame, null, { model });
-            const handler = (args: NavigatedData) => {
-                if (args.isBackNavigation) {
-                    element.nativeView.off('navigatedFrom', handler);
-                    // const destructor = Application.resolver.managerFor().getDestructor()
-                    // destructor.destroy();
-                }
-            };
-            element.nativeView.on('navigatedFrom', handler);
-            topmost().navigate({
-                ...options,
-                create: () => {
-                    return element.nativeView;
-                }
-            });
-            console.log('New page rendered');
-        } catch (error) {
-            console.log(`Error in initial render: ${error}`);
-        }
     }
 
     return null;
@@ -192,12 +145,9 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
     const target = resolveFrame();
     let modalLauncher = target.currentPage;
     let backTarget = target.currentPage;
-    let frame = createElement('frame');
     const targetNode = target.get('__GlimmerNativeElement__');
-    const element = Application.renderPage(componentName, frame, null, {
-        model
-    });
-    element._meta.component = {
+    const element = Application.renderPage(componentName, targetNode, null, { model }) as PageElement;
+    element.navigation = {
         componentName,
         targetNode,
         model,
@@ -212,9 +162,12 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
             if (resolved) return;
             resolved = true;
             try {
-                const target = element as any;
-                const page = target._meta.component.backTarget;
-                const { glimmerResult, runtime } = page.__GlimmerNativeElement__._meta.component;
+                const pageToDestroy = element as NativeViewElementNode<Page>;
+                const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
+                const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
+                element.component.destroy();
+                element.component = null;
+                element.navigation = null;
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
                 Application._rerender();

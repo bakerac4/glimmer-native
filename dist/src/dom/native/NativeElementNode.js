@@ -1,172 +1,90 @@
-import { KeyframeAnimation } from 'tns-core-modules/ui/animation/keyframe-animation';
-import { LayoutBase } from 'tns-core-modules/ui/layouts/layout-base';
-import { ContentView, isAndroid, isIOS, View } from 'tns-core-modules/ui/page';
-import { CssAnimationParser } from 'tns-core-modules/ui/styling/css-animation-parser';
+import { ObservableArray } from 'tns-core-modules/data/observable-array/observable-array';
+import { isAndroid, isIOS } from 'tns-core-modules/ui/page';
+import { registerElement } from '../element-registry';
 import ElementNode from '../nodes/ElementNode';
-function camelize(kebab) {
-    return kebab.replace(/[\-]+(\w)/g, (m, l) => l.toUpperCase());
+export var NativeElementPropType;
+(function (NativeElementPropType) {
+    NativeElementPropType[NativeElementPropType["Value"] = 0] = "Value";
+    NativeElementPropType[NativeElementPropType["Array"] = 1] = "Array";
+    NativeElementPropType[NativeElementPropType["ObservableArray"] = 2] = "ObservableArray";
+})(NativeElementPropType || (NativeElementPropType = {}));
+function setOnArrayProp(parent, value, propName, build = null) {
+    let current = parent[propName];
+    if (!current || !current.push) {
+        parent[propName] = build ? build(value) : [value];
+    }
+    else {
+        current.push(value);
+    }
 }
-const defaultViewMeta = {
-    skipAddToDom: false
-};
+function removeFromArrayProp(parent, value, propName) {
+    let current = parent[propName];
+    if (!current || !current.splice) {
+        let idx = current.indexOf(value);
+        if (idx >= 0)
+            current.splice(idx, 1);
+    }
+}
+const _normalizedKeys = new Map();
+function getNormalizedKeysForObject(obj, knownPropNames) {
+    let proto = Object.getPrototypeOf(obj);
+    let m = _normalizedKeys.get(proto);
+    if (m)
+        return m;
+    //calculate our prop names
+    let props = new Map();
+    _normalizedKeys.set(proto, props);
+    //include known props
+    knownPropNames.forEach((p) => props.set(p.toLowerCase(), p));
+    //infer the rest from the passed object (including updating any incorrect known prop names if found)
+    for (let p in obj) {
+        props.set(p.toLowerCase(), p);
+    }
+    return props;
+}
+function normalizeKeyFromObject(obj, key) {
+    let lowerkey = key.toLowerCase();
+    for (let p in obj) {
+        if (p.toLowerCase() == lowerkey) {
+            return p;
+        }
+    }
+    return key;
+}
+// Implements an ElementNode that wraps a NativeScript object. It uses the object as the source of truth for its attributes
 export default class NativeElementNode extends ElementNode {
-    constructor(tagName, viewClass, meta = null) {
+    constructor(tagName, elementClass, setsParentProp = null, propConfig = {}) {
         super(tagName);
-        this.nodeType = 1;
-        this.tagName = tagName;
-        this._meta = Object.assign({}, defaultViewMeta, meta || {});
-        this._nativeView = new viewClass();
-        this._nativeView.__GlimmerNativeElement__ = this;
-        // log.debug(`created ${this} ${this._nativeView}`);
-        //TODO these style shims mess up the code, extract to external modules
-        let setStyleAttribute = (value) => {
-            this.setAttribute('style', value);
-        };
-        let getStyleAttribute = () => {
-            return this.getAttribute('style');
-        };
-        let getParentPage = () => {
-            if (this.nativeView && this.nativeView.page) {
-                return this.nativeView.page.__GlimmerNativeElement__;
-            }
-            return null;
-        };
-        let animations = new Map();
-        let oldAnimations = [];
-        const addAnimation = (animation) => {
-            // log.debug(`Adding animation ${animation}`);
-            if (!this.nativeView) {
-                throw Error('Attempt to apply animation to tag without a native view' + this.tagName);
-            }
-            let page = getParentPage();
-            if (page == null) {
-                animations.set(animation, null);
-                return;
-            }
-            //quickly cancel any old ones
-            while (oldAnimations.length) {
-                let oldAnimation = oldAnimations.shift();
-                if (oldAnimation.isPlaying) {
-                    oldAnimation.cancel();
-                }
-            }
-            //Parse our "animation" style property into an animation info instance (this won't include the keyframes from the css)
-            let animationInfos = CssAnimationParser.keyframeAnimationsFromCSSDeclarations([
-                { property: 'animation', value: animation }
-            ]);
-            if (!animationInfos) {
-                animations.set(animation, null);
-                return;
-            }
-            let animationInfo = animationInfos[0];
-            //Fetch an animationInfo instance that includes the keyframes from the css (this won't include the animation properties parsed above)
-            let animationWithKeyframes = page.nativeView.getKeyframeAnimationWithName(animationInfo.name);
-            if (!animationWithKeyframes) {
-                animations.set(animation, null);
-                return;
-            }
-            animationInfo.keyframes = animationWithKeyframes.keyframes;
-            //combine the keyframes from the css with the animation from the parsed attribute to get a complete animationInfo object
-            let animationInstance = KeyframeAnimation.keyframeAnimationFromInfo(animationInfo);
-            // save and launch the animation
-            animations.set(animation, animationInstance);
-            animationInstance.play(this.nativeView);
-        };
-        const removeAnimation = (animation) => {
-            // log.debug(`Removing animation ${animation}`);
-            if (animations.has(animation)) {
-                let animationInstance = animations.get(animation);
-                animations.delete(animation);
-                if (animationInstance) {
-                    if (animationInstance.isPlaying) {
-                        //we don't want to stop right away since svelte removes the animation before it is finished due to our lag time starting the animation.
-                        oldAnimations.push(animationInstance);
-                    }
-                }
-            }
-        };
-        this.style = {
-            setProperty: (propertyName, value, priority) => {
-                this.setStyle(camelize(propertyName), value);
-            },
-            removeProperty: (propertyName) => {
-                this.setStyle(camelize(propertyName), null);
-            },
-            get animation() {
-                return [...animations.keys()].join(', ');
-            },
-            set animation(value) {
-                // log.debug(`setting animation ${value}`);
-                let new_animations = value.trim() == '' ? [] : value.split(',').map((a) => a.trim());
-                //add new ones
-                for (let anim of new_animations) {
-                    if (!animations.has(anim)) {
-                        addAnimation(anim);
-                    }
-                }
-                //remove old ones
-                for (let anim of animations.keys()) {
-                    if (new_animations.indexOf(anim) < 0) {
-                        removeAnimation(anim);
-                    }
-                }
-            },
-            get cssText() {
-                // log.debug('got css text');
-                return getStyleAttribute();
-            },
-            set cssText(value) {
-                // log.debug('set css text');
-                setStyleAttribute(value);
-            }
-        };
+        this.propAttribute = null;
+        this.propConfig = propConfig;
+        this.propAttribute = setsParentProp;
+        this._nativeElement = new elementClass();
+        this._normalizedKeys = getNormalizedKeysForObject(this._nativeElement, Object.keys(this.propConfig));
+        this._nativeElement.__GlimmerNativeElement__ = this;
+        console.debug(`created ${this} ${this._nativeElement}`);
     }
-    /* istanbul ignore next */
-    setStyle(property, value) {
-        // log.debug(`setStyle ${this} ${property} ${value}`);
-        if (!(value = value.toString().trim()).length) {
-            return;
+    get nativeElement() {
+        return this._nativeElement;
+    }
+    set nativeElement(el) {
+        if (this._nativeElement) {
+            throw new Error(`Can't overwrite native element.`);
         }
-        if (property.endsWith('Align')) {
-            // NativeScript uses Alignment instead of Align, this ensures that text-align works
-            property += 'ment';
-        }
-        this.nativeView.style[property] = value;
-    }
-    get nativeView() {
-        return this._nativeView;
-    }
-    set nativeView(view) {
-        this._nativeView = view;
-    }
-    get meta() {
-        return this._meta;
-    }
-    /* istanbul ignore next */
-    addEventListener(event, handler) {
-        // log.debug(`add event listener ${this} ${event}`);
-        this.nativeView.on(event, handler);
-    }
-    /* istanbul ignore next */
-    removeEventListener(event, handler) {
-        // log.debug(`remove event listener ${this} ${event}`);
-        this.nativeView.off(event, handler);
+        this._nativeElement = el;
     }
     getAttribute(fullkey) {
-        let getTarget = this.nativeView;
+        let getTarget = this.nativeElement;
         let keypath = fullkey.split('.');
         let resolvedKeys = [];
         while (keypath.length > 0) {
             if (!getTarget)
                 return null;
             let key = keypath.shift();
-            // try to fix case
-            let lowerkey = key.toLowerCase();
-            for (let realKey in getTarget) {
-                if (lowerkey == realKey.toLowerCase()) {
-                    key = realKey;
-                    break;
-                }
+            if (resolvedKeys.length == 0) {
+                key = this._normalizedKeys.get(key) || key;
+            }
+            else {
+                key = normalizeKeyFromObject(getTarget, key);
             }
             resolvedKeys.push(key);
             if (keypath.length > 0) {
@@ -179,14 +97,46 @@ export default class NativeElementNode extends ElementNode {
         return null;
     }
     onInsertedChild(childNode, index) {
-        insertChild(this, childNode, index);
+        super.onInsertedChild(childNode, index);
+        // support for the prop: shorthand for setting parent property to native element
+        if (!(childNode instanceof NativeElementNode))
+            return;
+        let propName = childNode.propAttribute;
+        if (!propName)
+            return;
+        //Special case Array and Observable Array keys
+        propName = this._normalizedKeys.get(propName) || propName;
+        switch (this.propConfig[propName]) {
+            case NativeElementPropType.Array:
+                setOnArrayProp(this.nativeElement, childNode.nativeElement, propName);
+                return;
+            case NativeElementPropType.ObservableArray:
+                setOnArrayProp(this.nativeElement, childNode.nativeElement, propName, (v) => new ObservableArray(v));
+                return;
+            default:
+                this.setAttribute(propName, childNode);
+        }
     }
     onRemovedChild(childNode) {
-        removeChild(this, childNode);
+        if (!(childNode instanceof NativeElementNode))
+            return;
+        let propName = childNode.propAttribute;
+        if (!propName)
+            return;
+        //Special case Array and Observable Array keys
+        propName = this._normalizedKeys.get(propName) || propName;
+        switch (this.propConfig[propName]) {
+            case NativeElementPropType.Array:
+            case NativeElementPropType.ObservableArray:
+                removeFromArrayProp(this.nativeElement, childNode, propName);
+                return;
+            default:
+                this.setAttribute(propName, null);
+        }
+        super.onRemovedChild(childNode);
     }
-    /* istanbul ignore next */
     setAttribute(fullkey, value) {
-        const nv = this.nativeView;
+        const nv = this.nativeElement;
         let setTarget = nv;
         // normalize key
         if (isAndroid && fullkey.startsWith('android:')) {
@@ -195,9 +145,13 @@ export default class NativeElementNode extends ElementNode {
         if (isIOS && fullkey.startsWith('ios:')) {
             fullkey = fullkey.substr(4);
         }
+        if (fullkey.startsWith('prop:')) {
+            this.propAttribute = fullkey.substr(5);
+            return;
+        }
         //we might be getting an element from a propertyNode eg page.actionBar, unwrap
         if (value instanceof NativeElementNode) {
-            value = value.nativeView;
+            value = value.nativeElement;
         }
         let keypath = fullkey.split('.');
         let resolvedKeys = [];
@@ -205,13 +159,12 @@ export default class NativeElementNode extends ElementNode {
             if (!setTarget)
                 return;
             let key = keypath.shift();
-            // try to fix case
-            let lowerkey = key.toLowerCase();
-            for (let realKey in setTarget) {
-                if (lowerkey == realKey.toLowerCase()) {
-                    key = realKey;
-                    break;
-                }
+            // normalize to correct case
+            if (resolvedKeys.length == 0) {
+                key = this._normalizedKeys.get(key) || key;
+            }
+            else {
+                key = normalizeKeyFromObject(setTarget, key);
             }
             resolvedKeys.push(key);
             if (keypath.length > 0) {
@@ -219,108 +172,17 @@ export default class NativeElementNode extends ElementNode {
             }
             else {
                 try {
-                    // log.debug(`setAttr ${this} ${resolvedKeys.join('.')} ${value}`);
+                    console.debug(`setAttr value ${this} ${resolvedKeys.join('.')} ${value}`);
                     setTarget[key] = value;
                 }
                 catch (e) {
                     // ignore but log
-                    // log.error(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
+                    console.error(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
                 }
             }
         }
     }
-    dispatchEvent(event) {
-        if (this.nativeView) {
-            //nativescript uses the EventName while dom uses Type
-            event.eventName = event.type;
-            this.nativeView.notify(event);
-        }
-    }
-    clear(node) {
-        while (node.childNodes.length) {
-            this.clear(node.firstChild);
-        }
-        node.parentNode.removeChild(node);
-    }
-    removeChildren() {
-        while (this.childNodes.length) {
-            this.clear(this.firstChild);
-        }
-    }
 }
-//TODO merge these into the class above
-function insertChild(parentNode, childNode, atIndex = -1) {
-    if (!parentNode) {
-        return;
-    }
-    if (!(parentNode instanceof NativeElementNode) || !(childNode instanceof NativeElementNode)) {
-        return;
-    }
-    if (parentNode.meta && typeof parentNode.meta.insertChild === 'function') {
-        //our dom includes "textNode" and "commentNode" which does not appear in the nativeview's children.
-        //we recalculate the index required for the insert operation buy only including native element nodes in the count
-        let nativeIndex = parentNode.childNodes.filter((e) => e instanceof NativeElementNode).indexOf(childNode);
-        return parentNode.meta.insertChild(parentNode, childNode, nativeIndex);
-    }
-    const parentView = parentNode.nativeView;
-    const childView = childNode.nativeView;
-    //use the builder logic if we aren't being dynamic, to catch config items like <actionbar> that are not likely to be toggled
-    if (atIndex < 0 && parentView._addChildFromBuilder) {
-        parentView._addChildFromBuilder(childNode._nativeView.constructor.name, childView);
-        return;
-    }
-    if (parentView instanceof LayoutBase) {
-        if (atIndex >= 0) {
-            //our dom includes "textNode" and "commentNode" which does not appear in the nativeview's children.
-            //we recalculate the index required for the insert operation buy only including native element nodes in the count
-            let nativeIndex = parentNode.childNodes.filter((e) => e instanceof NativeElementNode).indexOf(childNode);
-            parentView.insertChild(childView, nativeIndex);
-        }
-        else {
-            parentView.addChild(childView);
-        }
-        return;
-    }
-    if (parentView._addChildFromBuilder) {
-        return parentView._addChildFromBuilder(childNode._nativeView.constructor.name, childView);
-    }
-    if (parentView instanceof ContentView) {
-        parentView.content = childView;
-        return;
-    }
-    throw new Error("Parent can't contain children: " + parentNode + ', ' + childNode);
-}
-function removeChild(parentNode, childNode) {
-    if (!parentNode) {
-        return;
-    }
-    if (!(parentNode instanceof NativeElementNode) || !(childNode instanceof NativeElementNode)) {
-        return;
-    }
-    if (parentNode.meta && typeof parentNode.meta.removeChild === 'function') {
-        return parentNode.meta.removeChild(parentNode, childNode);
-    }
-    if (!childNode.nativeView || !childNode.nativeView) {
-        return;
-    }
-    const parentView = parentNode.nativeView;
-    const childView = childNode.nativeView;
-    if (parentView instanceof LayoutBase) {
-        parentView.removeChild(childView);
-    }
-    else if (parentView instanceof ContentView) {
-        if (parentView.content === childView) {
-            parentView.content = null;
-        }
-        if (childNode.nodeType === 8) {
-            parentView._removeView(childView);
-        }
-    }
-    else if (parentView instanceof View) {
-        parentView._removeView(childView);
-    }
-    else {
-        // throw new Error("Unknown parent type: " + parent);
-    }
-    childNode.nativeView = null;
+export function registerNativeConfigElement(elementName, resolver, parentProp = null, propConfig = {}) {
+    registerElement(elementName, () => new NativeElementNode(elementName, resolver(), parentProp, propConfig));
 }

@@ -6,12 +6,14 @@ import { State, UpdatableReference } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
 
-import { createElement } from './src/dom/element-registry';
+import { createElement, registerElement } from './src/dom/element-registry';
+import { registerGlimmerElements } from './src/dom/glimmer-elements';
 import FrameElement from './src/dom/native/FrameElement';
+import NativeViewElementNode from './src/dom/native/NativeViewElementNode';
 import PageElement from './src/dom/native/PageElement';
+import { registerNativeElements } from './src/dom/nativescript-elements';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
-import { registerElements, registerNativeElement } from './src/dom/setup-registry';
 import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/glimmer/context';
 import { navigate } from './src/glimmer/navigation';
 import buildUserHelper from './src/glimmer/references/helper-reference';
@@ -21,7 +23,6 @@ import setupGlimmer from './src/glimmer/setup';
 
 //Exports
 export { ResolverDelegate } from './src/glimmer/context';
-export { registerElements } from './src/dom/setup-registry';
 export { createElement } from './src/dom/element-registry';
 export { action } from './src/glimmer/decorators/action';
 export { default as Navigation } from './src/glimmer/navigation';
@@ -64,7 +65,8 @@ export default class Application {
     static _rendering: boolean;
 
     constructor(appFolder, components, helpers) {
-        registerElements();
+        registerNativeElements();
+        registerGlimmerElements();
         const resolverDelegate = new ResolverDelegate();
         const resolver = new Resolver();
         Application.resolver = resolver;
@@ -99,7 +101,7 @@ export default class Application {
         });
     }
 
-    static _renderPage(name, containerElement: FrameElement, nextSibling, compilable, data = {}): ElementNode {
+    static _renderPage(name, containerElement: FrameElement, nextSibling, compilable, data = {}): PageElement {
         let state = State(data);
         const artifact = artifacts(Application.context);
         Application.aotRuntime = AotRuntime(Application.document as any, artifact, Application.resolver);
@@ -112,12 +114,12 @@ export default class Application {
             Application.state = state;
             Application._rendered = true;
             let node = result.firstNode() as any;
-            while (!node._nativeView) {
+            while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
             (node as PageElement).parentNode = containerElement;
             containerElement.childNodes.push(node);
-            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             Application.renderedPage = node;
             return node as any;
         } catch (error) {
@@ -181,7 +183,7 @@ export default class Application {
     }
 
     registerNativeComponent(name, value) {
-        registerNativeElement(name, value);
+        this.registerNativeElement(name, value);
         const handle = Application.resolver.registerTemplateOnlyComponent();
         Application.resolverDelegate.registerComponent(
             name,
@@ -199,7 +201,7 @@ export default class Application {
     boot(name) {
         const rootFrame = Application.rootFrame as FrameElement;
         const navigation = navigate(name, null, {
-            frame: rootFrame
+            frame: rootFrame.nativeView
         });
         return new Promise((resolve, reject) => {
             //wait for launch
@@ -212,6 +214,10 @@ export default class Application {
                 reject(e);
             }
         });
+    }
+
+    registerNativeElement(elementName, resolver, meta = null) {
+        registerElement(elementName, () => new NativeViewElementNode(elementName, resolver(), meta));
     }
 
     scheduleRerender(): void {

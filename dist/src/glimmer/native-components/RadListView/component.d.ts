@@ -6,5 +6,4 @@ export interface Args {
     loaded: any;
 }
 export default class RadListView extends Component<Args> {
-    readonly keyedTemplates: any;
 }

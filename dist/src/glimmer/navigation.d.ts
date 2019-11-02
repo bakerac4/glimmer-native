@@ -1,9 +1,9 @@
 import { Frame, NavigationTransition } from 'tns-core-modules/ui/frame';
 import FrameElement from '../dom/native/FrameElement';
-export declare type FrameType = Frame | FrameElement | string;
+export declare type FrameSpec = Frame | FrameElement | string;
 export interface NavigationOptions {
-    frame: FrameType;
-    context?: any;
+    props?: any;
+    frame?: FrameSpec;
     animated?: boolean;
     backstackVisible?: boolean;
     clearHistory?: boolean;

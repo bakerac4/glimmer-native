@@ -13,9 +13,11 @@ import { artifacts } from '@glimmer/program';
 import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { launchEvent, on, run } from 'tns-core-modules/application';
-import { createElement } from './src/dom/element-registry';
+import { createElement, registerElement } from './src/dom/element-registry';
+import { registerGlimmerElements } from './src/dom/glimmer-elements';
+import NativeViewElementNode from './src/dom/native/NativeViewElementNode';
+import { registerNativeElements } from './src/dom/nativescript-elements';
 import DocumentNode from './src/dom/nodes/DocumentNode';
-import { registerElements, registerNativeElement } from './src/dom/setup-registry';
 import GlimmerResolverDelegate, { Compilable, ResolverDelegate } from './src/glimmer/context';
 import { navigate } from './src/glimmer/navigation';
 import buildUserHelper from './src/glimmer/references/helper-reference';
@@ -24,7 +26,6 @@ import NativeComponentResult from './src/glimmer/result';
 import setupGlimmer from './src/glimmer/setup';
 //Exports
 export { ResolverDelegate } from './src/glimmer/context';
-export { registerElements } from './src/dom/setup-registry';
 export { createElement } from './src/dom/element-registry';
 export { action } from './src/glimmer/decorators/action';
 export { default as Navigation } from './src/glimmer/navigation';
@@ -36,7 +37,8 @@ export { default as NativeCapabilities } from './src/glimmer/native-capabilities
 export { NativeModifier, NativeModifierDefinitionState } from './src/glimmer/native-modifier-manager';
 export default class Application {
     constructor(appFolder, components, helpers) {
-        registerElements();
+        registerNativeElements();
+        registerGlimmerElements();
         const resolverDelegate = new ResolverDelegate();
         const resolver = new Resolver();
         Application.resolver = resolver;
@@ -78,12 +80,12 @@ export default class Application {
             Application.state = state;
             Application._rendered = true;
             let node = result.firstNode();
-            while (!node._nativeView) {
+            while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
             node.parentNode = containerElement;
             containerElement.childNodes.push(node);
-            node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
+            node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             Application.renderedPage = node;
             return node;
         }
@@ -140,7 +142,7 @@ export default class Application {
         });
     }
     registerNativeComponent(name, value) {
-        registerNativeElement(name, value);
+        this.registerNativeElement(name, value);
         const handle = Application.resolver.registerTemplateOnlyComponent();
         Application.resolverDelegate.registerComponent(name, handle, precompile(`<${name.toLowerCase()} ...attributes> {{yield}} </${name.toLowerCase()}>`), TEMPLATE_ONLY_COMPONENT);
     }
@@ -152,7 +154,7 @@ export default class Application {
     boot(name) {
         const rootFrame = Application.rootFrame;
         const navigation = navigate(name, null, {
-            frame: rootFrame
+            frame: rootFrame.nativeView
         });
         return new Promise((resolve, reject) => {
             //wait for launch
@@ -166,6 +168,9 @@ export default class Application {
                 reject(e);
             }
         });
+    }
+    registerNativeElement(elementName, resolver, meta = null) {
+        registerElement(elementName, () => new NativeViewElementNode(elementName, resolver(), meta));
     }
     scheduleRerender() {
         if (this._scheduled || !Application._rendered)

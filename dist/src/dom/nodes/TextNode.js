@@ -4,12 +4,15 @@ export default class TextNode extends ViewNode {
         super();
         this.nodeType = 3;
         this.text = text;
-        this._meta = {
-            skipAddToDom: true
-        };
     }
     setText(text) {
         this.text = text;
         this.parentNode.setText(text);
+    }
+    set data(text) {
+        this.setText(text);
+    }
+    get data() {
+        return this.text;
     }
 }

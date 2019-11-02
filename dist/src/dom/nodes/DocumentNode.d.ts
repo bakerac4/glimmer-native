@@ -4,12 +4,12 @@ import PropertyNode from './PropertyNode';
 import TextNode from './TextNode';
 import ViewNode from './ViewNode';
 export default class DocumentNode extends ViewNode {
-    head: any;
     constructor();
-    createComment(text: any): CommentNode;
+    createComment(text: string): CommentNode;
     createPropertyNode(tagName: string, propertyName: string): PropertyNode;
-    createElement(tagName: any): ElementNode;
-    createElementNS(namespace: any, tagName: any): ElementNode;
-    createTextNode(text: any): TextNode;
-    getElementById(id: any): any;
+    createElement(tagName: string): ElementNode;
+    createElementNS(namespace: string, tagName: string): ElementNode;
+    createTextNode(text: string): TextNode;
+    getElementById(id: string): ViewNode;
+    dispatchEvent(event: any): void;
 }

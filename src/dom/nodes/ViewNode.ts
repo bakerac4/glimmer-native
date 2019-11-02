@@ -1,34 +1,26 @@
-import { isAndroid, isIOS } from 'tns-core-modules/platform';
-import { EventData } from 'tns-core-modules/ui/page/page';
-import { isBoolean } from 'tns-core-modules/utils/types';
+import DocumentNode from './DocumentNode';
 
-import { getViewMeta, normalizeElementName } from '../element-registry';
+const dashRegExp = /-/g;
+export function normalizeElementName(elementName: string) {
+    return `${elementName.replace(dashRegExp, '').toLowerCase()}`;
+}
 
-const XML_ATTRIBUTES = Object.freeze(['tap', 'style', 'rows', 'columns', 'fontAttributes']);
+export function* elementIterator(el: ViewNode): Iterable<ViewNode> {
+    yield el;
+    for (let child of el.childNodes) {
+        yield* elementIterator(child);
+    }
+}
 
 export default class ViewNode {
-    nodeValue: any;
-    namespaceURI: any;
-    attributes: any;
-    insertAdjacentHTML: any;
-    getAttributeNS: any;
-    removeAttributeNS: any;
-    setAttributeNS: any;
-    nodeName: any;
-    previousSibling: any;
-    cloneNode: any;
-    args: any;
-    template: any;
-
-    nodeType: any;
-    _tagName: any;
-    parentNode: any;
-    childNodes: any;
-    prevSibling: any;
-    nextSibling: any;
-    _ownerDocument: any;
-    _nativeView: any;
-    _meta: any;
+    nodeType: number;
+    _tagName: string;
+    parentNode: ViewNode;
+    childNodes: ViewNode[];
+    prevSibling: ViewNode;
+    nextSibling: ViewNode;
+    _ownerDocument: DocumentNode;
+    _attributes: { [index: string]: any };
 
     constructor() {
         this.nodeType = null;
@@ -39,16 +31,15 @@ export default class ViewNode {
         this.nextSibling = null;
 
         this._ownerDocument = null;
-        this._nativeView = null;
-        this._meta = null;
+        this._attributes = {};
     }
 
-    hasAttribute() {
-        return false;
+    hasAttribute(name: string) {
+        return Object.keys(this._attributes).indexOf(name) > -1;
     }
 
-    removeAttribute() {
-        return false;
+    removeAttribute(name: string) {
+        delete this._attributes[name];
     }
 
     /* istanbul ignore next */
@@ -72,95 +63,32 @@ export default class ViewNode {
         return this.childNodes.length ? this.childNodes[this.childNodes.length - 1] : null;
     }
 
-    get nativeView() {
-        return this._nativeView;
-    }
-
-    set nativeView(view) {
-        this._nativeView = view;
-    }
-
-    get meta() {
-        if (this._meta) {
-            return this._meta;
-        }
-
-        return (this._meta = getViewMeta(this.tagName));
-    }
-
     /* istanbul ignore next */
-    get ownerDocument() {
+    get ownerDocument(): DocumentNode {
         if (this._ownerDocument) {
             return this._ownerDocument;
         }
 
-        let el = this;
+        let el: ViewNode = this;
         while (el != null && el.nodeType !== 9) {
             el = el.parentNode;
         }
 
-        return (this._ownerDocument = el);
+        return (this._ownerDocument = el as DocumentNode);
     }
 
-    getAttribute(key) {
-        return this.nativeView[key];
-    }
-
-    /* istanbul ignore next */
-    setAttribute(key, value) {
-        const nv = this.nativeView;
-
-        if (!nv) return;
-
-        // normalize key
-        if (isAndroid && key.startsWith('android:')) {
-            key = key.substr(8);
-        }
-        if (isIOS && key.startsWith('ios:')) {
-            key = key.substr(4);
-        }
-
-        // try to fix case
-        let lowerkey = key.toLowerCase();
-        for (let realKey in nv) {
-            if (lowerkey == realKey.toLowerCase()) {
-                key = realKey;
-                break;
-            }
-        }
-        try {
-            if (XML_ATTRIBUTES.indexOf(key) !== -1) {
-                nv[key] = value;
-            } else {
-                // detect expandable attrs for boolean values
-                // See https://vuejs.org/v2/guide/components-props.html#Passing-a-Boolean
-                if (isBoolean(nv[key]) && value === '') {
-                    value = true;
-                } else {
-                    nv[key] = value;
-                }
-            }
-        } catch (e) {
-            // ignore but log
-            console.warn(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
-        }
+    getAttribute(key: string): any {
+        return this._attributes[key];
     }
 
     /* istanbul ignore next */
-    setStyle(property, value) {
-        if (!(value = value.trim()).length) {
-            return;
-        }
-
-        if (property.endsWith('Align')) {
-            // NativeScript uses Alignment instead of Align, this ensures that text-align works
-            property += 'ment';
-        }
-        this.nativeView.style[property] = value;
+    setAttribute(key: string, value: any) {
+        this._attributes[key] = value;
     }
 
     /* istanbul ignore next */
-    setText(text) {
+    setText(text: string) {
+        console.debug(`setText ${this} ${text}`);
         if (this.nodeType === 3) {
             this.parentNode.setText(text);
         } else {
@@ -168,29 +96,12 @@ export default class ViewNode {
         }
     }
 
-    /* istanbul ignore next */
-    addEventListener(event, handler) {
-        this.nativeView.on(event, handler);
-    }
-
-    /* istanbul ignore next */
-    removeEventListener(event, handler) {
-        this.nativeView.off(event, handler);
-    }
-
-    dispatchEvent(event: EventData) {
-        if (this.nativeView) {
-            //nativescript uses the EventName while dom uses Type
-            event.eventName = (event as any).type;
-            this.nativeView.notify(event);
-        }
-    }
-
     onInsertedChild(childNode: ViewNode, index: number) {}
 
     onRemovedChild(childNode: ViewNode) {}
 
-    insertBefore(childNode, referenceNode) {
+    insertBefore(childNode: ViewNode, referenceNode: ViewNode) {
+        console.debug(`insert before ${this} ${childNode} ${referenceNode}`);
         if (!childNode) {
             throw new Error(`Can't insert child.`);
         }
@@ -222,14 +133,15 @@ export default class ViewNode {
         childNode.parentNode = this;
         childNode.nextSibling = referenceNode;
         childNode.prevSibling = this.childNodes[index - 1];
-        this.childNodes[index - 1].nextSibling = childNode;
+
         referenceNode.prevSibling = childNode;
         this.childNodes.splice(index, 0, childNode);
 
         this.onInsertedChild(childNode, index);
     }
 
-    appendChild(childNode) {
+    appendChild(childNode: ViewNode) {
+        console.debug(`append child ${this} ${childNode}`);
         if (!childNode) {
             throw new Error(`Can't append child.`);
         }
@@ -254,11 +166,11 @@ export default class ViewNode {
         }
 
         this.childNodes.push(childNode);
-
         this.onInsertedChild(childNode, this.childNodes.length - 1);
     }
 
-    removeChild(childNode) {
+    removeChild(childNode: ViewNode) {
+        console.debug(`remove child ${this} ${childNode}`);
         if (!childNode) {
             throw new Error(`Can't remove child.`);
         }
@@ -284,25 +196,11 @@ export default class ViewNode {
         // reset the prevSibling and nextSibling. If not, a keep-alived component will
         // still have a filled nextSibling attribute so vue will not
         // insert the node again to the parent. See #220
-        // childNode.prevSibling = null;
-        // childNode.nextSibling = null;
+        childNode.prevSibling = null;
+        childNode.nextSibling = null;
 
         this.childNodes = this.childNodes.filter((node) => node !== childNode);
-        childNode.removeChildren();
         this.onRemovedChild(childNode);
-    }
-
-    clear(node: any) {
-        while (node.childNodes.length) {
-            this.clear(node.firstChild);
-        }
-        node.parentNode.removeChild(node);
-    }
-
-    removeChildren() {
-        while (this.childNodes.length) {
-            this.clear(this.firstChild);
-        }
     }
 
     firstElement() {

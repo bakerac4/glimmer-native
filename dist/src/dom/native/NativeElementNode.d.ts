@@ -1,34 +1,23 @@
-import { EventData, View } from 'tns-core-modules/ui/page';
 import ElementNode from '../nodes/ElementNode';
 import ViewNode from '../nodes/ViewNode';
-interface IStyleProxy {
-    setProperty(propertyName: string, value: string, priority?: string): void;
-    removeProperty(property: string): void;
-    animation: string;
-    cssText: string;
+export declare enum NativeElementPropType {
+    Value = 0,
+    Array = 1,
+    ObservableArray = 2
 }
-export interface ComponentMeta {
-    skipAddToDom?: boolean;
-    insertChild?: (parent: ViewNode, child: ViewNode, index: number) => void;
-    removeChild?: (parent: ViewNode, child: ViewNode) => void;
+export interface NativeElementPropConfig {
+    [key: string]: NativeElementPropType;
 }
-export declare type EventListener = (args: any) => void;
-export default class NativeElementNode extends ElementNode {
-    style: IStyleProxy;
-    _nativeView: View;
-    _meta: ComponentMeta;
-    constructor(tagName: string, viewClass: typeof View, meta?: ComponentMeta);
-    setStyle(property: string, value: string | number): void;
-    nativeView: View;
-    readonly meta: ComponentMeta;
-    addEventListener(event: string, handler: EventListener): void;
-    removeEventListener(event: string, handler?: EventListener): void;
+export default class NativeElementNode<T> extends ElementNode {
+    _nativeElement: T;
+    propAttribute: string;
+    propConfig: NativeElementPropConfig;
+    _normalizedKeys: Map<string, string>;
+    constructor(tagName: string, elementClass: new () => T, setsParentProp?: string, propConfig?: NativeElementPropConfig);
+    nativeElement: T;
     getAttribute(fullkey: string): any;
     onInsertedChild(childNode: ViewNode, index: number): void;
     onRemovedChild(childNode: ViewNode): void;
     setAttribute(fullkey: string, value: any): void;
-    dispatchEvent(event: EventData): void;
-    clear(node: any): void;
-    removeChildren(): void;
 }
-export {};
+export declare function registerNativeConfigElement<T>(elementName: string, resolver: () => new () => T, parentProp?: string, propConfig?: NativeElementPropConfig): void;

@@ -1,8 +1,8 @@
 import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { ListViewEventData, RadListView } from 'nativescript-ui-listview';
 import { View } from 'tns-core-modules/ui/core/view/view';
-import NativeElementNode from './NativeElementNode';
-export default class RadListViewElement extends NativeElementNode {
+import NativeViewElementNode from './NativeViewElementNode';
+export default class RadListViewElement extends NativeViewElementNode<RadListView> {
     nativeView: RadListView;
     lastItemSelected: any;
     component: any;

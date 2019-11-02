@@ -5,13 +5,12 @@ import { ListViewEventData, ListViewViewType, RadListView } from 'nativescript-u
 import { View } from 'tns-core-modules/ui/core/view/view';
 
 import Application from '../../..';
-import GlimmerResolverDelegate, { Compilable } from '../../glimmer/context';
 import NativeComponentResult from '../../glimmer/result';
 import { createElement } from '../element-registry';
-import NativeElementNode from './NativeElementNode';
+import NativeViewElementNode from './NativeViewElementNode';
 import TemplateElement from './TemplateElement';
 
-export default class RadListViewElement extends NativeElementNode {
+export default class RadListViewElement extends NativeViewElementNode<RadListView> {
     nativeView: RadListView;
     lastItemSelected: any;
     component: any;
@@ -48,7 +47,7 @@ export default class RadListViewElement extends NativeElementNode {
         if (!template) return null;
         console.log('creating view for ', viewType);
 
-        let wrapper = createElement('StackLayout') as NativeElementNode;
+        let wrapper = createElement('StackLayout') as NativeViewElementNode<View>;
         wrapper.setAttribute('class', 'list-view-item');
         let nativeEl = wrapper.nativeView;
         this.items.push(wrapper);
@@ -134,26 +133,26 @@ export default class RadListViewElement extends NativeElementNode {
         if (this.templates[name]) {
             return this.templates[name];
         } else {
-            const templateNode = this.childNodes.find((x) => {
-                if (x instanceof TemplateElement && !name) {
-                    return true;
-                } else if (x instanceof TemplateElement && name) {
-                    return x.component && x.component.args.key === name;
-                } else {
-                    return false;
-                }
-            }) as TemplateElement;
-            if (templateNode) {
-                let component = Compilable(templateNode.component.args.src);
-                const compiled = component.compile(Application.context);
-                this.templates[name] = {
-                    compiled,
-                    args: templateNode.component.args
-                };
-                return this.templates[name];
-            } else {
-                return null;
-            }
+            // const templateNode = this.childNodes.find((x) => {
+            //     if (x instanceof TemplateElement && !name) {
+            //         return true;
+            //     } else if (x instanceof TemplateElement && name) {
+            //         return x.component && x.component.args.key === name;
+            //     } else {
+            //         return false;
+            //     }
+            // }) as TemplateElement;
+            // if (templateNode) {
+            //     let component = Compilable(templateNode.component.args.src);
+            //     const compiled = component.compile(Application.context);
+            //     this.templates[name] = {
+            //         compiled,
+            //         args: templateNode.component.args
+            //     };
+            //     return this.templates[name];
+            // } else {
+            //     return null;
+            // }
         }
     }
 
@@ -167,7 +166,7 @@ export default class RadListViewElement extends NativeElementNode {
         });
 
         let nativeEl = view.nativeView;
-        (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
+        (nativeEl as any).__GlimmerComponent__ = componentInstance;
         return nativeEl;
     }
 }

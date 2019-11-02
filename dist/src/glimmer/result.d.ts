@@ -7,6 +7,7 @@ export default class NativeComponentResult {
     runtime: AotRuntimeContext;
     constructor(name: string, result: RenderResult, state: UpdatableReference<{}>, runtime: AotRuntimeContext);
     update(state: any): Promise<void>;
+    destroy(): void;
     toJSON(): {
         GlimmerDebug: string;
     };

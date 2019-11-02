@@ -1,5 +1,5 @@
-import { normalizeElementName } from '../element-registry';
 import ElementNode from './ElementNode';
+import { normalizeElementName } from './ViewNode';
 export default class PropertyNode extends ElementNode {
     constructor(tagName, propertyName) {
         super(`${tagName}.${propertyName}`);
