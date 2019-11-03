@@ -53,7 +53,6 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
                 component = listView.itemTemplates
                     .filter((x) => x.key === key)
                     .map((x) => (x as GlimmerKeyedTemplate).component)[0];
-                return;
             } else if (typeof listView.itemTemplates === 'object') {
                 component = listView.itemTemplates
                     .filter((x) => x.key == 'default')

@@ -44,7 +44,7 @@ export default class ListViewElement extends NativeViewElementNode {
                 if (args.view && args.view.__GlimmerComponentBuilder__) {
                     console.debug(`instantiating component in keyed view item at ${args.index}`);
                     args.view.__GlimmerComponentBuilder__(item);
-                    // (args.view as any).__GlimmerComponentBuilder__ = null; // free the memory
+                    args.view.__GlimmerComponentBuilder__ = null; // free the memory
                     return;
                 }
                 console.debug(`creating default view for item at ${args.index}`);
@@ -53,7 +53,6 @@ export default class ListViewElement extends NativeViewElementNode {
                     component = listView.itemTemplates
                         .filter((x) => x.key === key)
                         .map((x) => x.component)[0];
-                    return;
                 }
                 else if (typeof listView.itemTemplates === 'object') {
                     component = listView.itemTemplates
