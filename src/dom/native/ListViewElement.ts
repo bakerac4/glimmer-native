@@ -38,17 +38,23 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
             item = (items as any)[args.index];
         }
 
-        if (!args.view && !(args.view as any).__GlimmerComponent__) {
+        if (!args.view || !(args.view as any).__GlimmerComponent__) {
             let component;
             if (args.view && (args.view as any).__GlimmerComponentBuilder__) {
                 console.debug(`instantiating component in keyed view item at ${args.index}`);
-                (args.view as any).__GlimmerComponentBuilder__({ item });
+                (args.view as any).__GlimmerComponentBuilder__(item);
                 (args.view as any).__GlimmerComponentBuilder__ = null; // free the memory
                 return;
             }
 
             console.debug(`creating default view for item at ${args.index}`);
-            if (typeof listView.itemTemplates == 'object') {
+            if (typeof listView.itemTemplateSelector === 'function' && typeof listView.itemTemplates === 'object') {
+                let key = listView.itemTemplateSelector(item, args.index, listView.items);
+                component = listView.itemTemplates
+                    .filter((x) => x.key === key)
+                    .map((x) => (x as GlimmerKeyedTemplate).component)[0];
+                return;
+            } else if (typeof listView.itemTemplates === 'object') {
                 component = listView.itemTemplates
                     .filter((x) => x.key == 'default')
                     .map((x) => (x as GlimmerKeyedTemplate).component)[0];
@@ -59,7 +65,7 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
                 return;
             }
 
-            let wrapper = createElement('StackLayout') as NativeViewElementNode<View>;
+            let wrapper = createElement('ProxyViewContainer') as NativeViewElementNode<View>;
             inTransaction(Application.aotRuntime.env, () => {
                 Application.addListItem({
                     id: `listViewItem${this.numberViewsCreated}`,
@@ -73,6 +79,7 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
                     listViewItems: [...Application.listItems]
                 });
                 Application.result.rerender();
+                this.numberViewsCreated = this.numberViewsCreated + 1;
             });
 
             let nativeEl = wrapper.nativeView;
@@ -90,76 +97,7 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
                 Application.result.rerender();
             });
         }
-
-        //     //Create the wrapper element
-        //     let wrapper = createElement('StackLayout') as NativeElementNode;
-        //     wrapper.setAttribute('class', 'list-view-item');
-        //     wrapper.setAttribute('id', `listViewItem${this.numberViewsCreated}`);
-        //     const templateSelector = listView.itemTemplateSelector as any;
-        //     let name = null;
-        //     if (templateSelector) {
-        //         name = templateSelector(item, args.index, listView.items);
-        //     }
-
-        //     const template = this.getItemTemplateComponent(name) as any;
-        //     Application.addListItem({
-        //         id: `listViewItem${this.numberViewsCreated}`,
-        //         node: wrapper,
-        //         template: template.args.src,
-        //         item
-        //     });
-
-        //     this.numberViewsCreated = this.numberViewsCreated + 1;
-        //     inTransaction(Application.aotRuntime.env, () => {
-        //         const oldState = Application.state.value();
-        //         Application.state.forceUpdate({
-        //             ...oldState,
-        //             listViewItems: [...Application.listItems]
-        //         });
-        //         Application.result.rerender();
-        //     });
-        //     args.view = wrapper.nativeView;
-        // } else {
-        //     const listItem = Application.listItems.find((item) => item.id === args.view.id);
-        //     listItem.item = item;
-
-        //     inTransaction(Application.aotRuntime.env, () => {
-        //         const oldState = Application.state.value();
-        //         Application.state.forceUpdate({
-        //             ...oldState,
-        //             listViewItems: [...Application.listItems]
-        //         });
-        //         Application.result.rerender();
-        //     });
-        // }
     }
-
-    // getItemTemplateComponent(name): GlimmerComponent {
-    //     if (this.templates[name]) {
-    //         return this.templates[name];
-    //     } else {
-    //         const templateNode = this.childNodes.find((x) => {
-    //             if (x instanceof TemplateElement && !name) {
-    //                 return true;
-    //             } else if (x instanceof TemplateElement && name) {
-    //                 return x.component && x.component.args.key === name;
-    //             } else {
-    //                 return false;
-    //             }
-    //         }) as TemplateElement;
-    //         if (templateNode) {
-    //             let component = Compilable(templateNode.component.args.src);
-    //             const compiled = component.compile(Application.context);
-    //             this.templates[name] = {
-    //                 compiled,
-    //                 args: templateNode.component.args
-    //             };
-    //             return this.templates[name];
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-    // }
 
     get nativeView(): ListView {
         return super.nativeView as ListView;
@@ -177,7 +115,9 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
             if (!this.nativeView.itemTemplates || typeof this.nativeView.itemTemplates == 'string') {
                 this.nativeView.itemTemplates = [];
             }
-            this.nativeView.itemTemplates.push(new GlimmerKeyedTemplate(key, childNode));
+            const keyedTemplate = new GlimmerKeyedTemplate(key, childNode);
+            // this.nativeView.itemTemplates.push(keyedTemplate);
+            (this.nativeView as any)._itemTemplatesInternal.push(keyedTemplate);
         }
     }
 
@@ -194,10 +134,12 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
 export class GlimmerKeyedTemplate {
     _key: string;
     _templateEl: TemplateElement;
+    _index: number;
 
     constructor(key: string, templateEl: TemplateElement) {
         this._key = key;
         this._templateEl = templateEl;
+        this._index = 0;
     }
 
     get component() {
@@ -217,7 +159,7 @@ export class GlimmerKeyedTemplate {
         (nativeEl as any).__GlimmerComponentBuilder__ = (props: any) => {
             inTransaction(Application.aotRuntime.env, () => {
                 Application.addListItem({
-                    id: this.key,
+                    id: `${this.key}${this._index}`,
                     node: wrapper,
                     template: this.component.args.src,
                     item: props
@@ -228,6 +170,7 @@ export class GlimmerKeyedTemplate {
                     listViewItems: [...Application.listItems]
                 });
                 Application.result.rerender();
+                this._index++;
             });
         };
         return nativeEl;

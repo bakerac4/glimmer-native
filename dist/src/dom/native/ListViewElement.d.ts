@@ -17,6 +17,7 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
 export declare class GlimmerKeyedTemplate {
     _key: string;
     _templateEl: TemplateElement;
+    _index: number;
     constructor(key: string, templateEl: TemplateElement);
     readonly component: import("@glimmer/component/dist/types/addon/-private/component").default<{
         src: string;
