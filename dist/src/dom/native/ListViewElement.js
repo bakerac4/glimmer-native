@@ -44,29 +44,28 @@ export default class ListViewElement extends NativeViewElementNode {
                 if (args.view && args.view.__GlimmerComponentBuilder__) {
                     console.debug(`instantiating component in keyed view item at ${args.index}`);
                     args.view.__GlimmerComponentBuilder__(item);
-                    args.view.__GlimmerComponentBuilder__ = null; // free the memory
+                    // (args.view as any).__GlimmerComponentBuilder__ = null; // free the memory
                     return;
                 }
                 console.debug(`creating default view for item at ${args.index}`);
-                if (typeof listView.itemTemplateSelector === 'function' && typeof listView.itemTemplates === 'object') {
-                    let key = listView.itemTemplateSelector(item, args.index, listView.items);
-                    component = listView.itemTemplates
-                        .filter((x) => x.key === key)
-                        .map((x) => x.component)[0];
-                }
-                else if (typeof listView.itemTemplates === 'object') {
-                    component = listView.itemTemplates
-                        .filter((x) => x.key == 'default')
-                        .map((x) => x.component)[0];
-                }
+                // if (typeof listView.itemTemplateSelector === 'function' && typeof listView.itemTemplates === 'object') {
+                //     let key = listView.itemTemplateSelector(item, args.index, listView.items);
+                //     component = listView.itemTemplates
+                //         .filter((x) => x.key === key)
+                //         .map((x) => (x as GlimmerKeyedTemplate).component)[0];
+                // } else
+                component = listView._itemTemplatesInternal
+                    .filter((x) => x.key == 'default')
+                    .map((x) => x.component)[0];
                 if (!component) {
                     console.error(`Counldn't determine component to use for item at ${args.index}`);
                     return;
                 }
                 let wrapper = createElement('ProxyViewContainer');
+                wrapper.setAttribute('id', `default-${this.numberViewsCreated}`);
                 inTransaction(Application.aotRuntime.env, () => {
                     Application.addListItem({
-                        id: `listViewItem${this.numberViewsCreated}`,
+                        id: `default-${this.numberViewsCreated}`,
                         node: wrapper,
                         template: component.args.src,
                         item
@@ -137,11 +136,12 @@ export class GlimmerKeyedTemplate {
         //TODO is StackLayout the best choice here?
         console.debug(`creating view for key ${this.key}`);
         let wrapper = createElement('StackLayout');
+        wrapper.setAttribute('id', `${this.key}-${this._index}`);
         let nativeEl = wrapper.nativeView;
         nativeEl.__GlimmerComponentBuilder__ = (props) => {
             inTransaction(Application.aotRuntime.env, () => {
                 Application.addListItem({
-                    id: `${this.key}${this._index}`,
+                    id: `${this.key}-${this._index}`,
                     node: wrapper,
                     template: this.component.args.src,
                     item: props
