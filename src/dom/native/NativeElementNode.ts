@@ -84,7 +84,7 @@ export default class NativeElementNode<T> extends ElementNode {
         this._normalizedKeys = getNormalizedKeysForObject(this._nativeElement, Object.keys(this.propConfig));
 
         (this._nativeElement as any).__GlimmerNativeElement__ = this;
-        console.debug(`created ${this} ${this._nativeElement}`);
+        // console.debug(`created ${this} ${this._nativeElement}`);
     }
 
     get nativeElement() {
@@ -210,11 +210,11 @@ export default class NativeElementNode<T> extends ElementNode {
                 setTarget = setTarget[key];
             } else {
                 try {
-                    console.debug(`setAttr value ${this} ${resolvedKeys.join('.')} ${value}`);
+                    // console.debug(`setAttr value ${this} ${resolvedKeys.join('.')} ${value}`);
                     setTarget[key] = value;
                 } catch (e) {
                     // ignore but log
-                    console.error(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
+                    // console.error(`set attribute threw an error, attr:${key} on ${this._tagName}: ${e.message}`);
                 }
             }
         }

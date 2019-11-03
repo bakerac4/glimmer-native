@@ -152,12 +152,12 @@ export default class NativeViewElementNode<T extends View> extends NativeElement
             },
 
             get cssText(): string {
-                console.debug('got css text');
+                // console.debug('got css text');
                 return getStyleAttribute();
             },
 
             set cssText(value: string) {
-                console.debug('set css text');
+                // console.debug('set css text');
                 setStyleAttribute(value);
             }
         };
@@ -165,7 +165,7 @@ export default class NativeViewElementNode<T extends View> extends NativeElement
 
     /* istanbul ignore next */
     setStyle(property: string, value: string | number) {
-        console.debug(`setStyle ${this} ${property} ${value}`);
+        // console.debug(`setStyle ${this} ${property} ${value}`);
 
         if (!(value = value.toString().trim()).length) {
             return;
@@ -188,13 +188,13 @@ export default class NativeViewElementNode<T extends View> extends NativeElement
 
     /* istanbul ignore next */
     addEventListener(event: string, handler: EventListener) {
-        console.debug(`add event listener ${this} ${event}`);
+        // console.debug(`add event listener ${this} ${event}`);
         this.nativeView.on(event, handler);
     }
 
     /* istanbul ignore next */
     removeEventListener(event: string, handler?: EventListener) {
-        console.debug(`remove event listener ${this} ${event}`);
+        // console.debug(`remove event listener ${this} ${event}`);
         this.nativeView.off(event, handler);
     }
 

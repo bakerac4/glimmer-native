@@ -107,18 +107,18 @@ export default class NativeViewElementNode extends NativeElementNode {
                 }
             },
             get cssText() {
-                console.debug('got css text');
+                // console.debug('got css text');
                 return getStyleAttribute();
             },
             set cssText(value) {
-                console.debug('set css text');
+                // console.debug('set css text');
                 setStyleAttribute(value);
             }
         };
     }
     /* istanbul ignore next */
     setStyle(property, value) {
-        console.debug(`setStyle ${this} ${property} ${value}`);
+        // console.debug(`setStyle ${this} ${property} ${value}`);
         if (!(value = value.toString().trim()).length) {
             return;
         }
@@ -136,12 +136,12 @@ export default class NativeViewElementNode extends NativeElementNode {
     }
     /* istanbul ignore next */
     addEventListener(event, handler) {
-        console.debug(`add event listener ${this} ${event}`);
+        // console.debug(`add event listener ${this} ${event}`);
         this.nativeView.on(event, handler);
     }
     /* istanbul ignore next */
     removeEventListener(event, handler) {
-        console.debug(`remove event listener ${this} ${event}`);
+        // console.debug(`remove event listener ${this} ${event}`);
         this.nativeView.off(event, handler);
     }
     onInsertedChild(childNode, index) {

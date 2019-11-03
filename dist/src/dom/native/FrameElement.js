@@ -8,7 +8,7 @@ export default class FrameElement extends NativeViewElementNode {
     }
     setAttribute(key, value) {
         if (key.toLowerCase() == 'defaultpage') {
-            console.debug(`loading page ${value}`);
+            // console.debug(`loading page ${value}`);
             let dummy = createElement('fragment');
             let page = new value({ target: dummy, props: {} });
             this.nativeView.navigate({

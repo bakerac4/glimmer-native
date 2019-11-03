@@ -30,7 +30,7 @@ export default class ListViewElement extends NativeViewElementNode {
             let listView = this.nativeView;
             let items = listView.items;
             if (args.index >= items.length) {
-                console.log(`Got request for item at index that didn't exist ${args.index}`);
+                // console.log(`Got request for item at index that didn't exist ${args.index}`);
                 return;
             }
             if (items.getItem) {
@@ -42,26 +42,27 @@ export default class ListViewElement extends NativeViewElementNode {
             if (!args.view || !args.view.__GlimmerComponent__) {
                 let component;
                 if (args.view && args.view.__GlimmerComponentBuilder__) {
-                    console.debug(`instantiating component in keyed view item at ${args.index}`);
+                    // console.debug(`instantiating component in keyed view item at ${args.index}`);
                     args.view.__GlimmerComponentBuilder__(item);
-                    // (args.view as any).__GlimmerComponentBuilder__ = null; // free the memory
+                    // (args.view as any).__GlimmerComponent__ = true;
+                    args.view.__GlimmerComponentBuilder__ = null; // free the memory
                     return;
                 }
-                console.debug(`creating default view for item at ${args.index}`);
+                // console.debug(`creating default view for item at ${args.index}`);
                 // if (typeof listView.itemTemplateSelector === 'function' && typeof listView.itemTemplates === 'object') {
                 //     let key = listView.itemTemplateSelector(item, args.index, listView.items);
                 //     component = listView.itemTemplates
                 //         .filter((x) => x.key === key)
                 //         .map((x) => (x as GlimmerKeyedTemplate).component)[0];
                 // } else
-                component = listView._itemTemplatesInternal
+                component = listView._itemTemplates
                     .filter((x) => x.key == 'default')
-                    .map((x) => x.component)[0];
+                    .map((x) => x.component)[1];
                 if (!component) {
-                    console.error(`Counldn't determine component to use for item at ${args.index}`);
+                    // console.error(`Counldn't determine component to use for item at ${args.index}`);
                     return;
                 }
-                let wrapper = createElement('ProxyViewContainer');
+                let wrapper = createElement('StackLayout');
                 wrapper.setAttribute('id', `default-${this.numberViewsCreated}`);
                 inTransaction(Application.aotRuntime.env, () => {
                     Application.addListItem({
@@ -76,11 +77,13 @@ export default class ListViewElement extends NativeViewElementNode {
                     this.numberViewsCreated = this.numberViewsCreated + 1;
                 });
                 let nativeEl = wrapper.nativeView;
+                nativeEl.__GlimmerComponent__ = true;
                 args.view = nativeEl;
             }
             else {
-                console.debug(`updating view for ${args.index} which is a ${args.view}`);
-                const listItem = Application.listItems.find((item) => item.id === args.view.id);
+                // console.debug(`updating view for ${args.index} which is a ${args.view}`);
+                const items = Application.listItems;
+                const listItem = items.find((item) => item.id === args.view.id);
                 listItem.item = item;
                 inTransaction(Application.aotRuntime.env, () => {
                     const oldState = Application.state.value();
@@ -100,13 +103,13 @@ export default class ListViewElement extends NativeViewElementNode {
         super.onInsertedChild(childNode, index);
         if (childNode instanceof TemplateElement) {
             let key = childNode.getAttribute('key') || 'default';
-            console.debug(`Adding template for key ${key}`);
+            // console.debug(`Adding template for key ${key}`);
             if (!this.nativeView.itemTemplates || typeof this.nativeView.itemTemplates == 'string') {
                 this.nativeView.itemTemplates = [];
             }
             const keyedTemplate = new GlimmerKeyedTemplate(key, childNode);
-            // this.nativeView.itemTemplates.push(keyedTemplate);
-            this.nativeView._itemTemplatesInternal.push(keyedTemplate);
+            this.nativeView.itemTemplates = this.nativeView.itemTemplates.concat([keyedTemplate]);
+            // (this.nativeView as any)._itemTemplatesInternal.push(keyedTemplate);
         }
     }
     onRemovedChild(childNode) {
@@ -134,22 +137,24 @@ export class GlimmerKeyedTemplate {
     createView() {
         //create a proxy element to eventually contain our item (once we have one to render)
         //TODO is StackLayout the best choice here?
-        console.debug(`creating view for key ${this.key}`);
+        // console.debug(`creating view for key ${this.key}`);
         let wrapper = createElement('StackLayout');
         wrapper.setAttribute('id', `${this.key}-${this._index}`);
         let nativeEl = wrapper.nativeView;
         nativeEl.__GlimmerComponentBuilder__ = (props) => {
             inTransaction(Application.aotRuntime.env, () => {
-                Application.addListItem({
+                const item = {
                     id: `${this.key}-${this._index}`,
                     node: wrapper,
                     template: this.component.args.src,
                     item: props
-                });
+                };
+                Application.addListItem(item);
                 const oldState = Application.state.value();
                 Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
                 Application.result.rerender();
                 this._index++;
+                nativeEl.__GlimmerComponent__ = item;
             });
         };
         return nativeEl;

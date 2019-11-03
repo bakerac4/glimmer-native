@@ -61,7 +61,7 @@ export default class ViewNode {
     }
     /* istanbul ignore next */
     setText(text) {
-        console.debug(`setText ${this} ${text}`);
+        // console.debug(`setText ${this} ${text}`);
         if (this.nodeType === 3) {
             this.parentNode.setText(text);
         }
@@ -72,7 +72,7 @@ export default class ViewNode {
     onInsertedChild(childNode, index) { }
     onRemovedChild(childNode) { }
     insertBefore(childNode, referenceNode) {
-        console.debug(`insert before ${this} ${childNode} ${referenceNode}`);
+        // console.debug(`insert before ${this} ${childNode} ${referenceNode}`);
         if (!childNode) {
             throw new Error(`Can't insert child.`);
         }
@@ -103,7 +103,7 @@ export default class ViewNode {
         this.onInsertedChild(childNode, index);
     }
     appendChild(childNode) {
-        console.debug(`append child ${this} ${childNode}`);
+        // console.debug(`append child ${this} ${childNode}`);
         if (!childNode) {
             throw new Error(`Can't append child.`);
         }
@@ -126,7 +126,7 @@ export default class ViewNode {
         this.onInsertedChild(childNode, this.childNodes.length - 1);
     }
     removeChild(childNode) {
-        console.debug(`remove child ${this} ${childNode}`);
+        // console.debug(`remove child ${this} ${childNode}`);
         if (!childNode) {
             throw new Error(`Can't remove child.`);
         }
