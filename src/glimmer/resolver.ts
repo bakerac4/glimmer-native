@@ -18,7 +18,7 @@ export interface TemplateMeta {
     specifier: string;
 }
 
-class NativeComponentDefinition implements ComponentDefinition {
+export class NativeComponentDefinition implements ComponentDefinition {
     name: string;
     manager: NativeComponentManager;
     ComponentClass: any;
@@ -99,9 +99,9 @@ export default class Resolver implements AotRuntimeResolver {
         return handle;
     }
 
-    registerTemplateOnlyComponent(): number {
+    registerTemplateOnlyComponent(name): number {
         const handle = this.table.length;
-        this.table.push(TEMPLATE_ONLY_COMPONENT);
+        this.table.push({ name: name, ComponentClass: TEMPLATE_ONLY_COMPONENT });
         return handle;
     }
 

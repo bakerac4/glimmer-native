@@ -2,6 +2,7 @@ import { ComponentDefinition } from '@glimmer/component';
 import { DefinitionState } from '@glimmer/component/dist/types/src/component-definition';
 import { AotRuntimeResolver, ComponentManager as VMComponentManager, Invocation } from '@glimmer/interfaces';
 import { PathReference, Tag } from '@glimmer/reference';
+import { NativeComponentDefinition } from './resolver';
 export declare const DESTROYING: unique symbol;
 export declare const DESTROYED: unique symbol;
 export declare class Bounds {
@@ -22,7 +23,7 @@ export default class NativeComponentManager implements VMComponentManager<Compon
     getCapabilities(state: any): any;
     prepareArgs(): any;
     getAotStaticLayout({ name, handle, symbolTable }: DefinitionState, resolver: AotRuntimeResolver): Invocation;
-    create(environment: any, definition: any, args: any, _dynamicScope: any, _caller: any, _hasDefaultBlock: any): ComponentStateBucket;
+    create(environment: any, definition: NativeComponentDefinition, args: any, _dynamicScope: any, _caller: any, _hasDefaultBlock: any): ComponentStateBucket;
     getSelf(bucket: ComponentStateBucket): PathReference;
     didCreateElement(): void;
     didRenderLayout(bucket: ComponentStateBucket, bounds: Bounds): void;

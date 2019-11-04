@@ -3,6 +3,8 @@ import { DefinitionState } from '@glimmer/component/dist/types/src/component-def
 import { AotRuntimeResolver, ComponentManager as VMComponentManager, Invocation } from '@glimmer/interfaces';
 import { CONSTANT_TAG, PathReference, Tag } from '@glimmer/reference';
 
+import { NativeComponentDefinition } from './resolver';
+
 const EMPTY_SELF = new RootReference(null);
 const NOOP_DESTROYABLE = { destroy() {} };
 export const DESTROYING = Symbol('destroying');
@@ -70,7 +72,14 @@ export default class NativeComponentManager implements VMComponentManager<Compon
         throw new Error('unimplemented getAotStaticLayout');
     }
 
-    create(environment: any, definition: any, args: any, _dynamicScope: any, _caller: any, _hasDefaultBlock: any) {
+    create(
+        environment: any,
+        definition: NativeComponentDefinition,
+        args: any,
+        _dynamicScope: any,
+        _caller: any,
+        _hasDefaultBlock: any
+    ) {
         if (definition.ComponentClass) {
             return new ComponentStateBucket(definition, args.capture());
         }

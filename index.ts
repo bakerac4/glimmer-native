@@ -4,6 +4,7 @@ import { Context, MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-
 import { artifacts } from '@glimmer/program';
 import { State, UpdatableReference } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
+import { strip } from '@glimmer/util';
 import { launchEvent, on, run } from 'tns-core-modules/application';
 
 import { createElement, registerElement } from './src/dom/element-registry';
@@ -91,7 +92,7 @@ export default class Application {
 
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
-        let component = Compilable(`<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`);
+        let component = Compilable(strip`<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`);
         const compiled = component.compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name);
         // const compiled = component.compilable.compile(Application.context);
@@ -184,7 +185,7 @@ export default class Application {
 
     registerNativeComponent(name, value) {
         this.registerNativeElement(name, value);
-        const handle = Application.resolver.registerTemplateOnlyComponent();
+        const handle = Application.resolver.registerTemplateOnlyComponent(name);
         Application.resolverDelegate.registerComponent(
             name,
             handle,

@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 // import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListView } from 'tns-core-modules/ui/list-view';
-import Application from '../../..';
+import Application, { NativeCapabilities } from '../../..';
 import { createElement } from '../element-registry';
 import NativeViewElementNode from './NativeViewElementNode';
 import TemplateElement from './TemplateElement';
@@ -143,10 +143,15 @@ export class GlimmerKeyedTemplate {
         let nativeEl = wrapper.nativeView;
         nativeEl.__GlimmerComponentBuilder__ = (props) => {
             inTransaction(Application.aotRuntime.env, () => {
+                const handle = Application.resolver.registerTemplateOnlyComponent(`list-template-${this.key}`);
+                Application.resolverDelegate.registerComponent(`list-template-${this.key}`, handle, this.component.args.src, NativeCapabilities);
+                let nativeComponentDef = Application.resolver.lookupComponent(`list-template-${this.key}`, null);
+                let manager = Application.resolver.managerFor();
+                const component = manager.create(Application.aotRuntime.env, nativeComponentDef, this.component.args, null, null, null);
                 const item = {
                     id: `${this.key}-${this._index}`,
                     node: wrapper,
-                    template: this.component.args.src,
+                    template: component,
                     item: props
                 };
                 Application.addListItem(item);

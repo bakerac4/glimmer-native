@@ -3,7 +3,7 @@ import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environm
 import { View } from 'tns-core-modules/ui/core/view';
 import { ItemEventData, ItemsSource, ListView } from 'tns-core-modules/ui/list-view';
 
-import Application from '../../..';
+import Application, { NativeCapabilities } from '../../..';
 import { createElement } from '../element-registry';
 import ViewNode from '../nodes/ViewNode';
 import NativeViewElementNode from './NativeViewElementNode';
@@ -161,10 +161,28 @@ export class GlimmerKeyedTemplate {
         let nativeEl = wrapper.nativeView;
         (nativeEl as any).__GlimmerComponentBuilder__ = (props: any) => {
             inTransaction(Application.aotRuntime.env, () => {
+                const handle = Application.resolver.registerTemplateOnlyComponent(`list-template-${this.key}`);
+                Application.resolverDelegate.registerComponent(
+                    `list-template-${this.key}`,
+                    handle,
+                    this.component.args.src,
+                    NativeCapabilities
+                );
+
+                let nativeComponentDef = Application.resolver.lookupComponent(`list-template-${this.key}`, null);
+                let manager = Application.resolver.managerFor();
+                const component = manager.create(
+                    Application.aotRuntime.env,
+                    nativeComponentDef,
+                    this.component.args,
+                    null,
+                    null,
+                    null
+                );
                 const item = {
                     id: `${this.key}-${this._index}`,
                     node: wrapper,
-                    template: this.component.args.src,
+                    template: component,
                     item: props
                 };
                 Application.addListItem(item);

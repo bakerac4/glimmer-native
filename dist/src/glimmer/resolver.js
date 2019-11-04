@@ -3,7 +3,7 @@ import { unreachable } from '@glimmer/util';
 import CAPABILITIES from './native-capabilities';
 import NativeComponentManager from './native-component-manager';
 import { NativeModifierDefinitionState, NativeModifierManager } from './native-modifier-manager';
-class NativeComponentDefinition {
+export class NativeComponentDefinition {
     constructor(name, manager, ComponentClass, handle, symbolTable) {
         this.name = name;
         this.manager = manager;
@@ -64,9 +64,9 @@ export default class Resolver {
         this.table.push(definition);
         return handle;
     }
-    registerTemplateOnlyComponent() {
+    registerTemplateOnlyComponent(name) {
         const handle = this.table.length;
-        this.table.push(TEMPLATE_ONLY_COMPONENT);
+        this.table.push({ name: name, ComponentClass: TEMPLATE_ONLY_COMPONENT });
         return handle;
     }
     registerHelper(helper) {

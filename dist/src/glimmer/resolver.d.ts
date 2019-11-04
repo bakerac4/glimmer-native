@@ -4,7 +4,7 @@ import NativeComponentManager from './native-component-manager';
 export interface TemplateMeta {
     specifier: string;
 }
-declare class NativeComponentDefinition implements ComponentDefinition {
+export declare class NativeComponentDefinition implements ComponentDefinition {
     name: string;
     manager: NativeComponentManager;
     ComponentClass: any;
@@ -25,8 +25,7 @@ export default class Resolver implements AotRuntimeResolver {
     lookupComponent(name: string, referrer: TemplateMeta): NativeComponentDefinition;
     lookupPartial(name: string, referrer: TemplateMeta): number;
     registerComponent(name: string, ComponentClass?: any): number;
-    registerTemplateOnlyComponent(): number;
+    registerTemplateOnlyComponent(name: any): number;
     registerHelper(helper: any): number;
     registerModifier(ModifierClass: any): number;
 }
-export {};
