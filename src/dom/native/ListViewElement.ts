@@ -84,7 +84,7 @@ export default class ListViewElement extends NativeElementNode {
         if (!args.view || !(args.view as any).__GlimmerComponent__) {
             let template: GlimmerKeyedTemplate;
             if (args.view && (args.view as any).__GlimmerComponentBuilder__) {
-                console.debug(`instantiating component in keyed view item at ${args.index}`);
+                console.info(`instantiating component in keyed view item at ${args.index}`);
                 (args.view as any).__GlimmerComponentBuilder__(item);
                 (args.view as any).__GlimmerComponentBuilder__ = null; // free the memory
                 return;
@@ -93,7 +93,7 @@ export default class ListViewElement extends NativeElementNode {
             template = (listView as any).itemTemplates.filter((x) => x.key == 'default')[0];
 
             if (!template) {
-                console.error(`Counldn't determine component to use for item at ${args.index}`);
+                console.info(`Counldn't determine component to use for item at ${args.index}`);
                 return;
             }
 
@@ -128,7 +128,7 @@ export default class ListViewElement extends NativeElementNode {
         super.onInsertedChild(childNode, index);
         if (childNode instanceof TemplateElement) {
             let key = childNode.getAttribute('key') || 'default';
-            console.debug(`Adding template for key ${key}`);
+            console.info(`Adding template for key ${key}`);
             if (!this.nativeView.itemTemplates || typeof this.nativeView.itemTemplates == 'string') {
                 this.nativeView.itemTemplates = [];
             }
@@ -175,7 +175,7 @@ export class GlimmerKeyedTemplate {
     createView(): View {
         //create a proxy element to eventually contain our item (once we have one to render)
         //TODO is StackLayout the best choice here?
-        console.debug(`creating view for key ${this.key}`);
+        console.info(`creating view for key ${this.key}`);
         let wrapper = createElement('StackLayout') as NativeElementNode;
         wrapper.setAttribute('id', `${this.key}-${this._index}`);
         let nativeEl = wrapper.nativeView;

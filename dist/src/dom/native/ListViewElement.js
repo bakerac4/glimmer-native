@@ -77,14 +77,14 @@ export default class ListViewElement extends NativeElementNode {
             if (!args.view || !args.view.__GlimmerComponent__) {
                 let template;
                 if (args.view && args.view.__GlimmerComponentBuilder__) {
-                    console.debug(`instantiating component in keyed view item at ${args.index}`);
+                    console.info(`instantiating component in keyed view item at ${args.index}`);
                     args.view.__GlimmerComponentBuilder__(item);
                     args.view.__GlimmerComponentBuilder__ = null; // free the memory
                     return;
                 }
                 template = listView.itemTemplates.filter((x) => x.key == 'default')[0];
                 if (!template) {
-                    console.error(`Counldn't determine component to use for item at ${args.index}`);
+                    console.info(`Counldn't determine component to use for item at ${args.index}`);
                     return;
                 }
                 let wrapper = createElement('StackLayout');
@@ -114,7 +114,7 @@ export default class ListViewElement extends NativeElementNode {
         super.onInsertedChild(childNode, index);
         if (childNode instanceof TemplateElement) {
             let key = childNode.getAttribute('key') || 'default';
-            console.debug(`Adding template for key ${key}`);
+            console.info(`Adding template for key ${key}`);
             if (!this.nativeView.itemTemplates || typeof this.nativeView.itemTemplates == 'string') {
                 this.nativeView.itemTemplates = [];
             }
@@ -152,7 +152,7 @@ export class GlimmerKeyedTemplate {
     createView() {
         //create a proxy element to eventually contain our item (once we have one to render)
         //TODO is StackLayout the best choice here?
-        console.debug(`creating view for key ${this.key}`);
+        console.info(`creating view for key ${this.key}`);
         let wrapper = createElement('StackLayout');
         wrapper.setAttribute('id', `${this.key}-${this._index}`);
         let nativeEl = wrapper.nativeView;
