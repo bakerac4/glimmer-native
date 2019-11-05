@@ -1,11 +1,9 @@
 import { precompile } from '@glimmer/compiler';
-export default precompile(`<listview
-        ...attributes
-        {{set 'items' @items}}
-        {{set 'itemTemplateSelector' @itemTemplateSelector}}
-        {{set 'itemTemplates' this.keyedTemplates}}
-        {{set 'template' @template false}}
-    >
-
-        {{yield this}}
-    </listview>`);
+import { strip } from '@glimmer/util';
+export default precompile(strip `<listview
+    ...attributes
+    {{set 'itemTemplateSelector' @itemTemplateSelector}}
+    {{set 'items' @items}}
+>
+    {{yield this}}
+</listview>`);

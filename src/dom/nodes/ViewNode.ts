@@ -103,14 +103,21 @@ export default class ViewNode {
     }
 
     getAttribute(key) {
-        return this.nativeView[key];
+        if (this.nativeView) {
+            return this.nativeView[key];
+        } else {
+            return this[key];
+        }
     }
 
     /* istanbul ignore next */
     setAttribute(key, value) {
         const nv = this.nativeView;
 
-        if (!nv) return;
+        if (!nv) {
+            this[key] = value;
+            return;
+        }
 
         // normalize key
         if (isAndroid && key.startsWith('android:')) {

@@ -1,21 +1,26 @@
-import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
-import { ItemEventData, ListView as NativeListView } from 'tns-core-modules/ui/list-view';
-import { KeyedTemplate } from 'tns-core-modules/ui/page/page';
+import { View } from 'tns-core-modules/ui/core/view';
+import { ItemEventData, ListView } from 'tns-core-modules/ui/list-view';
+import ViewNode from '../nodes/ViewNode';
 import NativeElementNode from './NativeElementNode';
+import TemplateElement from './TemplateElement';
 export default class ListViewElement extends NativeElementNode {
     template: any;
     items: any;
+    numberViewsCreated: number;
     templates: {};
     constructor();
-    registerTemplate(name?: string): void;
-    renderItem(template: any, item: any): import("tns-core-modules/ui/page/page").View;
-    updateListItem(args: ItemEventData): void;
-    getItemTemplateComponent(name: any): GlimmerComponent;
-    nativeView: NativeListView;
+    updateListItem(args: ItemEventData): Promise<void>;
+    nativeView: ListView;
+    onInsertedChild(childNode: ViewNode, index: number): void;
+    onRemovedChild(childNode: ViewNode): void;
 }
-export declare class GlimmerKeyedTemplate implements KeyedTemplate {
-    _key: any;
-    constructor(key: any);
-    readonly key: any;
-    createView(): any;
+export declare class GlimmerKeyedTemplate {
+    _key: string;
+    _templateEl: TemplateElement;
+    _index: number;
+    constructor(key: string, templateEl: TemplateElement);
+    readonly component: number;
+    readonly args: any;
+    readonly key: string;
+    createView(): View;
 }
