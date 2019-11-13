@@ -1,6 +1,7 @@
 import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@glimmer/interfaces';
 import { MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
 import FrameElement from './src/dom/native/FrameElement';
+import PageElement from './src/dom/native/PageElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
 import ElementNode from './src/dom/nodes/ElementNode';
 import { ResolverDelegate } from './src/glimmer/context';
@@ -36,6 +37,7 @@ export default class Application {
     static _rendered: boolean;
     static aotRuntime: AotRuntimeContext;
     static outsideComponents: any;
+    static currentPageNode: PageElement;
     constructor(appFolder: any, components: any, helpers: any);
     static renderPage(name: any, containerElement: any, nextSibling: any, state: any): ElementNode;
     static _renderPage(name: any, containerElement: FrameElement, nextSibling: any, compilable: any, data?: {}): ElementNode;

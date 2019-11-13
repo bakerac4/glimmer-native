@@ -57,6 +57,7 @@ export default class Application {
     static _rendered: boolean;
     static aotRuntime: AotRuntimeContext;
     static outsideComponents: any = [];
+    static currentPageNode: PageElement;
 
     constructor(appFolder, components, helpers) {
         registerElements();
@@ -103,6 +104,7 @@ export default class Application {
                 node = node.nextSibling;
             }
             (node as PageElement).parentNode = containerElement;
+            Application.currentPageNode = node;
             containerElement.childNodes.push(node);
             node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node as any;
@@ -125,6 +127,9 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
+            const listViewWrapperElement = node.parentNode;
+            Application.currentPageNode.childNodes.push(listViewWrapperElement);
+            listViewWrapperElement.parentNode = Application.currentPageNode;
             node._meta.component = new NativeComponentResult(name, result, state, runtime);
             return node as any;
         } catch (error) {

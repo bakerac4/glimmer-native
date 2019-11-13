@@ -77,7 +77,7 @@ export default class ListViewElement extends NativeElementNode {
             if (!args.view || !args.view.__GlimmerComponent__) {
                 let template;
                 if (args.view && args.view.__GlimmerComponentBuilder__) {
-                    console.info(`instantiating component in keyed view item at ${args.index}`);
+                    console.info(`instantiating component in keyed view item ${args.view.__GlimmerNativeElement__.id} for item index ${args.index}`);
                     args.view.__GlimmerComponentBuilder__(item);
                     args.view.__GlimmerComponentBuilder__ = null; // free the memory
                     return;
@@ -159,6 +159,7 @@ export class GlimmerKeyedTemplate {
         nativeEl.__GlimmerComponentBuilder__ = (props) => {
             inTransaction(Application.aotRuntime.env, () => {
                 renderItem(wrapper, { compiled: this.component, args: this.args }, props);
+                this._index++;
             });
         };
         return nativeEl;
