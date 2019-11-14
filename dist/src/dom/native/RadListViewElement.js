@@ -23,15 +23,16 @@ export default class RadListViewElement extends NativeElementNode {
         this.nativeView.on(RadListView.itemLoadingEvent, (args) => {
             this.updateListItem(args);
         });
+        this.nativeView.on('itemLoadingInternal', (args) => {
+            this.updateInternalItem(args);
+        });
     }
     loadView(viewType) {
         if (viewType.toLowerCase() == ListViewViewType.ItemView.toLowerCase() &&
             typeof this.nativeView.itemTemplates == 'object') {
             let keyedTemplate = this.nativeView.itemTemplates.find((t) => t.key == 'default');
             if (keyedTemplate) {
-                const nativeElement = keyedTemplate.createView();
-                // (nativeElement as any).__GlimmerComponentBuilder__({});
-                return nativeElement;
+                return keyedTemplate.createView();
             }
         }
         let componentClass = this.getComponentForView(viewType);
@@ -146,17 +147,19 @@ export default class RadListViewElement extends NativeElementNode {
             console.error("Couldn't find component for ", view);
         }
     }
+    updateInternalItem(args) {
+        //groups have index less than zero
+        if (args.index < 0) {
+            this.updateViewWithProps(args.view, args.view.bindingContext.category);
+            return;
+        }
+    }
     updateListItem(args) {
         let item;
         let listView = this.nativeView;
         let items = listView.items;
         if (args.index >= items.length) {
             console.log("Got request for item at index that didn't exist");
-            return;
-        }
-        //groups have index less than zero
-        if (args.index < 0) {
-            this.updateViewWithProps(args.view, { item: args.view.bindingContext.category });
             return;
         }
         if (items.getItem) {

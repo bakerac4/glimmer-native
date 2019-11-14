@@ -8,6 +8,7 @@ export default class RadListViewElement extends NativeElementNode {
     private loadView;
     private getComponentForView;
     private updateViewWithProps;
+    private updateInternalItem;
     private updateListItem;
     nativeView: RadListView;
     onInsertedChild(childNode: ViewNode, index: number): void;

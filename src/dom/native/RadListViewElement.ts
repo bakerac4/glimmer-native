@@ -37,6 +37,9 @@ export default class RadListViewElement extends NativeElementNode {
         this.nativeView.on(RadListView.itemLoadingEvent, (args) => {
             this.updateListItem(args as ListViewEventData);
         });
+        this.nativeView.on('itemLoadingInternal', (args) => {
+            this.updateInternalItem(args as ListViewEventData);
+        });
     }
 
     private loadView(viewType: string): View {
@@ -46,9 +49,7 @@ export default class RadListViewElement extends NativeElementNode {
         ) {
             let keyedTemplate = this.nativeView.itemTemplates.find((t) => t.key == 'default');
             if (keyedTemplate) {
-                const nativeElement = keyedTemplate.createView();
-                // (nativeElement as any).__GlimmerComponentBuilder__({});
-                return nativeElement;
+                return keyedTemplate.createView();
             }
         }
 
@@ -182,6 +183,14 @@ export default class RadListViewElement extends NativeElementNode {
         }
     }
 
+    private updateInternalItem(args: ListViewEventData) {
+        //groups have index less than zero
+        if (args.index < 0) {
+            this.updateViewWithProps(args.view, args.view.bindingContext.category);
+            return;
+        }
+    }
+
     private updateListItem(args: ListViewEventData) {
         let item;
         let listView = this.nativeView;
@@ -189,12 +198,6 @@ export default class RadListViewElement extends NativeElementNode {
 
         if (args.index >= items.length) {
             console.log("Got request for item at index that didn't exist");
-            return;
-        }
-
-        //groups have index less than zero
-        if (args.index < 0) {
-            this.updateViewWithProps(args.view, { item: args.view.bindingContext.category });
             return;
         }
 
