@@ -1,5 +1,6 @@
 import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListViewViewType, RadListView } from 'nativescript-ui-listview';
+import { isAndroid, isIOS } from 'tns-core-modules/ui/core/view/view';
 import Application from '../../..';
 import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
@@ -23,9 +24,11 @@ export default class RadListViewElement extends NativeElementNode {
         this.nativeView.on(RadListView.itemLoadingEvent, (args) => {
             this.updateListItem(args);
         });
-        this.nativeView.on('itemLoadingInternal', (args) => {
-            this.updateInternalItem(args);
-        });
+        if (isIOS) {
+            this.nativeView.on('itemLoadingInternal', (args) => {
+                this.updateInternalItem(args);
+            });
+        }
     }
     loadView(viewType) {
         if (viewType.toLowerCase() == ListViewViewType.ItemView.toLowerCase() &&
@@ -160,6 +163,10 @@ export default class RadListViewElement extends NativeElementNode {
         let items = listView.items;
         if (args.index >= items.length) {
             console.log("Got request for item at index that didn't exist");
+            return;
+        }
+        if (isAndroid && args.index < 0) {
+            this.updateViewWithProps(args.view, args.view.bindingContext.category);
             return;
         }
         if (items.getItem) {
