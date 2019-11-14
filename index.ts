@@ -127,9 +127,12 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            const listViewWrapperElement = node.parentNode;
-            Application.currentPageNode.childNodes.push(listViewWrapperElement);
-            listViewWrapperElement.parentNode = Application.currentPageNode;
+            // const listViewWrapperElement = node.parentNode;
+            // if (!listViewWrapperElement.parentNode) {
+            //     Application.currentPageNode.childNodes.push(listViewWrapperElement);
+            //     listViewWrapperElement.parentNode = Application.currentPageNode;
+            // }
+
             node._meta.component = new NativeComponentResult(name, result, state, runtime);
             return node as any;
         } catch (error) {

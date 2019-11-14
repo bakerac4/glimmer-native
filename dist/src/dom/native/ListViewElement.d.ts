@@ -18,6 +18,7 @@ export declare class GlimmerKeyedTemplate {
     _key: string;
     _templateEl: TemplateElement;
     _index: number;
+    _component: number;
     constructor(key: string, templateEl: TemplateElement);
     readonly component: number;
     readonly args: any;

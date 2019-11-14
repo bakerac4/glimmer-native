@@ -139,9 +139,12 @@ export class GlimmerKeyedTemplate {
         this._index = 0;
     }
     get component() {
-        let component = Compilable(this._templateEl.component.args.src);
-        const compiled = component.compile(Application.context);
-        return compiled;
+        if (!this._component) {
+            let component = Compilable(this._templateEl.component.args.src);
+            const compiled = component.compile(Application.context);
+            this._component = compiled;
+        }
+        return this._component;
     }
     get args() {
         return this._templateEl.component.args;

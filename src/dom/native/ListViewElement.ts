@@ -155,6 +155,7 @@ export class GlimmerKeyedTemplate {
     _key: string;
     _templateEl: TemplateElement;
     _index: number;
+    _component: number;
 
     constructor(key: string, templateEl: TemplateElement) {
         this._key = key;
@@ -163,9 +164,12 @@ export class GlimmerKeyedTemplate {
     }
 
     get component() {
-        let component = Compilable(this._templateEl.component.args.src);
-        const compiled = component.compile(Application.context);
-        return compiled;
+        if (!this._component) {
+            let component = Compilable(this._templateEl.component.args.src);
+            const compiled = component.compile(Application.context);
+            this._component = compiled;
+        }
+        return this._component;
     }
 
     get args() {

@@ -1,6 +1,7 @@
 import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListViewViewType, RadListView } from 'nativescript-ui-listview';
 import Application from '../../..';
+import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import { GlimmerKeyedTemplate } from './ListViewElement';
 import NativeElementNode from './NativeElementNode';
@@ -28,7 +29,9 @@ export default class RadListViewElement extends NativeElementNode {
             typeof this.nativeView.itemTemplates == 'object') {
             let keyedTemplate = this.nativeView.itemTemplates.find((t) => t.key == 'default');
             if (keyedTemplate) {
-                return keyedTemplate.createView();
+                const nativeElement = keyedTemplate.createView();
+                // (nativeElement as any).__GlimmerComponentBuilder__({});
+                return nativeElement;
             }
         }
         let componentClass = this.getComponentForView(viewType);
@@ -41,7 +44,7 @@ export default class RadListViewElement extends NativeElementNode {
         let nativeEl = wrapper.nativeView;
         let builder = (props) => {
             inTransaction(Application.aotRuntime.env, () => {
-                renderItem(wrapper, { compiled: this.component, args: this.args }, props);
+                renderItem(wrapper, { compiled: componentClass.component, args: componentClass.args }, props);
             });
             // (nativeEl as any).__GlimmerComponent__ = componentInstance;
         };
@@ -63,7 +66,12 @@ export default class RadListViewElement extends NativeElementNode {
         let templateEl = this.childNodes.find((n) => n.tagName == 'template' && String(n.getAttribute('type')).toLowerCase() == normalizedViewType);
         if (!templateEl)
             return null;
-        return templateEl.component;
+        let component = Compilable(templateEl.component.args.src);
+        const compiled = component.compile(Application.context);
+        return {
+            component: compiled,
+            args: templateEl.component.args
+        };
     }
     // loadView(viewType: string): View {
     //     if (viewType === ListViewViewType.ItemView) {
@@ -81,6 +89,10 @@ export default class RadListViewElement extends NativeElementNode {
     //         (nativeEl as any).__GlimmerComponent__ = componentInstance._meta.component;
     //         return nativeEl;
     //     }
+    // }
+    // get itemTemplateComponent(): GlimmerComponent {
+    //     const templateNode = this.childNodes.find((x) => x instanceof TemplateElement) as TemplateElement;
+    //     return templateNode ? templateNode.component : null;
     // }
     // updateListItem(args: ListViewEventData) {
     //     let item;
@@ -163,7 +175,7 @@ export default class RadListViewElement extends NativeElementNode {
     }
     onInsertedChild(childNode, index) {
         super.onInsertedChild(childNode, index);
-        if (childNode instanceof TemplateElement) {
+        if (childNode instanceof TemplateElement && !childNode.getAttribute('type')) {
             let key = childNode.getAttribute('key') || 'default';
             console.info(`Adding template for key ${key}`);
             if (!this.nativeView.itemTemplates || typeof this.nativeView.itemTemplates == 'string') {
