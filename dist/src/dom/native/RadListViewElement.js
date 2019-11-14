@@ -58,6 +58,7 @@ export default class RadListViewElement extends NativeElementNode {
         //    || viewType.toLowerCase() == ListViewViewType.ItemSwipeView.toLowerCase() doesn't work at the moment
         ) {
             nativeEl.__GlimmerComponentBuilder__ = builder;
+            builder({});
         }
         else {
             //otherwise, do it now
