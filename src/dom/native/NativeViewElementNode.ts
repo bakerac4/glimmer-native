@@ -280,6 +280,10 @@ export default class NativeViewElementNode<T extends View> extends NativeElement
         } else {
             console.warn('Unknown parent view type: ' + parentView);
         }
+
+        (childNode as any).__GlimmerNativeElement = null;
+        (childNode as any).__nativeView = null;
+        (childNode as any)._nativeElement = null;
     }
 
     dispatchEvent(event: EventData) {

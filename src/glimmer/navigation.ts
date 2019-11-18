@@ -85,17 +85,19 @@ export function navigate(componentName: string, model: any, options: NavigationO
 
         const dispose = element.nativeView.disposeNativeView;
         element.nativeView.disposeNativeView = (...args) => {
-            if (element.component) {
-                element.component.destroy();
-                element.component = null;
-                element.navigation = null;
-            }
             if (element.listViewItems) {
                 element.listViewItems.forEach((component) => {
                     component.destroy();
                 });
                 element.listViewItems = [];
             }
+
+            if (element.component) {
+                element.component.destroy();
+                element.component = null;
+                element.navigation = null;
+            }
+
             dispose.call(element.nativeView, args);
         };
     }
