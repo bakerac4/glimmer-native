@@ -90,6 +90,12 @@ export function navigate(componentName: string, model: any, options: NavigationO
                 element.component = null;
                 element.navigation = null;
             }
+            if (element.listViewItems) {
+                element.listViewItems.forEach((component) => {
+                    component.destroy();
+                });
+                element.listViewItems = [];
+            }
             dispose.call(element.nativeView, args);
         };
     }

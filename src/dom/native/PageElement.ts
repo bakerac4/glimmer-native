@@ -5,6 +5,7 @@ import NativeViewElementNode from './NativeViewElementNode';
 
 export default class PageElement extends NativeViewElementNode<Page> {
     __GlimmerNativeComponent__: NativeComponentResult;
+    listViewItems: NativeComponentResult[];
     navigation: any;
     constructor() {
         super('page', Page);

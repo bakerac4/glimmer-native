@@ -81,7 +81,7 @@ export default class Application {
                 node = node.nextSibling;
             }
             // (node as PageElement).parentNode = containerElement;
-            // Application.currentPageNode = node;
+            Application.currentPageNode = node;
             // containerElement.childNodes.push(node);
             node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node;
@@ -104,12 +104,17 @@ export default class Application {
             while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
+            const component = new NativeComponentResult(name, result, state, runtime);
+            if (!Application.currentPageNode.listViewItems) {
+                Application.currentPageNode.listViewItems = [];
+            }
+            Application.currentPageNode.listViewItems.push(component);
             // const listViewWrapperElement = node.parentNode;
             // if (!listViewWrapperElement.parentNode) {
             //     Application.currentPageNode.childNodes.push(listViewWrapperElement);
             //     listViewWrapperElement.parentNode = Application.currentPageNode;
             // }
-            node.component = new NativeComponentResult(name, result, state, runtime);
+            node.component = component;
             return node;
         }
         catch (error) {
