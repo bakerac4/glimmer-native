@@ -108,9 +108,9 @@ export default class Application {
             while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
-            (node as PageElement).parentNode = containerElement;
-            Application.currentPageNode = node;
-            containerElement.childNodes.push(node);
+            // (node as PageElement).parentNode = containerElement;
+            // Application.currentPageNode = node;
+            // containerElement.childNodes.push(node);
             node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node as any;
         } catch (error) {
@@ -129,7 +129,7 @@ export default class Application {
             const result = renderSync(runtime.env, iterator);
             console.log(`Component ${name} Rendered`);
             let node = result.firstNode() as any;
-            while (!node._nativeView) {
+            while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
             // const listViewWrapperElement = node.parentNode;

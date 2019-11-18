@@ -38,33 +38,6 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
         });
     }
 
-    // getItemTemplateComponent(name): GlimmerComponent {
-    //     if (this.templates[name]) {
-    //         return this.templates[name];
-    //     } else {
-    //         const templateNode = this.childNodes.find((x) => {
-    //             if (x instanceof TemplateElement && !name) {
-    //                 return true;
-    //             } else if (x instanceof TemplateElement && name) {
-    //                 return x.component && x.component.args.key === name;
-    //             } else {
-    //                 return false;
-    //             }
-    //         }) as TemplateElement;
-    //         if (templateNode) {
-    //             let component = Compilable(templateNode.component.args.src);
-    //             const compiled = component.compile(Application.context);
-    //             this.templates[name] = {
-    //                 compiled,
-    //                 args: templateNode.component.args
-    //             };
-    //             return this.templates[name];
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-    // }
-
     async updateListItem(args: ItemEventData) {
         let item;
         let listView = this.nativeView;

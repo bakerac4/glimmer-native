@@ -101,7 +101,8 @@ export default class Resolver implements AotRuntimeResolver {
 
     registerTemplateOnlyComponent(name): number {
         const handle = this.table.length;
-        this.table.push({ name: name, ComponentClass: TEMPLATE_ONLY_COMPONENT });
+        let manager = this.managerFor();
+        this.table.push({ name: name, ComponentClass: TEMPLATE_ONLY_COMPONENT, manager });
         return handle;
     }
 

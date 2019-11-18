@@ -6,6 +6,7 @@ import ListViewElement from './native/ListViewElement';
 import { NativeElementPropType } from './native/NativeElementNode';
 import { registerNativeViewElement } from './native/NativeViewElementNode';
 import PageElement from './native/PageElement';
+import RadListViewElement from './native/RadListViewElement';
 import TabsElement from './native/TabsElement';
 import TabViewElement from './native/TabViewElement';
 export function registerNativeElements() {
@@ -54,6 +55,7 @@ export function registerNativeElements() {
     registerElement('Frame', () => new FrameElement());
     registerElement('Page', () => new PageElement());
     registerElement('ListView', () => new ListViewElement());
+    registerElement('RadListView', () => new RadListViewElement());
     registerElement('TabView', () => new TabViewElement());
     registerElement('BottomNavigation', () => new BottomNavigationElement());
     registerElement('Tabs', () => new TabsElement());

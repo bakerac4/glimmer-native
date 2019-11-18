@@ -33,32 +33,6 @@ export default class ListViewElement extends NativeViewElementNode {
             this.updateListItem(args);
         });
     }
-    // getItemTemplateComponent(name): GlimmerComponent {
-    //     if (this.templates[name]) {
-    //         return this.templates[name];
-    //     } else {
-    //         const templateNode = this.childNodes.find((x) => {
-    //             if (x instanceof TemplateElement && !name) {
-    //                 return true;
-    //             } else if (x instanceof TemplateElement && name) {
-    //                 return x.component && x.component.args.key === name;
-    //             } else {
-    //                 return false;
-    //             }
-    //         }) as TemplateElement;
-    //         if (templateNode) {
-    //             let component = Compilable(templateNode.component.args.src);
-    //             const compiled = component.compile(Application.context);
-    //             this.templates[name] = {
-    //                 compiled,
-    //                 args: templateNode.component.args
-    //             };
-    //             return this.templates[name];
-    //         } else {
-    //             return null;
-    //         }
-    //     }
-    // }
     updateListItem(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let item;

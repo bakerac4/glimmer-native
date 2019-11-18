@@ -66,7 +66,8 @@ export default class Resolver {
     }
     registerTemplateOnlyComponent(name) {
         const handle = this.table.length;
-        this.table.push({ name: name, ComponentClass: TEMPLATE_ONLY_COMPONENT });
+        let manager = this.managerFor();
+        this.table.push({ name: name, ComponentClass: TEMPLATE_ONLY_COMPONENT, manager });
         return handle;
     }
     registerHelper(helper) {

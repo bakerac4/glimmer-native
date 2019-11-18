@@ -64,15 +64,15 @@ export function navigate(componentName, model, options) {
         target.navigate(Object.assign(Object.assign({}, options), { create: () => {
                 return element.nativeView;
             } }));
-        const dispose = element.nativeView.disposeNativeView;
-        element.nativeView.disposeNativeView = (...args) => {
-            if (element.component) {
-                element.component.destroy();
-                element.component = null;
-                element.navigation = null;
-            }
-            dispose.call(element.nativeView, args);
-        };
+        // const dispose = element.nativeView.disposeNativeView;
+        // element.nativeView.disposeNativeView = (...args) => {
+        //     if (element.component) {
+        //         element.component.destroy();
+        //         element.component = null;
+        //         element.navigation = null;
+        //     }
+        //     dispose.call(element.nativeView, args);
+        // };
     }
     return null;
 }
