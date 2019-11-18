@@ -84,7 +84,11 @@ export default class ListViewElement extends NativeElementNode {
         if (!args.view || !(args.view as any).__GlimmerComponent__) {
             let template: GlimmerKeyedTemplate;
             if (args.view && (args.view as any).__GlimmerComponentBuilder__) {
-                console.info(`instantiating component in keyed view item at ${args.index}`);
+                console.info(
+                    `instantiating component in keyed view item ${
+                        (args.view as any).__GlimmerNativeElement__.id
+                    } for item index ${args.index}`
+                );
                 (args.view as any).__GlimmerComponentBuilder__(item);
                 (args.view as any).__GlimmerComponentBuilder__ = null; // free the memory
                 return;
@@ -151,6 +155,7 @@ export class GlimmerKeyedTemplate {
     _key: string;
     _templateEl: TemplateElement;
     _index: number;
+    _component: number;
 
     constructor(key: string, templateEl: TemplateElement) {
         this._key = key;
@@ -159,9 +164,12 @@ export class GlimmerKeyedTemplate {
     }
 
     get component() {
-        let component = Compilable(this._templateEl.component.args.src);
-        const compiled = component.compile(Application.context);
-        return compiled;
+        if (!this._component) {
+            let component = Compilable(this._templateEl.component.args.src);
+            const compiled = component.compile(Application.context);
+            this._component = compiled;
+        }
+        return this._component;
     }
 
     get args() {
@@ -182,6 +190,7 @@ export class GlimmerKeyedTemplate {
         (nativeEl as any).__GlimmerComponentBuilder__ = (props: any) => {
             inTransaction(Application.aotRuntime.env, () => {
                 renderItem(wrapper, { compiled: this.component, args: this.args }, props);
+                this._index++;
             });
         };
         return nativeEl;

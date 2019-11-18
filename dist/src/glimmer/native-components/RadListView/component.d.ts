@@ -5,5 +5,4 @@ export interface Args {
     loaded: any;
 }
 export default class RadListView extends Component<Args> {
-    loaded(event: any): void;
 }

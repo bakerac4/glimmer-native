@@ -78,6 +78,7 @@ export default class Application {
                 node = node.nextSibling;
             }
             node.parentNode = containerElement;
+            Application.currentPageNode = node;
             containerElement.childNodes.push(node);
             node._meta.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node;
@@ -100,6 +101,11 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
+            // const listViewWrapperElement = node.parentNode;
+            // if (!listViewWrapperElement.parentNode) {
+            //     Application.currentPageNode.childNodes.push(listViewWrapperElement);
+            //     listViewWrapperElement.parentNode = Application.currentPageNode;
+            // }
             node._meta.component = new NativeComponentResult(name, result, state, runtime);
             return node;
         }
