@@ -1,14 +1,12 @@
 import { precompile } from '@glimmer/compiler';
+import { strip } from '@glimmer/util';
 
-export default precompile(
-    `<radListView
-        ...attributes
-        {{set 'items' @items}}
-        {{set 'itemTemplateSelector' @itemTemplateSelector}}
-        {{set 'itemTemplates' this.keyedTemplates}}
-        {{set 'template' @template false}}
-    >
-
-        {{yield this}}
-    </radListView>`
-);
+export default precompile(strip`<radListView
+    ...attributes
+    {{set 'itemTemplateSelector' @itemTemplateSelector}}
+    {{set 'groupingFunction' @groupingFunction}}
+    {{set 'sortingFunction' @sortingFunction}}
+    {{set 'items' @items}}
+>
+    {{yield this}}
+</radListView>`);

@@ -2,10 +2,11 @@ import { precompile } from '@glimmer/compiler';
 import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@glimmer/interfaces';
 import { Context, MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
 import { artifacts } from '@glimmer/program';
-import { State, UpdatableReference } from '@glimmer/reference';
+import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
 import { strip } from '@glimmer/util';
 import { launchEvent, on, run } from 'tns-core-modules/application';
+import { View } from 'tns-core-modules/ui/core/view/view';
 
 import { createElement, registerElement } from './src/dom/element-registry';
 import { registerGlimmerElements } from './src/dom/glimmer-elements';
@@ -59,11 +60,8 @@ export default class Application {
     static _rendered: boolean;
     static aotRuntime: AotRuntimeContext;
     static outsideComponents: any = [];
-    static listItems = [];
+    static currentPageNode: PageElement;
     static renderedPage: any;
-    static state: UpdatableReference<any>;
-    static _scheduled: boolean;
-    static _rendering: boolean;
 
     constructor(appFolder, components, helpers) {
         registerNativeElements();
@@ -86,20 +84,13 @@ export default class Application {
         Application.context = Context(GlimmerResolverDelegate);
     }
 
-    static addListItem(viewNode) {
-        this.listItems.push(viewNode);
-    }
-
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
         let component = Compilable(strip`<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`);
         const compiled = component.compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name);
         // const compiled = component.compilable.compile(Application.context);
-        return Application._renderPage(name, containerElement, nextSibling, compiled, {
-            ...state,
-            listViewItems: [...Application.listItems]
-        });
+        return Application._renderPage(name, containerElement, nextSibling, compiled, state);
     }
 
     static _renderPage(name, containerElement: FrameElement, nextSibling, compilable, data = {}): PageElement {
@@ -112,23 +103,22 @@ export default class Application {
             const result = renderSync(Application.aotRuntime.env, iterator);
             console.log(`Page ${name} Rendered`);
             Application.result = result;
-            Application.state = state;
             Application._rendered = true;
             let node = result.firstNode() as any;
             while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
             (node as PageElement).parentNode = containerElement;
+            Application.currentPageNode = node;
             containerElement.childNodes.push(node);
             node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
-            Application.renderedPage = node;
             return node as any;
         } catch (error) {
             console.log(`Error rendering page ${name}: ${error}`);
         }
     }
 
-    static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): ElementNode {
+    static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): NativeViewElementNode<View> {
         let state = State(data);
         const artifact = artifacts(Application.context);
         const runtime = AotRuntime(Application.document as any, artifact, Application.resolver);
@@ -142,7 +132,13 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = new NativeComponentResult(name, result, state, runtime);
+            // const listViewWrapperElement = node.parentNode;
+            // if (!listViewWrapperElement.parentNode) {
+            //     Application.currentPageNode.childNodes.push(listViewWrapperElement);
+            //     listViewWrapperElement.parentNode = Application.currentPageNode;
+            // }
+
+            node.component = new NativeComponentResult(name, result, state, runtime);
             return node as any;
         } catch (error) {
             console.log(`Error rendering component ${name}: ${error}`);
@@ -233,17 +229,17 @@ export default class Application {
         }, 0);
     }
 
-    static async scheduleRerender() {
-        if (this._scheduled || !Application._rendered) return;
+    // static async scheduleRerender() {
+    //     if (this._scheduled || !Application._rendered) return;
 
-        this._rendering = true;
-        this._scheduled = true;
-        setTimeout(async () => {
-            this._scheduled = false;
-            await Application._rerender();
-            this._rendering = false;
-        }, 0);
-    }
+    //     this._rendering = true;
+    //     this._scheduled = true;
+    //     setTimeout(async () => {
+    //         this._scheduled = false;
+    //         await Application._rerender();
+    //         this._rendering = false;
+    //     }, 0);
+    // }
 
     static async rerenderForListView() {
         try {

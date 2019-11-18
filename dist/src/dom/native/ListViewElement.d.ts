@@ -18,8 +18,10 @@ export declare class GlimmerKeyedTemplate {
     _key: string;
     _templateEl: TemplateElement;
     _index: number;
+    _component: number;
     constructor(key: string, templateEl: TemplateElement);
-    readonly component: import("@glimmer/component/dist/types/addon/-private/component").default<{
+    readonly component: number;
+    readonly args: Readonly<{
         src: string;
     }>;
     readonly key: string;

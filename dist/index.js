@@ -57,16 +57,13 @@ export default class Application {
         Application.document.appendChild(Application.rootFrame);
         Application.context = Context(GlimmerResolverDelegate);
     }
-    static addListItem(viewNode) {
-        this.listItems.push(viewNode);
-    }
     static renderPage(name, containerElement, nextSibling = null, state) {
         //Shouldn't need to do this here - TODO: Look into why
         let component = Compilable(strip `<${name} @model={{this.model}} @listViewItems={{this.listViewItems}} />`);
         const compiled = component.compile(Application.context);
         // const component = GlimmerResolverDelegate.lookupComponent(name);
         // const compiled = component.compilable.compile(Application.context);
-        return Application._renderPage(name, containerElement, nextSibling, compiled, Object.assign(Object.assign({}, state), { listViewItems: [...Application.listItems] }));
+        return Application._renderPage(name, containerElement, nextSibling, compiled, state);
     }
     static _renderPage(name, containerElement, nextSibling, compilable, data = {}) {
         let state = State(data);
@@ -78,16 +75,15 @@ export default class Application {
             const result = renderSync(Application.aotRuntime.env, iterator);
             console.log(`Page ${name} Rendered`);
             Application.result = result;
-            Application.state = state;
             Application._rendered = true;
             let node = result.firstNode();
             while (node && !node._nativeElement) {
                 node = node.nextSibling;
             }
             node.parentNode = containerElement;
+            Application.currentPageNode = node;
             containerElement.childNodes.push(node);
             node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
-            Application.renderedPage = node;
             return node;
         }
         catch (error) {
@@ -108,7 +104,12 @@ export default class Application {
             while (!node._nativeView) {
                 node = node.nextSibling;
             }
-            node._meta.component = new NativeComponentResult(name, result, state, runtime);
+            // const listViewWrapperElement = node.parentNode;
+            // if (!listViewWrapperElement.parentNode) {
+            //     Application.currentPageNode.childNodes.push(listViewWrapperElement);
+            //     listViewWrapperElement.parentNode = Application.currentPageNode;
+            // }
+            node.component = new NativeComponentResult(name, result, state, runtime);
             return node;
         }
         catch (error) {
@@ -184,19 +185,16 @@ export default class Application {
             this._rendering = false;
         }), 0);
     }
-    static scheduleRerender() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this._scheduled || !Application._rendered)
-                return;
-            this._rendering = true;
-            this._scheduled = true;
-            setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-                this._scheduled = false;
-                yield Application._rerender();
-                this._rendering = false;
-            }), 0);
-        });
-    }
+    // static async scheduleRerender() {
+    //     if (this._scheduled || !Application._rendered) return;
+    //     this._rendering = true;
+    //     this._scheduled = true;
+    //     setTimeout(async () => {
+    //         this._scheduled = false;
+    //         await Application._rerender();
+    //         this._rendering = false;
+    //     }, 0);
+    // }
     static rerenderForListView() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -227,4 +225,3 @@ export default class Application {
     }
 }
 Application.outsideComponents = [];
-Application.listItems = [];

@@ -1,10 +1,10 @@
 import { AotRuntimeContext, CompilerArtifacts, Cursor, RenderResult } from '@glimmer/interfaces';
 import { MacrosImpl, ProgramCompilationContext } from '@glimmer/opcode-compiler';
-import { UpdatableReference } from '@glimmer/reference';
+import { View } from 'tns-core-modules/ui/core/view/view';
 import FrameElement from './src/dom/native/FrameElement';
+import NativeViewElementNode from './src/dom/native/NativeViewElementNode';
 import PageElement from './src/dom/native/PageElement';
 import DocumentNode from './src/dom/nodes/DocumentNode';
-import ElementNode from './src/dom/nodes/ElementNode';
 import { ResolverDelegate } from './src/glimmer/context';
 import Resolver from './src/glimmer/resolver';
 export { ResolverDelegate } from './src/glimmer/context';
@@ -37,16 +37,12 @@ export default class Application {
     static _rendered: boolean;
     static aotRuntime: AotRuntimeContext;
     static outsideComponents: any;
-    static listItems: any[];
+    static currentPageNode: PageElement;
     static renderedPage: any;
-    static state: UpdatableReference<any>;
-    static _scheduled: boolean;
-    static _rendering: boolean;
     constructor(appFolder: any, components: any, helpers: any);
-    static addListItem(viewNode: any): void;
     static renderPage(name: any, containerElement: any, nextSibling: any, state: any): PageElement;
     static _renderPage(name: any, containerElement: FrameElement, nextSibling: any, compilable: any, data?: {}): PageElement;
-    static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): ElementNode;
+    static _renderComponent(name: string, cursor: Cursor, compilable: number, data: {}): NativeViewElementNode<View>;
     parseTemplates(folder: any): void;
     registerHelpers(helpers: any): void;
     registerState(components: any): Promise<void>;
@@ -55,7 +51,6 @@ export default class Application {
     boot(name: any): Promise<unknown>;
     registerNativeElement(elementName: any, resolver: any, meta?: any): void;
     scheduleRerender(): void;
-    static scheduleRerender(): Promise<void>;
     static rerenderForListView(): Promise<void>;
     static _rerender(): Promise<void>;
 }

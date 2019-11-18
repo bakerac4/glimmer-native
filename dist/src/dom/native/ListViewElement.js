@@ -7,13 +7,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// import GlimmerComponent from '@glimmer/component/dist/types/addon/-private/component';
 import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { ListView } from 'tns-core-modules/ui/list-view';
-import Application, { NativeCapabilities } from '../../..';
+import Application from '../../..';
+import { Compilable } from '../../glimmer/context';
 import { createElement } from '../element-registry';
 import NativeViewElementNode from './NativeViewElementNode';
 import TemplateElement from './TemplateElement';
+function renderItem(wrapper, template, item) {
+    // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
+    // const compiled = component.compilable.compile(Application.context);
+    const cursor = { element: wrapper, nextSibling: null };
+    let componentInstance = Application._renderComponent(null, cursor, template.compiled, Object.assign(Object.assign({}, template.args), { item }));
+    let nativeEl = wrapper.nativeView;
+    nativeEl.__GlimmerComponent__ = componentInstance.component;
+    return nativeEl;
+}
 export default class ListViewElement extends NativeViewElementNode {
     constructor() {
         super('listview', ListView, null);
@@ -24,6 +33,32 @@ export default class ListViewElement extends NativeViewElementNode {
             this.updateListItem(args);
         });
     }
+    // getItemTemplateComponent(name): GlimmerComponent {
+    //     if (this.templates[name]) {
+    //         return this.templates[name];
+    //     } else {
+    //         const templateNode = this.childNodes.find((x) => {
+    //             if (x instanceof TemplateElement && !name) {
+    //                 return true;
+    //             } else if (x instanceof TemplateElement && name) {
+    //                 return x.component && x.component.args.key === name;
+    //             } else {
+    //                 return false;
+    //             }
+    //         }) as TemplateElement;
+    //         if (templateNode) {
+    //             let component = Compilable(templateNode.component.args.src);
+    //             const compiled = component.compile(Application.context);
+    //             this.templates[name] = {
+    //                 compiled,
+    //                 args: templateNode.component.args
+    //             };
+    //             return this.templates[name];
+    //         } else {
+    //             return null;
+    //         }
+    //     }
+    // }
     updateListItem(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let item;
@@ -40,55 +75,31 @@ export default class ListViewElement extends NativeViewElementNode {
                 item = items[args.index];
             }
             if (!args.view || !args.view.__GlimmerComponent__) {
-                let component;
+                let template;
                 if (args.view && args.view.__GlimmerComponentBuilder__) {
-                    // console.debug(`instantiating component in keyed view item at ${args.index}`);
+                    console.info(`instantiating component in keyed view item ${args.view.__GlimmerNativeElement__.id} for item index ${args.index}`);
                     args.view.__GlimmerComponentBuilder__(item);
-                    // (args.view as any).__GlimmerComponent__ = true;
                     args.view.__GlimmerComponentBuilder__ = null; // free the memory
                     return;
                 }
-                // console.debug(`creating default view for item at ${args.index}`);
-                // if (typeof listView.itemTemplateSelector === 'function' && typeof listView.itemTemplates === 'object') {
-                //     let key = listView.itemTemplateSelector(item, args.index, listView.items);
-                //     component = listView.itemTemplates
-                //         .filter((x) => x.key === key)
-                //         .map((x) => (x as GlimmerKeyedTemplate).component)[0];
-                // } else
-                component = listView._itemTemplates
-                    .filter((x) => x.key == 'default')
-                    .map((x) => x.component)[1];
-                if (!component) {
-                    // console.error(`Counldn't determine component to use for item at ${args.index}`);
+                template = listView.itemTemplates.filter((x) => x.key == 'default')[0];
+                if (!template) {
+                    console.info(`Counldn't determine component to use for item at ${args.index}`);
                     return;
                 }
                 let wrapper = createElement('StackLayout');
                 wrapper.setAttribute('id', `default-${this.numberViewsCreated}`);
                 inTransaction(Application.aotRuntime.env, () => {
-                    Application.addListItem({
-                        id: `default-${this.numberViewsCreated}`,
-                        node: wrapper,
-                        template: component.args.src,
-                        item
-                    });
-                    const oldState = Application.state.value();
-                    Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
-                    Application.result.rerender();
-                    this.numberViewsCreated = this.numberViewsCreated + 1;
+                    renderItem(wrapper, { compiled: template.component, args: template.args }, item);
                 });
-                let nativeEl = wrapper.nativeView;
-                nativeEl.__GlimmerComponent__ = true;
-                args.view = nativeEl;
+                args.view = wrapper.nativeView;
             }
             else {
-                // console.debug(`updating view for ${args.index} which is a ${args.view}`);
-                const items = Application.listItems;
-                const listItem = items.find((item) => item.id === args.view.id);
-                listItem.item = item;
                 inTransaction(Application.aotRuntime.env, () => {
-                    const oldState = Application.state.value();
-                    Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
-                    Application.result.rerender();
+                    let componentInstance = args.view.__GlimmerComponent__;
+                    const oldState = componentInstance.state.value();
+                    // Update the state with the new item
+                    componentInstance.update(Object.assign(Object.assign({}, oldState), { item }));
                 });
             }
         });
@@ -103,13 +114,12 @@ export default class ListViewElement extends NativeViewElementNode {
         super.onInsertedChild(childNode, index);
         if (childNode instanceof TemplateElement) {
             let key = childNode.getAttribute('key') || 'default';
-            // console.debug(`Adding template for key ${key}`);
+            console.log(`Adding template for key ${key}`);
             if (!this.nativeView.itemTemplates || typeof this.nativeView.itemTemplates == 'string') {
                 this.nativeView.itemTemplates = [];
             }
             const keyedTemplate = new GlimmerKeyedTemplate(key, childNode);
             this.nativeView.itemTemplates = this.nativeView.itemTemplates.concat([keyedTemplate]);
-            // (this.nativeView as any)._itemTemplatesInternal.push(keyedTemplate);
         }
     }
     onRemovedChild(childNode) {
@@ -129,7 +139,15 @@ export class GlimmerKeyedTemplate {
         this._index = 0;
     }
     get component() {
-        return this._templateEl.component;
+        if (!this._component) {
+            let component = Compilable(this._templateEl.component.args.src);
+            const compiled = component.compile(Application.context);
+            this._component = compiled;
+        }
+        return this._component;
+    }
+    get args() {
+        return this._templateEl.component.args;
     }
     get key() {
         return this._key;
@@ -137,29 +155,14 @@ export class GlimmerKeyedTemplate {
     createView() {
         //create a proxy element to eventually contain our item (once we have one to render)
         //TODO is StackLayout the best choice here?
-        // console.debug(`creating view for key ${this.key}`);
+        console.info(`creating view for key ${this.key}`);
         let wrapper = createElement('StackLayout');
         wrapper.setAttribute('id', `${this.key}-${this._index}`);
         let nativeEl = wrapper.nativeView;
         nativeEl.__GlimmerComponentBuilder__ = (props) => {
             inTransaction(Application.aotRuntime.env, () => {
-                const handle = Application.resolver.registerTemplateOnlyComponent(`list-template-${this.key}`);
-                Application.resolverDelegate.registerComponent(`list-template-${this.key}`, handle, this.component.args.src, NativeCapabilities);
-                let nativeComponentDef = Application.resolver.lookupComponent(`list-template-${this.key}`, null);
-                let manager = Application.resolver.managerFor();
-                const component = manager.create(Application.aotRuntime.env, nativeComponentDef, this.component.args, null, null, null);
-                const item = {
-                    id: `${this.key}-${this._index}`,
-                    node: wrapper,
-                    template: component,
-                    item: props
-                };
-                Application.addListItem(item);
-                const oldState = Application.state.value();
-                Application.state.forceUpdate(Object.assign(Object.assign({}, oldState), { listViewItems: [...Application.listItems] }));
-                Application.result.rerender();
+                renderItem(wrapper, { compiled: this.component, args: this.args }, props);
                 this._index++;
-                nativeEl.__GlimmerComponent__ = item;
             });
         };
         return nativeEl;
