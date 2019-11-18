@@ -67,7 +67,8 @@ export default class Resolver {
     registerTemplateOnlyComponent(name) {
         const handle = this.table.length;
         let manager = this.managerFor();
-        this.table.push({ name: name, ComponentClass: TEMPLATE_ONLY_COMPONENT, manager });
+        const definition = new NativeComponentDefinition(name, manager, TEMPLATE_ONLY_COMPONENT, handle);
+        this.table.push(definition);
         return handle;
     }
     registerHelper(helper) {

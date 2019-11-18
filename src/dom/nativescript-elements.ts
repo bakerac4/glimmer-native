@@ -7,7 +7,6 @@ import { NativeElementPropType } from './native/NativeElementNode';
 import { registerNativeViewElement } from './native/NativeViewElementNode';
 import PageElement from './native/PageElement';
 import RadListViewElement from './native/RadListViewElement';
-import TabsElement from './native/TabsElement';
 import TabViewElement from './native/TabViewElement';
 
 export function registerNativeElements() {
@@ -93,20 +92,30 @@ export function registerNativeElements() {
     registerElement('TabView', () => new TabViewElement());
 
     registerElement('BottomNavigation', () => new BottomNavigationElement());
-    registerElement('Tabs', () => new TabsElement());
-    registerNativeViewElement(
-        'TabStrip',
-        () => require('tns-core-modules/ui/tab-navigation-base/tab-strip').TabStrip,
-        'tabStrip',
-        { items: NativeElementPropType.Array }
-    );
-    registerNativeViewElement(
-        'TabStripItem',
-        () => require('tns-core-modules/ui/tab-navigation-base/tab-strip-item').TabStripItem,
-        'items'
-    );
     registerNativeViewElement(
         'TabContentItem',
         () => require('tns-core-modules/ui/tab-navigation-base/tab-content-item').TabContentItem
     );
+    registerNativeViewElement('Tabs', () => require('tns-core-modules/ui/tabs').Tabs);
+    registerNativeViewElement('TabStrip', () => require('tns-core-modules/ui/tab-navigation-base/tab-strip').TabStrip);
+    registerNativeViewElement(
+        'TabStripItem',
+        () => require('tns-core-modules/ui/tab-navigation-base/tab-strip-item').TabStripItem
+    );
+    // registerElement('Tabs', () => new TabsElement());
+    // registerNativeViewElement(
+    //     'TabStrip',
+    //     () => require('tns-core-modules/ui/tab-navigation-base/tab-strip').TabStrip,
+    //     'tabStrip',
+    //     { items: NativeElementPropType.Array }
+    // );
+    // registerNativeViewElement(
+    //     'TabStripItem',
+    //     () => require('tns-core-modules/ui/tab-navigation-base/tab-strip-item').TabStripItem,
+    //     'items'
+    // );
+    // registerNativeViewElement(
+    //     'TabContentItem',
+    //     () => require('tns-core-modules/ui/tab-navigation-base/tab-content-item').TabContentItem
+    // );
 }

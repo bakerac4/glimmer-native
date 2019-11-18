@@ -15,5 +15,4 @@ export default class RadListViewElement extends NativeViewElementNode<RadListVie
     nativeView: RadListView;
     onInsertedChild(childNode: ViewNode, index: number): void;
     onRemovedChild(childNode: ViewNode): void;
-    renderItem(view: any, template: any, item: any): any;
 }

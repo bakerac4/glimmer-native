@@ -129,12 +129,13 @@ export default class ViewNode {
         }
 
         let index = this.childNodes.indexOf(referenceNode);
-
+        let previousSibling = this.childNodes[index - 1];
         childNode.parentNode = this;
         childNode.nextSibling = referenceNode;
-        childNode.prevSibling = this.childNodes[index - 1];
+        childNode.prevSibling = previousSibling;
 
         referenceNode.prevSibling = childNode;
+        previousSibling.nextSibling = childNode;
         this.childNodes.splice(index, 0, childNode);
 
         this.onInsertedChild(childNode, index);

@@ -207,13 +207,4 @@ export default class RadListViewElement extends NativeViewElementNode {
             }
         }
     }
-    renderItem(view, template, item) {
-        // const component = GlimmerResolverDelegate.lookupComponent(template.args.name);
-        // const compiled = component.compilable.compile(Application.context);
-        const cursor = { element: view, nextSibling: null };
-        let componentInstance = Application._renderComponent(null, cursor, template.compiled, Object.assign(Object.assign({}, template.args), { item }));
-        let nativeEl = view.nativeView;
-        nativeEl.__GlimmerComponent__ = componentInstance;
-        return nativeEl;
-    }
 }

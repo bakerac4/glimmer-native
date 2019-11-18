@@ -13,7 +13,7 @@ export default class BaseTabNavigationElement extends NativeViewElementNode {
                 Promise.resolve().then(() => {
                     let items = (this.nativeView.items || []).concat([item]);
                     this.nativeView.items = [];
-                    this.nativeView.items = items;
+                    this.nativeView.items = this.nativeView.items.concat(items);
                 });
                 return;
             }
