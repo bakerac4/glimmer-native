@@ -151,6 +151,7 @@ export default class ViewNode {
         childNode.prevSibling = null;
         childNode.nextSibling = null;
         this.childNodes = this.childNodes.filter((node) => node !== childNode);
+        childNode.removeChildren();
         this.onRemovedChild(childNode);
     }
     firstElement() {
@@ -160,5 +161,16 @@ export default class ViewNode {
             }
         }
         return null;
+    }
+    clear(node) {
+        while (node.childNodes.length) {
+            this.clear(node.firstChild);
+        }
+        node.parentNode.removeChild(node);
+    }
+    removeChildren() {
+        while (this.childNodes.length) {
+            this.clear(this.firstChild);
+        }
     }
 }

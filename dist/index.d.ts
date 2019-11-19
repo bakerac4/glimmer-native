@@ -51,6 +51,5 @@ export default class Application {
     boot(name: any): Promise<unknown>;
     registerNativeElement(elementName: any, resolver: any, meta?: any): void;
     scheduleRerender(): void;
-    static rerenderForListView(): Promise<void>;
     static _rerender(): Promise<void>;
 }

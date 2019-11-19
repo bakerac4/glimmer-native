@@ -22,7 +22,10 @@ export default class NativeComponentResult {
     }
 
     destroy() {
-        return this.result.destroy();
+        if (this.result) {
+            this.result.destroy();
+            this.result = null;
+        }
     }
 
     toJSON() {

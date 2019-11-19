@@ -12,6 +12,7 @@ import { Context } from '@glimmer/opcode-compiler';
 import { artifacts } from '@glimmer/program';
 import { State } from '@glimmer/reference';
 import { AotRuntime, renderAot, renderSync, TEMPLATE_ONLY_COMPONENT } from '@glimmer/runtime';
+import { inTransaction } from '@glimmer/runtime/dist/modules/es2017/lib/environment';
 import { strip } from '@glimmer/util';
 import { launchEvent, on, run } from 'tns-core-modules/application';
 import { createElement, registerElement } from './src/dom/element-registry';
@@ -82,6 +83,7 @@ export default class Application {
             }
             // (node as PageElement).parentNode = containerElement;
             Application.currentPageNode = node;
+            Application.currentPageNode.listViewItems = [];
             // containerElement.childNodes.push(node);
             node.component = new NativeComponentResult(name, result, state, Application.aotRuntime);
             return node;
@@ -190,36 +192,15 @@ export default class Application {
             this._rendering = false;
         }), 0);
     }
-    // static async scheduleRerender() {
-    //     if (this._scheduled || !Application._rendered) return;
-    //     this._rendering = true;
-    //     this._scheduled = true;
-    //     setTimeout(async () => {
-    //         this._scheduled = false;
-    //         await Application._rerender();
-    //         this._rendering = false;
-    //     }, 0);
-    // }
-    static rerenderForListView() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                Application.aotRuntime.env.begin();
-                yield Application.result.rerender();
-                Application.aotRuntime.env.commit();
-                Application._rendered = true;
-                console.log('Result Re-rendered');
-            }
-            catch (error) {
-                console.log(`Error in re-render: ${error}`);
-            }
-        });
-    }
     static _rerender() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                Application.aotRuntime.env.begin();
-                yield Application.result.rerender();
-                Application.aotRuntime.env.commit();
+                inTransaction(Application.aotRuntime.env, () => {
+                    Application.result.rerender();
+                });
+                // Application.aotRuntime.env.begin();
+                // await Application.result.rerender();
+                // Application.aotRuntime.env.commit();
                 Application._rendered = true;
                 console.log('Result Re-rendered');
             }

@@ -68,7 +68,7 @@ export function navigate(componentName: string, model: any, options: NavigationO
                 element.nativeView.off('navigatedFrom', onNavigatedFrom);
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
-                Application._rerender();
+                // Application._rerender();
             }
         };
 
@@ -82,24 +82,27 @@ export function navigate(componentName: string, model: any, options: NavigationO
                 return element.nativeView;
             }
         });
-
+        let destroyed = false;
         const dispose = element.nativeView.disposeNativeView;
         element.nativeView.disposeNativeView = (...args) => {
-            if (element.listViewItems) {
-                element.listViewItems.forEach((component) => {
-                    component.destroy();
-                });
-                element.listViewItems = [];
-            }
-
-            if (element.component) {
+            if (!destroyed) {
+                destroyed = true;
                 element.component.destroy();
-                element.component = null;
-                element.navigation = null;
+                if (element.listViewItems) {
+                    element.listViewItems.forEach((component) => {
+                        // console.log(`Destroying item for page ${element.navigation.componentName}`);
+                        setTimeout(() => {
+                            component.destroy();
+                        }, 1);
+                    });
+                    element.listViewItems = [];
+                }
+                // element.component = null;
+                // element.navigation = null;
             }
-
             dispose.call(element.nativeView, args);
         };
+        destroyed = false;
     }
 
     return null;

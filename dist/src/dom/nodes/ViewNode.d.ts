@@ -29,4 +29,6 @@ export default class ViewNode {
     appendChild(childNode: ViewNode): void;
     removeChild(childNode: ViewNode): void;
     firstElement(): ViewNode;
+    clear(node: any): void;
+    removeChildren(): void;
 }
