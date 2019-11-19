@@ -68,7 +68,7 @@ export function navigate(componentName: string, model: any, options: NavigationO
                 element.nativeView.off('navigatedFrom', onNavigatedFrom);
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
-                // Application._rerender();
+                Application._rerender();
             }
         };
 
@@ -176,12 +176,26 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
                 const pageToDestroy = element as NativeViewElementNode<Page>;
                 const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
                 const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
-                element.component.destroy();
-                element.component = null;
-                element.navigation = null;
+
+                if (element.listViewItems) {
+                    element.listViewItems.forEach((component) => {
+                        // console.log(`Destroying item for page ${element.navigation.componentName}`);
+                        setTimeout(() => {
+                            component.destroy();
+                        }, 1);
+                    });
+                    element.listViewItems = [];
+                }
+
                 Application.result = glimmerResult;
                 Application.aotRuntime = runtime;
                 Application._rerender();
+                element.component.destroy();
+                element.component = null;
+                element.navigation = null;
+            } catch (errors) {
+                console.log(errors);
+                resolve(result);
             } finally {
                 resolve(result);
             }

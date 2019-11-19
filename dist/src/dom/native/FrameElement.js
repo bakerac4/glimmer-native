@@ -26,20 +26,4 @@ export default class FrameElement extends NativeViewElementNode {
             return;
         // this.nativeView.navigate({ create: () => childNode.nativeView });
     }
-    removeChild(childNode) {
-        if (!childNode) {
-            return;
-        }
-        if (!childNode.parentNode) {
-            return;
-        }
-        if (childNode.parentNode !== this) {
-            return;
-        }
-        childNode.parentNode = null;
-        childNode.prevSibling = null;
-        childNode.nextSibling = null;
-        this.childNodes = this.childNodes.filter((node) => node !== childNode);
-        this.onRemovedChild(childNode);
-    }
 }
