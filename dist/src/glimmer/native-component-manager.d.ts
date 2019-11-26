@@ -8,15 +8,15 @@ export declare const DESTROYED: unique symbol;
 export declare class Bounds {
     private _bounds;
     constructor(__bounds: any);
-    readonly firstNode: Node;
-    readonly lastNode: Node;
+    get firstNode(): Node;
+    get lastNode(): Node;
 }
 export declare class ComponentStateBucket {
     name: string;
     component: any;
     private args;
     constructor(definition: any, args: any);
-    readonly tag: Tag;
+    get tag(): Tag;
     namedArgsSnapshot(): any;
 }
 export default class NativeComponentManager implements VMComponentManager<ComponentStateBucket, ComponentDefinition> {

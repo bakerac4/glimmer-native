@@ -14,11 +14,13 @@ export default class NativeViewElementNode<T extends View> extends NativeElement
     component: any;
     constructor(tagName: string, viewClass: new () => T, setsParentProp?: string, propConfig?: NativeElementPropConfig);
     setStyle(property: string, value: string | number): void;
-    nativeView: T;
+    get nativeView(): T;
+    set nativeView(view: T);
     addEventListener(event: string, handler: EventListener): void;
     removeEventListener(event: string, handler?: EventListener): void;
     onInsertedChild(childNode: ViewNode, index: number): any;
     onRemovedChild(childNode: ViewNode): void;
+    destroyNativeElement(): void;
     dispatchEvent(event: EventData): void;
 }
 export {};

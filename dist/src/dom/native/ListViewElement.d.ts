@@ -10,7 +10,8 @@ export default class ListViewElement extends NativeViewElementNode<ListView> {
     templates: {};
     constructor();
     updateListItem(args: ItemEventData): Promise<void>;
-    nativeView: ListView;
+    get nativeView(): ListView;
+    set nativeView(view: ListView);
     onInsertedChild(childNode: ViewNode, index: number): void;
     onRemovedChild(childNode: ViewNode): void;
 }
@@ -20,10 +21,10 @@ export declare class GlimmerKeyedTemplate {
     _index: number;
     _component: number;
     constructor(key: string, templateEl: TemplateElement);
-    readonly component: number;
-    readonly args: Readonly<{
+    get component(): number;
+    get args(): Readonly<{
         src: string;
     }>;
-    readonly key: string;
+    get key(): string;
     createView(): View;
 }

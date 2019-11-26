@@ -1,4 +1,4 @@
-export declare function Compilable(source: any): import("@glimmer/interfaces").CompilableTemplate<import("@glimmer/interfaces").ProgramSymbolTable>;
+export declare function Compilable(source: any): import("@glimmer/interfaces").CompilableProgram;
 export declare class ResolverDelegate {
     static components: any;
     static helpers: any;
@@ -9,7 +9,7 @@ export declare class ResolverDelegate {
     static lookupComponent(name: any): {
         handle: any;
         source: any;
-        compilable: import("@glimmer/interfaces").CompilableTemplate<import("@glimmer/interfaces").ProgramSymbolTable>;
+        compilable: import("@glimmer/interfaces").CompilableProgram;
         capabilities: any;
     };
     static lookupModifier(name: any): any;

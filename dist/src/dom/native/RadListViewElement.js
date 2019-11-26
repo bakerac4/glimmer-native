@@ -21,6 +21,7 @@ export default class RadListViewElement extends NativeViewElementNode {
         super('radlistview', RadListView, null);
         this.items = [];
         this.templates = {};
+        this.templateNodes = [];
         let nativeView = this.nativeView;
         nativeView.itemViewLoader = (viewType) => this.loadView(viewType);
         this.nativeView.on(RadListView.itemLoadingEvent, (args) => {
@@ -70,7 +71,8 @@ export default class RadListViewElement extends NativeViewElementNode {
     }
     getComponentForView(viewType) {
         const normalizedViewType = viewType.toLowerCase();
-        let templateEl = this.childNodes.find((n) => n.tagName == 'template' && String(n.getAttribute('type')).toLowerCase() == normalizedViewType);
+        let templateEl = null;
+        templateEl = this.childNodes.find((n) => n.tagName == 'template' && String(n.getAttribute('type')).toLowerCase() == normalizedViewType);
         if (!templateEl)
             return null;
         let component = Compilable(templateEl.component.args.src);
@@ -156,7 +158,7 @@ export default class RadListViewElement extends NativeViewElementNode {
     updateInternalItem(args) {
         //groups have index less than zero
         if (args.index < 0) {
-            this.updateViewWithProps(args.view, args.view.bindingContext.category);
+            this.updateViewWithProps(args.view, args.view.bindingContext ? args.view.bindingContext.category : {});
             return;
         }
     }
@@ -197,6 +199,7 @@ export default class RadListViewElement extends NativeViewElementNode {
             const keyedTemplate = new GlimmerKeyedTemplate(key, childNode);
             this.nativeView.itemTemplates = this.nativeView.itemTemplates.concat([keyedTemplate]);
         }
+        return;
     }
     onRemovedChild(childNode) {
         super.onRemovedChild(childNode);

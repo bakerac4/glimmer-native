@@ -110,7 +110,7 @@ export default class Application {
             if (!Application.currentPageNode.listViewItems) {
                 Application.currentPageNode.listViewItems = [];
             }
-            Application.currentPageNode.listViewItems.push(component);
+            Application.currentPageNode.listViewItems.push({ component, cursor });
             // const listViewWrapperElement = node.parentNode;
             // if (!listViewWrapperElement.parentNode) {
             //     Application.currentPageNode.childNodes.push(listViewWrapperElement);
@@ -197,11 +197,8 @@ export default class Application {
             try {
                 inTransaction(Application.aotRuntime.env, () => {
                     Application.result.rerender();
+                    Application._rendered = true;
                 });
-                // Application.aotRuntime.env.begin();
-                // await Application.result.rerender();
-                // Application.aotRuntime.env.commit();
-                Application._rendered = true;
                 console.log('Result Re-rendered');
             }
             catch (error) {

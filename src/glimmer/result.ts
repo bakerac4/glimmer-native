@@ -15,7 +15,7 @@ export default class NativeComponentResult {
     }
 
     async update(state) {
-        this.state.update(state);
+        this.state.forceUpdate(state);
         this.runtime.env.begin();
         await this.result.rerender();
         this.runtime.env.commit();

@@ -6,13 +6,15 @@ export default class RadListViewElement extends NativeViewElementNode<RadListVie
     component: any;
     items: any[];
     templates: {};
+    templateNodes: any[];
     constructor();
     private loadView;
     private getComponentForView;
     private updateViewWithProps;
     private updateInternalItem;
     private updateListItem;
-    nativeView: RadListView;
+    get nativeView(): RadListView;
+    set nativeView(view: RadListView);
     onInsertedChild(childNode: ViewNode, index: number): void;
     onRemovedChild(childNode: ViewNode): void;
 }

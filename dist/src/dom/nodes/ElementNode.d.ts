@@ -7,8 +7,9 @@ export interface IClassList {
 export default class ElementNode extends ViewNode {
     _classList: IClassList;
     constructor(tagName: string);
-    id: string;
-    readonly classList: IClassList;
+    get id(): string;
+    set id(value: string);
+    get classList(): IClassList;
     appendChild(childNode: ViewNode): void;
     insertBefore(childNode: ViewNode, referenceNode: ViewNode): void;
     removeChild(childNode: ViewNode): void;

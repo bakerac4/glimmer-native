@@ -6,5 +6,4 @@ export default class onModifier<NativeModifierInstance> {
     params: any;
     didInsertElement(element: any, _params: unknown[], _hash: Dict<unknown>): void;
     didUpdate(element: any, _params: unknown[], _hash: Dict<unknown>): void;
-    willDestroyElement(element: any): void;
 }

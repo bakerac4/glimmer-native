@@ -20,8 +20,4 @@ export default class onModifier {
         element.removeEventListener(this.eventName, this.callback);
         // console.log(`Modifier Did Update Element: ${_params}`);
     }
-    willDestroyElement(element) {
-        // element.removeEventListeners(this.eventName, this.callback);
-        // console.log(`Modifier Will Destroy Element`);
-    }
 }

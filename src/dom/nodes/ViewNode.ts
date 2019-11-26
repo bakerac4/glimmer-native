@@ -203,6 +203,7 @@ export default class ViewNode {
         this.childNodes = this.childNodes.filter((node) => node !== childNode);
         childNode.removeChildren();
         this.onRemovedChild(childNode);
+        childNode = null;
     }
 
     firstElement() {
@@ -217,6 +218,7 @@ export default class ViewNode {
     clear(node: any) {
         while (node.childNodes.length) {
             this.clear(node.firstChild);
+            // node.firstChild = null;
         }
         node.parentNode.removeChild(node);
     }
@@ -225,5 +227,6 @@ export default class ViewNode {
         while (this.childNodes.length) {
             this.clear(this.firstChild);
         }
+        this.childNodes = null;
     }
 }

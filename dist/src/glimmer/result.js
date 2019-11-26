@@ -16,7 +16,7 @@ export default class NativeComponentResult {
     }
     update(state) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.state.update(state);
+            this.state.forceUpdate(state);
             this.runtime.env.begin();
             yield this.result.rerender();
             this.runtime.env.commit();

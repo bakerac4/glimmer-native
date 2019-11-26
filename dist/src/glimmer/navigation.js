@@ -61,6 +61,9 @@ export function navigate(componentName, model, options) {
         element.nativeView.on('navigatingFrom', function (args) {
             onNavigatedFrom(args, element);
         });
+        if (modalStack.length) {
+            closeModal(null, false);
+        }
         target.navigate(Object.assign(Object.assign({}, options), { create: () => {
                 return element.nativeView;
             } }));
@@ -73,14 +76,15 @@ export function navigate(componentName, model, options) {
                 if (element.listViewItems) {
                     element.listViewItems.forEach((component) => {
                         // console.log(`Destroying item for page ${element.navigation.componentName}`);
-                        setTimeout(() => {
-                            component.destroy();
-                        }, 1);
+                        component.component.destroy();
+                        component.cursor.element.destroyNativeElement();
+                        component.component = null;
+                        component.cursor = null;
                     });
                     element.listViewItems = [];
                 }
-                // element.component = null;
-                // element.navigation = null;
+                element.component = null;
+                element.navigation = null;
             }
             dispose.call(element.nativeView, args);
         };
@@ -134,26 +138,20 @@ export function showModal(componentName, model, options) {
     };
     return new Promise((resolve, reject) => {
         let resolved = false;
-        const closeCallback = (result) => {
+        const closeCallback = (result, rerenderPage) => {
             if (resolved)
                 return;
             resolved = true;
             try {
-                const pageToDestroy = element;
-                const pageToGoBackTo = pageToDestroy.navigation.backTarget;
-                const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
                 if (element.listViewItems) {
                     element.listViewItems.forEach((component) => {
-                        // console.log(`Destroying item for page ${element.navigation.componentName}`);
-                        setTimeout(() => {
-                            component.destroy();
-                        }, 1);
+                        component.component.destroy();
+                        component.cursor.element.destroyNativeElement();
+                        component.component = null;
+                        component.cursor = null;
                     });
                     element.listViewItems = [];
                 }
-                Application.result = glimmerResult;
-                Application.aotRuntime = runtime;
-                Application._rerender();
                 element.component.destroy();
                 element.component = null;
                 element.navigation = null;
@@ -163,6 +161,14 @@ export function showModal(componentName, model, options) {
                 resolve(result);
             }
             finally {
+                if (rerenderPage) {
+                    const pageToDestroy = element;
+                    const pageToGoBackTo = pageToDestroy.navigation.backTarget;
+                    const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
+                    Application.result = glimmerResult;
+                    Application.aotRuntime = runtime;
+                    Application._rerender();
+                }
                 resolve(result);
             }
         };
@@ -170,10 +176,10 @@ export function showModal(componentName, model, options) {
         modalLauncher.showModal(element.nativeView, Object.assign(Object.assign({}, options), { context: model, closeCallback }));
     });
 }
-export function closeModal(returnValue) {
+export function closeModal(returnValue, rerenderPage = true) {
     let modalPageInstanceInfo = modalStack.pop();
     if (modalPageInstanceInfo) {
-        modalPageInstanceInfo.nativeView.closeModal(returnValue);
+        modalPageInstanceInfo.nativeView.closeModal(returnValue, rerenderPage);
     }
 }
 class Navigation {

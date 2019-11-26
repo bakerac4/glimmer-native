@@ -3,5 +3,6 @@ export default class TextNode extends ViewNode {
     text: string;
     constructor(text: string);
     setText(text: string): void;
-    data: string;
+    set data(text: string);
+    get data(): string;
 }

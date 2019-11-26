@@ -16,10 +16,11 @@ export default class ViewNode {
     hasAttribute(name: string): boolean;
     removeAttribute(name: string): void;
     toString(): string;
-    tagName: any;
-    readonly firstChild: ViewNode;
-    readonly lastChild: ViewNode;
-    readonly ownerDocument: DocumentNode;
+    set tagName(name: string);
+    get tagName(): string;
+    get firstChild(): ViewNode;
+    get lastChild(): ViewNode;
+    get ownerDocument(): DocumentNode;
     getAttribute(key: string): any;
     setAttribute(key: string, value: any): void;
     setText(text: string): void;

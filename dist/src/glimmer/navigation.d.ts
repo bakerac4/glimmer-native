@@ -4,6 +4,7 @@ export declare type FrameSpec = Frame | FrameElement | string;
 export interface NavigationOptions {
     props?: any;
     frame?: FrameSpec;
+    closeModals?: boolean;
     animated?: boolean;
     backstackVisible?: boolean;
     clearHistory?: boolean;
@@ -39,7 +40,7 @@ export interface ShowModalOptions {
     stretched: boolean;
 }
 export declare function showModal<T>(componentName: string, model: any, options?: ShowModalOptions): Promise<T>;
-export declare function closeModal(returnValue?: any): void;
+export declare function closeModal(returnValue?: any, rerenderPage?: boolean): void;
 declare class Navigation {
     static instance: Navigation;
     static pages: any;

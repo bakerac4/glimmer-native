@@ -14,7 +14,8 @@ export default class NativeElementNode<T> extends ElementNode {
     propConfig: NativeElementPropConfig;
     _normalizedKeys: Map<string, string>;
     constructor(tagName: string, elementClass: new () => T, setsParentProp?: string, propConfig?: NativeElementPropConfig);
-    nativeElement: T;
+    get nativeElement(): T;
+    set nativeElement(el: T);
     getAttribute(fullkey: string): any;
     onInsertedChild(childNode: ViewNode, index: number): void;
     onRemovedChild(childNode: ViewNode): void;

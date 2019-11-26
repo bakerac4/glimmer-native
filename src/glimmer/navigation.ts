@@ -17,7 +17,7 @@ export type FrameSpec = Frame | FrameElement | string;
 export interface NavigationOptions {
     props?: any;
     frame?: FrameSpec;
-
+    closeModals?: boolean;
     animated?: boolean;
     backstackVisible?: boolean;
     clearHistory?: boolean;
@@ -76,6 +76,10 @@ export function navigate(componentName: string, model: any, options: NavigationO
             onNavigatedFrom(args, element);
         });
 
+        if (modalStack.length) {
+            closeModal(null, false);
+        }
+
         target.navigate({
             ...options,
             create: () => {
@@ -91,14 +95,15 @@ export function navigate(componentName: string, model: any, options: NavigationO
                 if (element.listViewItems) {
                     element.listViewItems.forEach((component) => {
                         // console.log(`Destroying item for page ${element.navigation.componentName}`);
-                        setTimeout(() => {
-                            component.destroy();
-                        }, 1);
+                        component.component.destroy();
+                        component.cursor.element.destroyNativeElement();
+                        component.component = null;
+                        component.cursor = null;
                     });
                     element.listViewItems = [];
                 }
-                // element.component = null;
-                // element.navigation = null;
+                element.component = null;
+                element.navigation = null;
             }
             dispose.call(element.nativeView, args);
         };
@@ -169,27 +174,20 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
 
     return new Promise((resolve, reject) => {
         let resolved = false;
-        const closeCallback = (result: T) => {
+        const closeCallback = (result: any, rerenderPage) => {
             if (resolved) return;
             resolved = true;
             try {
-                const pageToDestroy = element as NativeViewElementNode<Page>;
-                const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
-                const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
-
                 if (element.listViewItems) {
                     element.listViewItems.forEach((component) => {
-                        // console.log(`Destroying item for page ${element.navigation.componentName}`);
-                        setTimeout(() => {
-                            component.destroy();
-                        }, 1);
+                        component.component.destroy();
+                        component.cursor.element.destroyNativeElement();
+                        component.component = null;
+                        component.cursor = null;
                     });
                     element.listViewItems = [];
                 }
 
-                Application.result = glimmerResult;
-                Application.aotRuntime = runtime;
-                Application._rerender();
                 element.component.destroy();
                 element.component = null;
                 element.navigation = null;
@@ -197,6 +195,15 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
                 console.log(errors);
                 resolve(result);
             } finally {
+                if (rerenderPage) {
+                    const pageToDestroy = element as NativeViewElementNode<Page>;
+                    const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
+                    const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
+                    Application.result = glimmerResult;
+                    Application.aotRuntime = runtime;
+                    Application._rerender();
+                }
+
                 resolve(result);
             }
         };
@@ -205,10 +212,10 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
     });
 }
 
-export function closeModal(returnValue?): void {
+export function closeModal(returnValue?, rerenderPage = true): void {
     let modalPageInstanceInfo = modalStack.pop();
     if (modalPageInstanceInfo) {
-        modalPageInstanceInfo.nativeView.closeModal(returnValue);
+        modalPageInstanceInfo.nativeView.closeModal(returnValue, rerenderPage);
     }
 }
 

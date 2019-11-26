@@ -221,6 +221,16 @@ export default class NativeViewElementNode extends NativeElementNode {
         childNode.__nativeView = null;
         childNode._nativeElement = null;
     }
+    destroyNativeElement() {
+        this.childNodes = null;
+        this.nextSibling = null;
+        this.prevSibling = null;
+        this.parentNode = null;
+        this.nativeView.disposeNativeView();
+        this.__GlimmerNativeElement = null;
+        this.__nativeView = null;
+        this._nativeElement = null;
+    }
     dispatchEvent(event) {
         if (this.nativeView) {
             //nativescript uses the EventName while dom uses Type
