@@ -195,7 +195,7 @@ export function showModal<T>(componentName: string, model: any, options?: ShowMo
                 console.log(errors);
                 resolve(result);
             } finally {
-                if (rerenderPage) {
+                if (rerenderPage !== false) {
                     const pageToDestroy = element as NativeViewElementNode<Page>;
                     const pageToGoBackTo = (pageToDestroy as PageElement).navigation.backTarget;
                     const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;

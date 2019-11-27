@@ -161,7 +161,7 @@ export function showModal(componentName, model, options) {
                 resolve(result);
             }
             finally {
-                if (rerenderPage) {
+                if (rerenderPage !== false) {
                     const pageToDestroy = element;
                     const pageToGoBackTo = pageToDestroy.navigation.backTarget;
                     const { glimmerResult, runtime } = pageToGoBackTo.__GlimmerNativeElement__.navigation;
