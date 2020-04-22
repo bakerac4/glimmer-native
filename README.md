@@ -1,5 +1,7 @@
 # Glimmer-Native
 
+**Hi there, Unfortunately Glimmer Native development has ceased. There were memory issues as well as issues with lists that I was unable to overcome. I would recommend not using this for any projects as of now. If anyone from the core team wants to help out directly, I am still interested in this**
+
 Have you ever wanted to use Ember/Glimmer to create a native mobile app? Well now you can!
 Keep in mind Glimmer Native is currently in an **ALPHA** state. **Use in production at your own risk**
 
